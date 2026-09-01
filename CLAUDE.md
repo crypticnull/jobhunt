@@ -6,7 +6,7 @@ For a fresh Claude Code project. Most of this belongs in `CLAUDE.md` at the repo
 
 ## Who this is for
 
-Matt Rodenbeck. Senior motion designer who also ships software. Currently at POWER Home Remodeling on $91,000, targeting remote roles at $130,000–170,000, relocating to the Pacific Northwest by June 2027.
+Matt Rodenbeck. Senior motion designer who also ships software. Targeting senior remote roles, relocating to the Pacific Northwest by June 2027. Compensation figures and negotiation posture live in `data/local/brief.md`, which never touches git.
 
 He is technical. He built a commercial After Effects CEP panel driven by a local llama.cpp model across roughly 77 tools, with a 533-step self-test and a VRAM tier system. Do not explain basics. Do not over-scaffold.
 
@@ -53,7 +53,7 @@ The target list is the asset, not the scraper. He already needs one for outreach
 **Filtering.** Encode the search protocol as scoring rather than binary rules, so borderline postings surface for judgment rather than being silently dropped:
 
 - Genuinely remote-first, not "remote for now" or "hybrid, 3 days"
-- Posted compensation, flagged when absent, scored against the $130,000–170,000 target
+- Posted compensation, flagged when absent, scored against the target band in `data/local/brief.md`
 - Title and description signal for the intersection. Weight terms like creative technologist, technical artist, pipeline, tooling, automation, generative, ComfyUI, Houdini, TouchDesigner, real-time
 - Penalize pure production roles, agency hour-shops, and anything implying long-form grind work
 - Seniority filter, exclude junior and mid
