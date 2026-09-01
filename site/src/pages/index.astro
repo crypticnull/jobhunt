@@ -1,0 +1,117 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import Still from "../components/Still.astro";
+import { site } from "../site.config.mjs";
+
+const byOrder = (a: { data: { order: number } }, b: { data: { order: number } }) => a.data.order - b.data.order;
+
+const pipelines = (await getCollection("pipelines")).sort(byOrder);
+const proof = (await getCollection("proof")).sort(byOrder);
+const projects = (await getCollection("projects", (p) => p.data.featured && !p.data.archive)).sort(byOrder);
+
+// A proof story that links projects is about the motion work and introduces
+// that section. Everything else is a build. A build links to its pipeline page
+// when one exists, else to its repo.
+const pipelineFor = new Map(pipelines.map((p) => [p.data.linked_proof, p]));
+const builds = proof
+  .filter((p) => p.data.linked_projects.length === 0)
+  .map((p) => {
+    const pipe = pipelineFor.get(p.data.id);
+    return {
+      id: p.data.id,
+      title: p.data.title,
+      summary: p.data.summary,
+      href: pipe ? `/builds/${pipe.id}` : (p.data.repo ?? null),
+      meta: pipe ? [pipe.data.kind, pipe.data.nodes ? `${pipe.data.nodes} nodes` : null].filter(Boolean).join(" · ") : p.data.repo ? "public repo" : "closed source",
+    };
+  });
+const workIntro = proof.find((p) => p.data.linked_projects.length > 0);
+---
+
+<Layout>
+  <section class="hero">
+    <h1>{site.hero}</h1>
+    <p class="sub">{site.sub}</p>
+  </section>
+
+  <section id="builds">
+    <h2>What I build</h2>
+    <p class="lede">Tools and pipelines that run on my own hardware, built because the work needed them.</p>
+    <ul class="cards">
+      {
+        builds.map((b) => (
+          <li>
+            {b.href ? (
+              <a class="card" href={b.href}>
+                <h3>{b.title}</h3>
+                <p>{b.summary}</p>
+                <span class="meta">{b.meta}</span>
+              </a>
+            ) : (
+              <div class="card">
+                <h3>{b.title}</h3>
+                <p>{b.summary}</p>
+                <span class="meta">{b.meta}</span>
+              </div>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section id="work">
+    <h2>Selected work</h2>
+    {workIntro && <p class="lede">{workIntro.data.summary}</p>}
+    <ul class="cards">
+      {
+        projects.map((p) => (
+          <li>
+            <a class="card work" href={`/work/${p.id}`}>
+              <Still still={p.data.hero} sizes="(min-width: 60rem) 22rem, 100vw" />
+              <div class="body">
+                <h3>{p.data.title}</h3>
+                <p>{p.data.summary}</p>
+                <span class="meta">
+                  {p.data.year}
+                  {p.data.franchise ? ` · ${p.data.franchise}` : ""}
+                  {p.data.turnaround ? ` · ${p.data.turnaround}` : ""}
+                </span>
+              </div>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section id="writing">
+    <h2>Writing</h2>
+    <p class="lede">Technical posts, starting with how the local pipeline works and why the job search polls ATS endpoints instead of scraping boards. The first ones land with the launch.</p>
+  </section>
+
+  <section id="about">
+    <h2>About</h2>
+    <p>
+      I'm a senior motion designer who ships software. The motion side is production 3D, brand systems and event work
+      carried across years. The software side is a commercial After Effects panel driven by a local language model, a
+      hand-built generative video pipeline, and the tools that get all of it into a real workflow. I run it on my own
+      workstation, and I care about asset management and metadata because the pipeline doesn't end at the render.
+    </p>
+    <p>{site.location}</p>
+  </section>
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <p>
+      <a href={site.github}>GitHub</a>
+      {site.email && (
+        <>
+          <span aria-hidden="true"> · </span>
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+        </>
+      )}
+    </p>
+  </section>
+</Layout>

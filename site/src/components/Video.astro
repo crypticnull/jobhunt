@@ -1,0 +1,40 @@
+---
+// Host-agnostic player. provider none renders the poster still only. Any real
+// provider renders a native video element with a local poster, preload none,
+// inside a box whose aspect ratio is fixed from the record, so nothing shifts
+// when the player or the stream arrives.
+import Still from "./Still.astro";
+
+interface Props {
+  video: {
+    provider: string;
+    mp4: string[];
+    hls?: string | null;
+    poster?: string | null;
+    width: number;
+    height: number;
+  };
+  poster: { src: ImageMetadata; width: number; height: number; alt: string };
+  title: string;
+}
+
+const { video, poster, title } = Astro.props;
+const playable = video.provider !== "none" && (video.mp4.length > 0 || video.hls);
+const ratio = `${video.width} / ${video.height}`;
+---
+
+<figure class="frame" style={`aspect-ratio: ${ratio}`}>
+  {
+    playable ? (
+      <video controls playsinline preload="none" width={video.width} height={video.height} poster={poster.src.src} aria-label={title}>
+        {video.mp4.map((src) => (
+          <source src={src} type="video/mp4" />
+        ))}
+        {video.hls && <source src={video.hls} type="application/vnd.apple.mpegurl" />}
+        <Still still={poster} />
+      </video>
+    ) : (
+      <Still still={poster} loading="eager" />
+    )
+  }
+</figure>
