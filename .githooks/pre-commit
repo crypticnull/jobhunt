@@ -1,0 +1,10 @@
+#!/bin/sh
+# Refuse commits that stage the private half of the search (ADR-0002).
+bad=$(git diff --cached --name-only | grep -E '(^|/)data/local/|\.db$')
+if [ -n "$bad" ]; then
+  echo "pre-commit: refusing to commit private files:" >&2
+  echo "$bad" >&2
+  echo "pre-commit: data/local/ and .db files never touch git (ADR-0002)." >&2
+  exit 1
+fi
+exit 0

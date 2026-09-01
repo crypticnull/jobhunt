@@ -285,7 +285,7 @@ Calendar anchors: first digest by week four (late September 2026), site skeleton
 
 The capture happens as the work happens, with hard caps so it survives a full-time job.
 
-**Commits.** Package-prefixed subjects (`scraper:`, `letters:`, `site:`, `pipeline:`, `tools:`, `data:`, `docs:`), imperative, body says why when the diff cannot, one working change per commit, ADR number cited when a commit executes a decision. Milestones get tags: `v0.1-scraper-live`, `v0.2-first-digest`, `v0.3-first-application`, `v1.0-site`. No squashing, the graph itself shows steady evenings-and-weekends cadence. The Claude co-author trailers stay in, recorded as ADR-0003, because directing agents well is a skill he is selling to exactly the AI companies on the target list, and the honest history proves it.
+**Commits.** Package-prefixed subjects (`scraper:`, `letters:`, `site:`, `pipeline:`, `tools:`, `data:`, `docs:`, and `repo:` for cross-cutting root files), imperative, body says why when the diff cannot, one working change per commit, ADR number cited when a commit executes a decision. Milestones get tags: `v0.1-scraper-live`, `v0.2-first-digest`, `v0.3-first-application`, `v1.0-site`. No squashing, the graph itself shows steady evenings-and-weekends cadence. The Claude co-author trailers stay in, recorded as ADR-0003, because directing agents well is a skill he is selling to exactly the AI companies on the target list, and the honest history proves it.
 
 **Decision records.** Every sign-off choice becomes a numbered file in `docs/decisions` the day it is made: context, options, the call, the tradeoff accepted, 25 lines maximum. The privacy split ADR is the showcase piece, since it demonstrates judgment about tradeoffs rather than tool choice.
 
