@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "posting.schema.json",
+  "title": "Normalized posting",
+  "description": "What every adapter emits and scraper/store.py consumes. Mirrors scraper/posting.py.",
+  "type": "object",
+  "required": ["source", "company_slug", "title", "url", "remote"],
+  "additionalProperties": false,
+  "properties": {
+    "source": { "type": "string", "enum": ["greenhouse", "lever", "ashby", "workable", "smartrecruiters", "recruitee", "rss", "manual"] },
+    "source_id": { "type": ["string", "null"], "description": "The ATS's own id when it gives one; the fingerprint is source:source_id" },
+    "company_slug": { "type": "string" },
+    "title": { "type": "string" },
+    "url": { "type": "string" },
+    "location": { "type": ["string", "null"] },
+    "remote": { "type": "string", "enum": ["remote", "hybrid", "onsite", "unclear"] },
+    "comp_min": { "type": ["integer", "null"], "description": "Whole currency units per year, null when not published" },
+    "comp_max": { "type": ["integer", "null"] },
+    "comp_currency": { "type": ["string", "null"] },
+    "description": { "type": ["string", "null"], "description": "Plain text" },
+    "posted_at": { "type": ["string", "null"], "description": "ISO 8601 when the ATS gives a date" }
+  }
+}
