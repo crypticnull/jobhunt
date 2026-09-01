@@ -346,3 +346,23 @@ The capture happens as the work happens, with hard caps so it survives a full-ti
 **Session one, an evening.** The sanitization pass goes first, because the repo is public right now: move the brief's salary figures and negotiation posture from CLAUDE.md into `data/local/brief.md`, commit, and make the history call, scrub the old figures or accept them, in the same sitting. Then fold `claude/jobhunt-claude-md-k8vpjj` into main and delete it. Create the directory skeleton with package README stubs. Commit `.gitignore` covering `data/local/` and the pre-commit guard, then CONTRIBUTING.md, `scripts/log.sh`, `scripts/new-adr.sh`, and ADRs 0001 through 0003 for the ones Matt signs off tonight: the ADR practice itself, the privacy split, and agent authorship. Stand up the CI stub. Close with the first log entry. The repo now captures its own story from commit one.
 
 **Session two, the first weekend.** Start with the ten-minute endpoint smoke test, two known board slugs each against Greenhouse, Lever and Ashby, since the endpoint research could not be live-probed during planning and any mismatch is a docs-drift note, never a design problem. Then build `scraper add` with ATS detection and `companies check`, and spend the rest of the weekend where the value is: seeding `data/local/companies.json` with the first 30 targets from the existing target-company research across all four categories, committing the redacted example, and writing the first cut of the contract table in `data/README.md`. By Sunday night the shared asset exists, both consumers have their source of truth, and milestone 3 has everything it needs to put real postings in SQLite the following weekend.
+## 8. Status, 2026-09-01
+
+Every milestone that could be built without assets, credentials or Matt's voice is built, tested and merged. The clean-clone check passes: `make demo` in a quarter of a second, 138 tests, validation and both lint profiles green.
+
+| Milestone | State | What remains, and whose |
+|---|---|---|
+| 1 Foundation | done | |
+| 2 Target list v1 | tooling done | Matt: the live endpoint smoke test, the first 30 companies through `scraper add`, `data/local/scoring.local.json` with the band |
+| 3 Scraper walking skeleton | done | Matt: first real poll on the workstation |
+| 4 Scoring and digest | done | Matt: install the schedule, read the first digest |
+| 5 Voice lint | done | |
+| 6 Site skeleton | done | Matt: domain, Cloudflare account, the two secrets and `CLOUDFLARE_DEPLOY=true` for the first deploy |
+| 7 Letters live | tooling done | Matt: rewrite the ten blocks in his own words, the first brief, the first sent application |
+| 8 Loop on schedule | done | Matt: two weeks of the loop running unattended |
+| 9 Adapter breadth and rot watch | done | |
+| 10 Full work and video | tooling done | Matt: the asset drop for ten POWER projects plus the game, then `ingest`, `encode`, `upload`, `publish` |
+| 11 Writing and launch | one post live, case study drafted | Matt: the pipeline post needs the graph exports and details only he has, read the case study draft, launch on the domain |
+| 12 Sibling repos and case study close | demo, tour and standard done | Matt: whether the sibling READMEs get the cross-links and the opening-line pass, and when the case study post goes live |
+
+The decisions table above is signed off in full. Nothing here sends anything, deploys anything, or spends anything until Matt does.
