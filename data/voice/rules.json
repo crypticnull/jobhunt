@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "max_sentence_words": 40,
+  "corporate_vocab": [
+    "leverage", "leverages", "leveraged", "leveraging", "delve", "delves", "delving", "circle back",
+    "streamline", "streamlines", "streamlined", "streamlining", "robust", "deep dive", "deep-dive",
+    "align on", "aligned on", "utilize", "utilizes", "utilized", "utilizing", "synergy", "synergies",
+    "touch base", "move the needle", "best-in-class", "cutting-edge", "world-class", "low-hanging fruit",
+    "value-add", "impactful", "learnings", "ideate", "holistic", "empower", "seamless", "seamlessly"
+  ],
+  "signoffs": [
+    "sincerely", "sincerely yours", "yours sincerely", "best regards", "kind regards", "warm regards",
+    "regards", "yours truly", "respectfully", "respectfully yours", "yours faithfully", "with appreciation"
+  ],
+  "apply_openers": [
+    "i am writing to apply", "i'm writing to apply", "i am writing to express", "i'm writing to express",
+    "i am excited to apply", "i'm excited to apply", "i would like to apply", "i'd like to apply",
+    "please consider my application", "i am applying for", "i'm applying for"
+  ],
+  "connectors": ["however", "nevertheless", "nonetheless", "furthermore", "moreover", "additionally", "therefore", "thus", "hence", "whereas"],
+  "contractions": {
+    "I am": "I'm", "I have": "I've", "I will": "I'll", "I would": "I'd", "it is": "it's", "that is": "that's",
+    "there is": "there's", "here is": "here's", "what is": "what's", "who is": "who's",
+    "do not": "don't", "does not": "doesn't", "did not": "didn't", "is not": "isn't", "are not": "aren't",
+    "was not": "wasn't", "were not": "weren't", "have not": "haven't", "has not": "hasn't", "had not": "hadn't",
+    "would not": "wouldn't", "could not": "couldn't", "should not": "shouldn't", "cannot": "can't", "will not": "won't",
+    "you are": "you're", "we are": "we're", "they are": "they're", "we have": "we've", "you have": "you've",
+    "they have": "they've", "let us": "let's", "it will": "it'll", "we will": "we'll", "you will": "you'll"
+  },
+  "profiles": {
+    "letter": {
+      "description": "Everything written in his voice: letters, proof stories, site copy that speaks as him.",
+      "errors": ["em-dash", "semicolon", "parentheses", "ellipsis", "bullet-list", "corporate-vocab", "not-x-but-y", "formal-signoff", "apply-opener"],
+      "warnings": ["contractions", "sentence-length", "connector"],
+      "strip_frontmatter": true,
+      "paths": ["letters/blocks", "data/proof"],
+      "include": ["*.md"],
+      "exclude": []
+    },
+    "repo": {
+      "description": "Documentation and site source. Only the strongest signals, so docs keep their parentheses.",
+      "errors": ["em-dash", "corporate-vocab"],
+      "warnings": [],
+      "strip_frontmatter": false,
+      "paths": ["."],
+      "include": ["*.md", "*.astro", "site.config.mjs"],
+      "exclude": ["CLAUDE.md", ".git", "node_modules", "data/local", "site/dist", "site/.astro", ".lighthouseci", "letters/tests/samples"]
+    }
+  }
+}
