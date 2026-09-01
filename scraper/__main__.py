@@ -1,6 +1,7 @@
 """python -m scraper <command>
 
   add URL        detect the ATS behind a careers URL and add the company
+  add-posting    a posting from a URL or a file, for referrals and unpolled companies
   check          probe every company's endpoint, report dead ones
   stale          companies not reviewed in N days
   poll           fetch every pollable company into postings.db, scoring on the way in
@@ -14,8 +15,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from . import adapters, companies, digest
-from .poll import poll
+from . import adapters, companies, digest, manual
+from .poll import enrich, poll
 from .score import load_rules, score
 from .store import STATES, Store
 
@@ -40,6 +41,27 @@ def cmd_add(args):
     companies.save(args.companies, data)
     where = f"{kind}/{board}" if board else kind
     print(f"added {slug}: {where}" + (f", {count} postings live" if count is not None else ""))
+    return 0
+
+
+def cmd_add_posting(args):
+    data = companies.load(args.companies)
+    if not any(c["slug"] == args.company for c in data["companies"]):
+        print(f"{args.company} is not on the list. Add the company first with: python -m scraper add <careers-url> --category ...", file=sys.stderr)
+        return 2
+    text, url = manual.read_source(args.src)
+    p = manual.from_text(args.company, args.title, text, url=args.url or url, location=args.location or "", remote=args.remote)
+    enrich(p)
+    rules = load_rules()
+    store = Store(args.db)
+    try:
+        pid, is_new = store.upsert(p)
+        store.set_score(pid, score(store.get(pid), rules))
+        row = store.get(pid)
+    finally:
+        store.close()
+    print(f"{'added' if is_new else 'updated'} posting {pid}: {row['title']} at {args.company}, {row['remote_class']}, score {round(row['score'])}")
+    print(f"next: python -m letters brief {pid}")
     return 0
 
 
@@ -157,6 +179,15 @@ def main(argv=None):
     a.add_argument("--kind", choices=companies.KINDS, help="skip detection and set the ATS kind")
     a.add_argument("--board", help="board slug when --kind is given")
     a.set_defaults(fn=cmd_add)
+
+    ap_ = sub.add_parser("add-posting", help="a posting from a URL or a file")
+    ap_.add_argument("src", help="a URL to fetch, or a text file")
+    ap_.add_argument("--company", required=True, help="slug on the company list")
+    ap_.add_argument("--title", required=True)
+    ap_.add_argument("--url", help="the posting URL when src is a file")
+    ap_.add_argument("--location", default="")
+    ap_.add_argument("--remote", choices=("remote", "hybrid", "onsite", "unclear"))
+    ap_.set_defaults(fn=cmd_add_posting)
 
     c = sub.add_parser("check", help="probe every company's endpoint")
     c.set_defaults(fn=cmd_check)
