@@ -5,7 +5,8 @@
       "url": [
         "http://localhost/index.html",
         "http://localhost/work/quest-2025.html",
-        "http://localhost/builds/h3-i2v.html"
+        "http://localhost/builds/h3-i2v.html",
+        "http://localhost/writing/polling-ats-endpoints.html"
       ],
       "numberOfRuns": 3
     },

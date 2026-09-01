@@ -1,0 +1,22 @@
+---
+slug: this-repo-is-the-case-study
+title: This repo is the case study
+date: "2026-09-01"
+summary: A job search toolkit built in public, by directing coding agents through a plan that was itself designed, judged and adversarially reviewed by agents, with the history left intact so the process is the portfolio piece.
+draft: true
+linked_pipelines: []
+---
+
+I needed three things for a job search, a portfolio site, a poller that finds the postings worth an evening, and a letter generator that sounds like me. I could've built them quietly and shown the results. Instead I built them in a public repo with the history left alone, because the way I work is the thing I'm trying to sell, and a commit log is harder to fake than a case study written afterward.
+
+The plan came first, and I didn't write it in one pass. Four independent design passes each planned the whole build from a different angle, data contracts, the case study itself, sequencing and risk, the asset pipeline. Three fact checks ran alongside them, one on which applicant tracking systems publish public endpoints, one on what video hosting costs at this scale, one on whether Astro or plain HTML was the honest call. Three judges scored the four plans, a synthesis merged the winner with everything the judges refused to lose, and a second panel then tried to break the result. It found thirty one things, including a sequencing bug on the critical path and the fact that the repo was public with my salary in it. Both got fixed before the plan was committed. That plan is in the repo, and so is every decision it forced, twenty five lines each, written the day it was made.
+
+Then the milestones, one pull request each, every commit prefixed with the package it touches and carrying the reason in the body. The privacy split went first because git history is forever and the intended readers of this repo include hiring managers at the companies on my list. The scraper went before the site because applications compound and a portfolio doesn't. The voice lint went before the letter generator because nothing in my voice ships without passing it. The lint caught my own prose on its first run, a construction I'd banned and a sentence too long for the rhythm I asked for. It caught three of the ten letter blocks the same way. That's the point of having it.
+
+Things broke, and they're in the log rather than smoothed over. The first CI run of the site scored a performance grade of 0.82 once and 100 once on the same commit, because a cold runner takes forty seconds on its first Lighthouse pass. The build now measures three runs and asserts the median instead of loosening the budget. A new hero image beside the old placeholder let the placeholder win until hero and poster became singletons. The Workable adapter counted a field that doesn't exist for two milestones before a fixture exposed it. A lead story for the letters got picked alphabetically, so the dance toolkit beat the video pipeline for AI video companies until the category default took precedence. Each of those is a commit with the failing case pinned in a test.
+
+The tooling underneath is deliberately boring. Standard-library Python with no runtime dependencies for everything that runs unattended, because a dependency is a thing that rots while you aren't looking. One pinned static site framework. SQLite with forward-only migrations and a status log that never overwrites. A voice lint that's a hundred lines of regex and a config file rather than a model, because the check has to be deterministic to be a gate. All of it runs offline against recorded fixtures, and one command runs the whole loop in under a second, so anyone reading the repo can verify what the README claims without credentials or network.
+
+I directed coding agents through most of this and the commits say so. I don't think that's a confession. The companies I want to work for build these tools, and the skill they're short on is people who can judge the output, whether that's a frame out of a diffusion model or a pull request out of an agent. Every session in the log ends with what shipped, what broke and what got decided, and every one of those entries was the re-entry point for the next session. The process that built this is the same process that runs the search, and both of them are on schedule instead of on willpower.
+
+The site carries the motion work, and it's real work I'm proud of. But if you filed me as a motion designer in the first four seconds, this repo is the argument that you filed me wrong.

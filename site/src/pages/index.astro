@@ -9,6 +9,7 @@ const byOrder = (a: { data: { order: number } }, b: { data: { order: number } })
 const pipelines = (await getCollection("pipelines")).sort(byOrder);
 const proof = (await getCollection("proof")).sort(byOrder);
 const projects = (await getCollection("projects", (p) => p.data.featured && !p.data.archive)).sort(byOrder);
+const writing = (await getCollection("writing", (w) => !w.data.draft)).sort((a, b) => b.data.date.localeCompare(a.data.date));
 
 // A proof story that links projects is about the motion work and introduces
 // that section. Everything else is a build. A build links to its pipeline page
@@ -88,7 +89,22 @@ const workIntro = proof.find((p) => p.data.linked_projects.length > 0);
 
   <section id="writing">
     <h2>Writing</h2>
-    <p class="lede">Technical posts, starting with how the local pipeline works and why the job search polls ATS endpoints instead of scraping boards. The first ones land with the launch.</p>
+    <p class="lede">Technical posts. How the local pipeline works, why the job search polls ATS endpoints instead of scraping boards, and what this repo is as a case study.</p>
+    {
+      writing.length > 0 && (
+        <ul class="cards">
+          {writing.map((post) => (
+            <li>
+              <a class="card" href={`/writing/${post.id}`}>
+                <h3>{post.data.title}</h3>
+                <p>{post.data.summary}</p>
+                <span class="meta">{post.data.date}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
   </section>
 
   <section id="about">

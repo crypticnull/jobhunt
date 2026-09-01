@@ -33,7 +33,7 @@
       "errors": ["em-dash", "semicolon", "parentheses", "ellipsis", "bullet-list", "corporate-vocab", "not-x-but-y", "formal-signoff", "apply-opener"],
       "warnings": ["contractions", "sentence-length", "connector"],
       "strip_frontmatter": true,
-      "paths": ["letters/blocks", "data/proof"],
+      "paths": ["letters/blocks", "data/proof", "data/writing"],
       "include": ["*.md"],
       "exclude": []
     },
