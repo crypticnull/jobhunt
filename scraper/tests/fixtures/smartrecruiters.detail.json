@@ -1,0 +1,13 @@
+{
+  "id": "743999900000001",
+  "name": "Technical Artist, Real-Time",
+  "applyUrl": "https://jobs.smartrecruiters.com/ExampleSR/743999900000001",
+  "jobAd": {
+    "sections": {
+      "companyDescription": { "title": "Company Description", "text": "<p>A studio.</p>" },
+      "jobDescription": { "title": "Job Description", "text": "<p>Build real-time pipeline tooling in Unreal and Houdini.</p>" },
+      "qualifications": { "title": "Qualifications", "text": "<ul><li>Python</li></ul>" },
+      "additionalInformation": { "title": "Additional Information", "text": "<p>Salary range $150,000 - $185,000.</p>" }
+    }
+  }
+}

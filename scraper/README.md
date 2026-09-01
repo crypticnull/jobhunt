@@ -2,8 +2,10 @@
 
 A company-list-driven poller against public ATS endpoints. Python 3.12,
 standard library only (ADR-0004). It never scrapes job boards; it asks
-Greenhouse, Lever and Ashby for the JSON they publish for each company on
-the target list, and the target list is the asset.
+Greenhouse, Lever, Ashby, Workable, SmartRecruiters and Recruitee for the
+JSON they publish for each company on the target list, reads a careers RSS
+or Atom feed where that is all a company offers, and the target list is
+the asset.
 
 ## Commands
 
@@ -15,8 +17,15 @@ python -m scraper poll               # fetch every pollable company, score on th
 python -m scraper digest [--stdout]  # this week's digest to data/local/digests/<week>.md
 python -m scraper score              # rescore every open posting after tuning scoring.json
 python -m scraper mark ID STATE      # new | interested | applied | rejected | ignored | interview | offer
-python -m scraper stats
+python -m scraper stats [--markdown --since 2026-09-01]   # the monthly snapshot block
+python -m scraper add-posting SRC --company SLUG --title T  # a referral, from a URL or a file
+python -m scraper discover           # companies the discovery feeds surface, never written
+python -m scraper backup --to DIR    # postings.db off the disk, newest fourteen kept
+python -m scraper export --to DIR    # status history as JSON, one file per month
+python -m scraper fixture KIND BOARD # refresh a test fixture from the live endpoint
 ```
+
+`docs/process.md` is the schedule these run on.
 
 `add` works out the ATS from the careers URL, or from the board links
 embedded in the page, and confirms the guess against the live endpoint
@@ -48,7 +57,7 @@ Sunday digest in Task Scheduler.
 | File | Job |
 | --- | --- |
 | `http.py` | the only network access, stubbed in tests |
-| `adapters/` | one module per ATS: `endpoint(board)` and `parse(payload)` to normalized postings; detection and probing in `__init__` |
+| `adapters/` | one module per source: `endpoint(board)` and `parse(payload)` to normalized postings, plus `fetch()` where a source needs more than one call; detection and probing in `__init__` |
 | `posting.py` | the normalized posting, mirrored by `data/schema/posting.schema.json` |
 | `companies.py` | the target list: load, save, add, check, stale |
 | `store.py` | the only writer of postings.db, forward-only migrations, status as a log |
@@ -56,12 +65,17 @@ Sunday digest in Task Scheduler.
 | `salary.py` | the regex that pulls a range out of description text |
 | `score.py` | the rules, pure functions over a posting row and `scoring.json` |
 | `digest.py` | the weekly markdown |
+| `manual.py` | a posting from a URL or a file |
+| `discover.py` | Remotive and We Work Remotely as suggestion feeds |
+| `maintain.py` | backup, export, fixture refresh |
 
 Deduplication: the fingerprint is `source:id` when the ATS gives an id, else
 a hash of company plus normalized title. A posting that vanishes from a
 successful poll is closed, never deleted, and reopens if it comes back.
-Workable, SmartRecruiters and Recruitee can be detected and health-checked
-today; their adapters arrive in milestone 9.
+SmartRecruiters needs one detail call per posting for the description,
+capped at sixty; a failed detail leaves the description empty rather than
+failing the company. Workable's widget API is unofficial and the likeliest
+to drift, which is what `fixture` is for.
 
 ## Tests
 

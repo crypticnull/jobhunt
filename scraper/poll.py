@@ -32,7 +32,7 @@ def poll(store, companies, get_json=None, now=None, rules=None):
             results.append({"slug": slug, "kind": kind, "ok": None, "seen": 0, "new": 0, "closed": 0, "error": "no adapter"})
             continue
         try:
-            payload = get_json(mod.endpoint(board))
+            payload = mod.fetch(board, get_json) if hasattr(mod, "fetch") else get_json(mod.endpoint(board))
             seen, new = [], 0
             for p in mod.parse(payload):
                 p["company_slug"] = slug

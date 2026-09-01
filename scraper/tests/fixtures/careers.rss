@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Example Careers</title>
+    <link>https://example.com/careers</link>
+    <item>
+      <title>Senior Creative Technologist (Remote)</title>
+      <link>https://example.com/careers/senior-creative-technologist</link>
+      <guid>https://example.com/careers/senior-creative-technologist</guid>
+      <description>&lt;p&gt;Pipeline and tooling for a generative video team.&lt;/p&gt;</description>
+      <pubDate>Tue, 25 Aug 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Motion Designer</title>
+      <link>https://example.com/careers/motion-designer</link>
+      <description>Brand motion, on site.</description>
+      <pubDate>Fri, 28 Aug 2026 10:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
