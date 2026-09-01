@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "proof.schema.json",
+  "title": "Proof story",
+  "description": "Frontmatter of data/proof/<id>.md. One source of facts for the site's What He Builds section and the letter generator's proof blocks. The body is the story in his voice, letter-profile linted.",
+  "type": "object",
+  "required": ["id", "title", "leads_for", "summary"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "title": { "type": "string" },
+    "leads_for": {
+      "type": "array",
+      "description": "Company categories this story leads for",
+      "items": { "type": "string", "enum": ["ai-video", "studio-ai", "product-inhouse", "brand-inhouse"] }
+    },
+    "linked_projects": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "linked_pipelines": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "repo": { "type": ["string", "null"] },
+    "summary": { "type": "string", "description": "One sentence for cards" },
+    "order": { "type": "integer", "default": 100 }
+  }
+}

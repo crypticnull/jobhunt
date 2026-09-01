@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pipeline.schema.json",
+  "title": "Pipeline record",
+  "description": "Frontmatter of data/pipelines/<slug>/index.md. ComfyUI graphs, node packs, panel backends and tools are portfolio content in their own right. Paths are relative to the slug directory. The body is the walkthrough.",
+  "type": "object",
+  "required": ["slug", "title", "kind", "status", "models", "hardware", "linked_proof", "summary"],
+  "additionalProperties": false,
+  "properties": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "title": { "type": "string" },
+    "kind": { "type": "string", "enum": ["comfyui-graph", "node-pack", "panel-backend", "tool"] },
+    "status": { "type": "string", "enum": ["production", "wip", "archived"] },
+    "nodes": { "type": ["integer", "null"], "description": "Node count for graphs, null otherwise" },
+    "models": { "type": "array", "items": { "type": "string" } },
+    "hardware": { "type": "string" },
+    "graph": {
+      "description": "Annotated node-graph export, null until it exists",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["src", "width", "height", "alt"],
+          "additionalProperties": false,
+          "properties": {
+            "src": { "type": "string" },
+            "width": { "type": "integer" },
+            "height": { "type": "integer" },
+            "alt": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "workflow_json": { "type": ["string", "null"], "description": "Committed per graph, only where he chooses to share" },
+    "demo": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["provider", "width", "height"],
+          "additionalProperties": false,
+          "properties": {
+            "provider": { "type": "string", "enum": ["none", "r2", "bunny", "youtube", "vimeo", "self"] },
+            "mp4": { "type": "array", "items": { "type": "string" }, "default": [] },
+            "hls": { "type": ["string", "null"] },
+            "poster": { "type": ["string", "null"] },
+            "width": { "type": "integer" },
+            "height": { "type": "integer" },
+            "duration": { "type": ["number", "null"] }
+          }
+        }
+      ]
+    },
+    "repo": { "type": ["string", "null"], "description": "Public repository URL where one exists" },
+    "linked_proof": { "type": "string", "description": "id of the proof story this pipeline backs" },
+    "writeup": { "type": ["string", "null"], "description": "slug of the writing post once it exists" },
+    "summary": { "type": "string" },
+    "order": { "type": "integer", "default": 100 }
+  }
+}
