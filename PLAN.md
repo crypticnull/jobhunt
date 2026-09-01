@@ -35,10 +35,10 @@ jobhunt/
     companies.example.json       committed, redacted, powers tests and demo
     scoring.json                 weights, term lists, comp band, thresholds
     voice/rules.json             banned lexicon, sign-offs, thresholds, two profiles
-    projects/<slug>.md           project records, frontmatter plus body
+    projects/<slug>/index.md     project record, frontmatter plus body, beside its assets
     projects/<slug>/assets/      committed web derivatives, posters, stills, boards
     proof/<id>.md                proof story records
-    pipelines/<slug>.md          pipeline records, ComfyUI graphs, node packs, tools
+    pipelines/<slug>/index.md    pipeline record, ComfyUI graphs, node packs, tools
     pipelines/<slug>/assets/     annotated graph exports, posters, demo stills
     local/                       GITIGNORED, the actual search
       companies.json             real target list with notes and contacts
@@ -125,7 +125,7 @@ CREATE TABLE poll_log (
 
 **Scoring config**, `data/scoring.json`, committed. Weights for remote authenticity, comp against the target band with absence flagged rather than fatal, intersection terms (creative technologist, technical artist, pipeline, tooling, automation, generative, ComfyUI, Houdini, TouchDesigner, real-time), penalty terms for agency grind and junior or mid seniority, and a borderline threshold. The committed file carries structure and weights only. The actual comp band lives in gitignored `data/local/scoring.local.json`, merged at load, so the public repo never states the negotiation floor. Scoring ranks, it never drops. Tuning the search protocol is a diffable commit, and every score row carries its per-rule breakdown into the digest so a borderline posting arrives with the reason it is borderline.
 
-**Project record**, `data/projects/<slug>.md` frontmatter. The ten POWER projects cleared to show are the initial content set: Quest 2024 animations, Quest 2025 key art and logo loop, Nitro Create 2025 branding, Nitro Create 2026 logo loop, Summit 2025 logo loop and branding expansion, PAG 2026 logo loop, Power Camp logo loop, HQ Soiree 2025 logo loop, the Company's Bill of Rights video, and Power For Good's Amberella motion graphics. `franchise` is a first-class field because Quest, Nitro Create, Summit and PAG carried across cycles is the curation strategy, ownership of a visual language rather than a pile of jobs. The eleventh record is personal rather than client work: the video game project, art direction and systems design in one artifact, its custom art generated through his own ComfyUI to Photoshop pipelines, `client` set to personal and `franchise` null.
+**Project record**, `data/projects/<slug>/index.md` frontmatter, the record sitting beside its `assets/` so relative paths mean the same thing to the data contract and to the site's image pipeline. The ten POWER projects cleared to show are the initial content set: Quest 2024 animations, Quest 2025 key art and logo loop, Nitro Create 2025 branding, Nitro Create 2026 logo loop, Summit 2025 logo loop and branding expansion, PAG 2026 logo loop, Power Camp logo loop, HQ Soiree 2025 logo loop, the Company's Bill of Rights video, and Power For Good's Amberella motion graphics. `franchise` is a first-class field because Quest, Nitro Create, Summit and PAG carried across cycles is the curation strategy, ownership of a visual language rather than a pile of jobs. The eleventh record is personal rather than client work: the video game project, art direction and systems design in one artifact, its custom art generated through his own ComfyUI to Photoshop pipelines, `client` set to personal and `franchise` null.
 
 ```yaml
 slug: quest-2025
@@ -150,7 +150,7 @@ Width, height and duration are written by the ingest probe in `/pipeline`, never
 
 **Proof stories**, `data/proof/<id>.md`: `ae-llama`, `local-pipeline`, `keynote-extractor`, `dancekit`, `file-renamer`, `game-project`, `event-franchises`. Frontmatter carries `leads_for` (the company categories this story leads for) and `linked_projects` (slugs), so letters and the site state the same facts from one source. AE Llama, the 77-tool CEP panel with the 533-step self-test, leads for studios building AI capability. The 38-node local ComfyUI pipeline leads for AI video companies. The event franchises lead for brand in-house teams. The game project leads where a role wants art direction and systems design in the same person.
 
-**Pipeline record**, `data/pipelines/<slug>.md`, frontmatter plus body. ComfyUI workflows and pipelines are portfolio content in their own right, a distinct content type beside projects, because a hand-built graph is exactly the artifact that separates him from the pure designers and the pure engineers at once. The body is the graph walkthrough: what each stage does and why the graph is shaped that way.
+**Pipeline record**, `data/pipelines/<slug>/index.md`, frontmatter plus body. ComfyUI workflows and pipelines are portfolio content in their own right, a distinct content type beside projects, because a hand-built graph is exactly the artifact that separates him from the pure designers and the pure engineers at once. The body is the graph walkthrough: what each stage does and why the graph is shaped that way.
 
 ```yaml
 slug: h3-i2v

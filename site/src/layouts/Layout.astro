@@ -1,0 +1,314 @@
+---
+import { site } from "../site.config.mjs";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.hero.replace(/\.$/, "")}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description ?? site.sub} />
+    <link rel="canonical" href={Astro.url} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description ?? site.sub} />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <a class="name" href="/">{site.name}</a>
+      <nav aria-label="Primary">
+        <a href="/#builds">Builds</a>
+        <a href="/#work">Work</a>
+        <a href="/#writing">Writing</a>
+        <a href="/#about">About</a>
+      </nav>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="foot">
+      <p>
+        <a href={site.github}>GitHub</a>
+        <span aria-hidden="true">·</span>
+        <span>{site.location}</span>
+      </p>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #f7f6f2;
+    --fg: #161512;
+    --muted: #5f5d56;
+    --line: #dedbd2;
+    --card: #ffffff;
+    --accent: #c4501c;
+    --measure: 68ch;
+    --gutter: clamp(1rem, 4vw, 3rem);
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121210;
+      --fg: #ebe9e2;
+      --muted: #a09e95;
+      --line: #2b2a26;
+      --card: #1a1917;
+      --accent: #ff7c46;
+    }
+  }
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  html {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+  main {
+    flex: 1;
+    width: 100%;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 0 var(--gutter) 4rem;
+  }
+  img,
+  video,
+  svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+  a {
+    color: inherit;
+    text-decoration-thickness: 0.06em;
+    text-underline-offset: 0.15em;
+  }
+  a:hover {
+    color: var(--accent);
+  }
+  :focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+  }
+  h1,
+  h2,
+  h3 {
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.5em;
+    font-weight: 650;
+  }
+  h2 {
+    font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+    margin-top: 0;
+  }
+  h3 {
+    font-size: 1.15rem;
+  }
+  p {
+    margin: 0 0 1em;
+    max-width: var(--measure);
+  }
+  .skip {
+    position: absolute;
+    left: -999px;
+    top: 0;
+    background: var(--fg);
+    color: var(--bg);
+    padding: 0.5rem 1rem;
+  }
+  .skip:focus {
+    left: var(--gutter);
+    z-index: 10;
+  }
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    align-items: baseline;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 1.25rem var(--gutter);
+  }
+  .top .name {
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .top nav {
+    display: flex;
+    gap: 1.25rem;
+  }
+  .top nav a {
+    text-decoration: none;
+    color: var(--muted);
+  }
+  .top nav a:hover {
+    color: var(--accent);
+  }
+  section {
+    padding: 3rem 0;
+    border-top: 1px solid var(--line);
+  }
+  section:first-of-type {
+    border-top: 0;
+  }
+  .hero {
+    padding: 4rem 0 3.5rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 6.5vw, 4.6rem);
+    max-width: 18ch;
+    margin-bottom: 0.4em;
+  }
+  .hero .sub {
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    color: var(--muted);
+    max-width: 44ch;
+  }
+  .lede {
+    color: var(--muted);
+    max-width: 60ch;
+    margin-bottom: 2rem;
+  }
+  .cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  }
+  .card {
+    display: block;
+    height: 100%;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    text-decoration: none;
+  }
+  .card:hover {
+    border-color: var(--accent);
+    color: inherit;
+  }
+  .card h3 {
+    margin-bottom: 0.35em;
+  }
+  .card p {
+    color: var(--muted);
+    margin: 0 0 0.75em;
+    font-size: 0.95rem;
+  }
+  .card .meta,
+  .meta {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .card.work {
+    padding: 0;
+    overflow: hidden;
+  }
+  .card.work .body {
+    padding: 1rem 1.25rem 1.25rem;
+  }
+  .card.work img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.35rem 1.25rem;
+    margin: 0 0 2rem;
+    font-size: 0.95rem;
+  }
+  .facts dt {
+    color: var(--muted);
+  }
+  .facts dd {
+    margin: 0;
+  }
+  .prose {
+    max-width: var(--measure);
+  }
+  .prose h2 {
+    font-size: 1.3rem;
+    margin-top: 2rem;
+  }
+  .frame {
+    margin: 0 0 2rem;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  .frame img,
+  .frame video {
+    width: 100%;
+  }
+  .grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    margin: 0 0 2rem;
+    padding: 0;
+    list-style: none;
+  }
+  .grid figcaption {
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 0.5rem 0;
+  }
+  .back {
+    display: inline-block;
+    margin: 1rem 0 2rem;
+    color: var(--muted);
+  }
+  .foot {
+    width: 100%;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 2rem var(--gutter);
+    color: var(--muted);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--line);
+  }
+  .foot p {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0;
+    max-width: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+</style>

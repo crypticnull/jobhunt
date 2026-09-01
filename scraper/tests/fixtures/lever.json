@@ -1,0 +1,32 @@
+[
+  {
+    "id": "8f1c-1",
+    "text": "Technical Artist, Generative Video",
+    "categories": {
+      "commitment": "Full-time",
+      "department": "Studio",
+      "level": "Senior",
+      "location": "Remote",
+      "team": "Pipeline",
+      "allLocations": ["Remote", "Los Angeles"]
+    },
+    "workplaceType": "remote",
+    "salaryRange": { "currency": "USD", "interval": "per-year-salary", "min": 150000, "max": 190000 },
+    "descriptionPlain": "Build the pipeline that gets generative video into production.",
+    "additionalPlain": "We are remote first.",
+    "createdAt": 1755000000000,
+    "hostedUrl": "https://jobs.lever.co/examplebrand/8f1c-1",
+    "applyUrl": "https://jobs.lever.co/examplebrand/8f1c-1/apply",
+    "lists": []
+  },
+  {
+    "id": "8f1c-2",
+    "text": "Junior Motion Designer",
+    "categories": { "commitment": "Full-time", "location": "Los Angeles, CA" },
+    "workplaceType": "onsite",
+    "descriptionPlain": "Entry level.",
+    "createdAt": 1755100000000,
+    "hostedUrl": "https://jobs.lever.co/examplebrand/8f1c-2",
+    "lists": []
+  }
+]

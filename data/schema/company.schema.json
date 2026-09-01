@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "company.schema.json",
+  "title": "Target company list",
+  "description": "Shape of data/local/companies.json (private) and data/companies.example.json (committed, redacted). One record per target company; the ATS slug is what the poller keys on.",
+  "type": "object",
+  "required": ["version", "companies"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "integer", "enum": [1] },
+    "companies": { "type": "array", "items": { "$ref": "#/$defs/company" } }
+  },
+  "$defs": {
+    "company": {
+      "type": "object",
+      "required": ["slug", "name", "ats", "category", "priority", "added", "last_reviewed"],
+      "additionalProperties": false,
+      "properties": {
+        "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "name": { "type": "string" },
+        "careers_url": { "type": ["string", "null"] },
+        "ats": {
+          "type": "object",
+          "required": ["kind", "board"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "type": "string", "enum": ["greenhouse", "lever", "ashby", "workable", "smartrecruiters", "recruitee", "rss", "manual"] },
+            "board": { "type": ["string", "null"], "description": "The company's slug on that ATS, or a feed URL for rss, null for manual" }
+          }
+        },
+        "category": { "type": "string", "enum": ["ai-video", "studio-ai", "product-inhouse", "brand-inhouse"] },
+        "priority": { "type": "integer", "enum": [1, 2, 3] },
+        "lead_proof": { "type": ["string", "null"], "description": "proof story id to lead with for this company" },
+        "remote_notes": { "type": "string" },
+        "contacts": { "type": "array", "description": "private, only ever in data/local", "items": { "type": "object" } },
+        "notes": { "type": "string" },
+        "added": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "last_reviewed": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+      }
+    }
+  }
+}

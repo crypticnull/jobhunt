@@ -1,0 +1,64 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Still from "../../components/Still.astro";
+import Video from "../../components/Video.astro";
+
+export async function getStaticPaths() {
+  const pipelines = await getCollection("pipelines");
+  return pipelines.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const kindLabel = { "comfyui-graph": "ComfyUI graph", "node-pack": "ComfyUI node pack", "panel-backend": "Panel backend", tool: "Tool" };
+---
+
+<Layout title={d.title} description={d.summary}>
+  <a class="back" href="/#builds">All builds</a>
+  <h1>{d.title}</h1>
+  <p class="lede">{d.summary}</p>
+
+  {d.graph && <figure class="frame"><Still still={d.graph} loading="eager" /></figure>}
+  {d.demo && d.graph && <Video video={d.demo} poster={d.graph} title={`${d.title} demo`} />}
+
+  <dl class="facts">
+    <dt>Kind</dt>
+    <dd>{kindLabel[d.kind]}</dd>
+    <dt>Status</dt>
+    <dd>{d.status}</dd>
+    {d.nodes && (
+      <>
+        <dt>Nodes</dt>
+        <dd>{d.nodes}</dd>
+      </>
+    )}
+    <dt>Models</dt>
+    <dd>{d.models.join(", ")}</dd>
+    <dt>Hardware</dt>
+    <dd>{d.hardware}</dd>
+    {d.repo && (
+      <>
+        <dt>Source</dt>
+        <dd>
+          <a href={d.repo}>{d.repo.replace("https://", "")}</a>
+        </dd>
+      </>
+    )}
+    {d.workflow_json && (
+      <>
+        <dt>Workflow</dt>
+        <dd>
+          <a href={d.workflow_json} download>
+            workflow JSON
+          </a>
+        </dd>
+      </>
+    )}
+  </dl>
+
+  <div class="prose">
+    <Content />
+  </div>
+</Layout>

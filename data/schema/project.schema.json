@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "project.schema.json",
+  "title": "Project record",
+  "description": "Frontmatter of data/projects/<slug>/index.md. Media paths are relative to the slug directory. Media beyond the hero still is optional so the site builds while assets arrive.",
+  "type": "object",
+  "required": ["slug", "title", "year", "client", "role", "disciplines", "tools", "summary", "featured", "hero"],
+  "additionalProperties": false,
+  "properties": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "title": { "type": "string" },
+    "franchise": { "type": ["string", "null"], "description": "Recurring event brand system this belongs to, the curation through-line" },
+    "year": { "type": "integer" },
+    "client": { "type": "string", "description": "Client, event owner, or 'personal'" },
+    "role": { "type": "string" },
+    "disciplines": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["3d", "motion", "brand-system", "key-art", "generative", "art-direction", "systems-design", "compositing"] }
+    },
+    "tools": { "type": "array", "items": { "type": "string" } },
+    "turnaround": { "type": ["string", "null"], "description": "Stated only where genuinely impressive" },
+    "summary": { "type": "string", "description": "One sentence for cards" },
+    "featured": { "type": "boolean" },
+    "archive": { "type": "boolean", "default": false },
+    "order": { "type": "integer", "default": 100 },
+    "hero": { "$ref": "#/$defs/still" },
+    "video": { "$ref": "#/$defs/video" },
+    "stills": { "type": "array", "items": { "$ref": "#/$defs/still" }, "default": [] },
+    "process": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "required": ["kind", "src", "width", "height", "alt"],
+        "additionalProperties": false,
+        "properties": {
+          "kind": { "type": "string", "enum": ["storyboard", "styleframe", "wip", "breakdown"] },
+          "src": { "type": "string" },
+          "width": { "type": "integer" },
+          "height": { "type": "integer" },
+          "alt": { "type": "string" },
+          "caption": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "still": {
+      "type": "object",
+      "required": ["src", "width", "height", "alt"],
+      "additionalProperties": false,
+      "properties": {
+        "src": { "type": "string" },
+        "width": { "type": "integer" },
+        "height": { "type": "integer" },
+        "alt": { "type": "string" }
+      }
+    },
+    "video": {
+      "type": "object",
+      "description": "Host-agnostic. provider none means poster only.",
+      "required": ["provider", "width", "height"],
+      "additionalProperties": false,
+      "properties": {
+        "provider": { "type": "string", "enum": ["none", "r2", "bunny", "youtube", "vimeo", "self"] },
+        "mp4": { "type": "array", "items": { "type": "string" }, "default": [] },
+        "hls": { "type": ["string", "null"] },
+        "poster": { "type": ["string", "null"] },
+        "width": { "type": "integer" },
+        "height": { "type": "integer" },
+        "duration": { "type": ["number", "null"] }
+      }
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "companies": [
+    {
+      "slug": "example-ai",
+      "name": "Example AI",
+      "careers_url": "https://jobs.ashbyhq.com/example-ai",
+      "ats": { "kind": "ashby", "board": "example-ai" },
+      "category": "ai-video",
+      "priority": 1,
+      "lead_proof": "local-pipeline",
+      "remote_notes": "",
+      "contacts": [],
+      "notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "example-studio",
+      "name": "Example Studio",
+      "careers_url": "https://boards.greenhouse.io/examplestudio",
+      "ats": { "kind": "greenhouse", "board": "examplestudio" },
+      "category": "studio-ai",
+      "priority": 2,
+      "lead_proof": "ae-llama",
+      "remote_notes": "",
+      "contacts": [],
+      "notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "example-brand",
+      "name": "Example Brand",
+      "careers_url": "https://jobs.lever.co/examplebrand",
+      "ats": { "kind": "lever", "board": "examplebrand" },
+      "category": "brand-inhouse",
+      "priority": 3,
+      "lead_proof": "event-franchises",
+      "remote_notes": "",
+      "contacts": [],
+      "notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "example-manual",
+      "name": "Example Manual",
+      "careers_url": "https://example.com/careers",
+      "ats": { "kind": "manual", "board": null },
+      "category": "product-inhouse",
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "contacts": [],
+      "notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    }
+  ]
+}

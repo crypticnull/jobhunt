@@ -1,0 +1,23 @@
+---
+// A still from a record: hero, gallery or process. Width and height always
+// reach the img element, so the box is reserved before the bytes arrive.
+import { Image } from "astro:assets";
+
+interface Props {
+  still: { src: ImageMetadata; width: number; height: number; alt: string };
+  sizes?: string;
+  loading?: "eager" | "lazy";
+}
+
+const { still, sizes = "(min-width: 72rem) 68rem, 100vw", loading = "lazy" } = Astro.props;
+// SVG placeholders pass through untouched; raster stills get a responsive set.
+const raster = still.src.format !== "svg";
+---
+
+{
+  raster ? (
+    <Image src={still.src} alt={still.alt} widths={[480, 960, 1600]} sizes={sizes} loading={loading} />
+  ) : (
+    <Image src={still.src} alt={still.alt} width={still.width} height={still.height} loading={loading} />
+  )
+}

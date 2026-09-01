@@ -1,0 +1,92 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Still from "../../components/Still.astro";
+import Video from "../../components/Video.astro";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const kinds = ["storyboard", "styleframe", "wip", "breakdown"] as const;
+const labels = { storyboard: "Storyboards", styleframe: "Styleframes", wip: "In progress", breakdown: "Breakdown" };
+---
+
+<Layout title={d.title} description={d.summary}>
+  <a class="back" href="/#work">All work</a>
+  <h1>{d.title}</h1>
+  <p class="lede">{d.summary}</p>
+
+  {d.video ? <Video video={d.video} poster={d.hero} title={d.title} /> : <figure class="frame"><Still still={d.hero} loading="eager" /></figure>}
+
+  <dl class="facts">
+    <dt>Year</dt>
+    <dd>{d.year}</dd>
+    {d.franchise && (
+      <>
+        <dt>Franchise</dt>
+        <dd>{d.franchise}</dd>
+      </>
+    )}
+    <dt>Client</dt>
+    <dd>{d.client}</dd>
+    <dt>Role</dt>
+    <dd>{d.role}</dd>
+    <dt>Discipline</dt>
+    <dd>{d.disciplines.join(", ")}</dd>
+    <dt>Tools</dt>
+    <dd>{d.tools.join(", ")}</dd>
+    {d.turnaround && (
+      <>
+        <dt>Turnaround</dt>
+        <dd>{d.turnaround}</dd>
+      </>
+    )}
+  </dl>
+
+  <div class="prose">
+    <Content />
+  </div>
+
+  {
+    d.stills.length > 0 && (
+      <>
+        <h2>Stills</h2>
+        <ul class="grid">
+          {d.stills.map((s) => (
+            <li>
+              <Still still={s} sizes="(min-width: 60rem) 20rem, 100vw" />
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+
+  {
+    kinds.map((kind) => {
+      const items = d.process.filter((p) => p.kind === kind);
+      return (
+        items.length > 0 && (
+          <>
+            <h2>{labels[kind]}</h2>
+            <ul class="grid">
+              {items.map((p) => (
+                <li>
+                  <figure>
+                    <Still still={p} sizes="(min-width: 60rem) 20rem, 100vw" />
+                    {p.caption && <figcaption>{p.caption}</figcaption>}
+                  </figure>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      );
+    })
+  }
+</Layout>
