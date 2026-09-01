@@ -1,13 +1,18 @@
 PYTHON ?= python3
 
-.PHONY: test validate hooks site drift lighthouse
+.PHONY: test validate lint hooks site drift lighthouse
 
 test:
 	$(PYTHON) -m unittest discover -s pipeline/tests -t . -v
 	$(PYTHON) -m unittest discover -s scraper/tests -t . -v
+	$(PYTHON) -m unittest discover -s letters/tests -t . -v
 
 validate:
 	$(PYTHON) -m pipeline.validate
+
+lint:
+	$(PYTHON) -m letters.voicelint --profile repo
+	$(PYTHON) -m letters.voicelint --profile letter
 
 hooks:
 	git config core.hooksPath .githooks

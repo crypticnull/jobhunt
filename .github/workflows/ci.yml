@@ -15,6 +15,7 @@ jobs:
           python-version: "3.12"
       - run: make test
       - run: make validate
+      - run: make lint
 
   site:
     runs-on: ubuntu-latest
