@@ -1,6 +1,6 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
-import { projectSchema, pipelineSchema, proofSchema } from "./schemas.mjs";
+import { projectSchema, pipelineSchema, proofSchema, writingSchema } from "./schemas.mjs";
 
 // Records live in /data, outside the site, because letters and the site read
 // the same files. The slug directory is the id.
@@ -21,4 +21,9 @@ const proof = defineCollection({
   schema: proofSchema,
 });
 
-export const collections = { projects, pipelines, proof };
+const writing = defineCollection({
+  loader: glob({ pattern: "*.md", base: "../data/writing" }),
+  schema: writingSchema,
+});
+
+export const collections = { projects, pipelines, proof, writing };

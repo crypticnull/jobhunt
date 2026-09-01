@@ -5,7 +5,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { z, projectSchema, pipelineSchema, proofSchema } from "../site/src/schemas.mjs";
+import { z, projectSchema, pipelineSchema, proofSchema, writingSchema } from "../site/src/schemas.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const image = () => z.string();
@@ -14,6 +14,7 @@ const pairs = [
   ["project", projectSchema({ image })],
   ["pipeline", pipelineSchema({ image })],
   ["proof", proofSchema({ image })],
+  ["writing", writingSchema({ image })],
 ];
 
 let drift = 0;

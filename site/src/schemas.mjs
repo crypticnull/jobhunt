@@ -90,3 +90,13 @@ export const proofSchema = () =>
     summary: z.string(),
     order: z.number().int().default(100),
   });
+
+export const writingSchema = () =>
+  z.object({
+    slug: z.string().regex(/^[a-z0-9-]+$/),
+    title: z.string(),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    summary: z.string(),
+    draft: z.boolean().default(false),
+    linked_pipelines: z.array(z.string()).default([]),
+  });
