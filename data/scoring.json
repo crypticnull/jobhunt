@@ -1,0 +1,36 @@
+{
+  "version": "2026-09-01",
+  "weights": {
+    "remote": { "remote": 30, "hybrid": -15, "onsite": -40, "unclear": 0 },
+    "remote_hedge": -15,
+    "senior_bonus": 10,
+    "junior_penalty": -40,
+    "intersection_term": 6,
+    "intersection_title_multiplier": 2,
+    "intersection_cap": 30,
+    "penalty_term": -8,
+    "penalty_cap": -30,
+    "comp": { "in_band": 20, "above_band": 25, "partial_overlap": 5, "below_band": -25, "absent": 0 },
+    "freshness_days": 14,
+    "freshness_bonus": 10
+  },
+  "terms": {
+    "intersection": [
+      "creative technologist", "technical artist", "design technologist", "creative engineer",
+      "pipeline", "tooling", "automation", "generative", "comfyui", "houdini", "touchdesigner",
+      "real-time", "realtime", "unreal", "after effects", "cinema 4d", "redshift", "octane",
+      "python", "extendscript", "workflow", "asset management", "metadata"
+    ],
+    "penalty": [
+      "agency", "fast-paced", "high volume", "high-volume", "long-form", "video editor", "social media",
+      "content creator", "unpaid", "intern", "internship", "contract", "freelance", "hourly", "quick turnaround"
+    ],
+    "junior": ["junior", "associate", "intern", "entry level", "entry-level", "coordinator", "assistant"],
+    "senior": ["senior", "sr.", "staff", "principal", "lead", "head of", "director"],
+    "remote_hedge": [
+      "remote for now", "hybrid", "days in office", "days in the office", "days per week in", "in-office",
+      "must be located", "relocat", "on-site", "onsite", "local candidates", "commutable"
+    ]
+  },
+  "thresholds": { "strong": 45, "borderline": 15 }
+}

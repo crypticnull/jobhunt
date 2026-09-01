@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "scoring.schema.json",
+  "title": "Scoring config",
+  "description": "Shape of data/scoring.json (committed: weights, terms, thresholds) and of data/local/scoring.local.json (private: the comp band, merged at load). Scoring ranks, it never drops.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "string", "description": "Stamped on every scored posting as ruleset_version, so history can be rescored after tuning" },
+    "weights": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "remote": {
+          "type": "object",
+          "required": ["remote", "hybrid", "onsite", "unclear"],
+          "additionalProperties": false,
+          "properties": {
+            "remote": { "type": "number" },
+            "hybrid": { "type": "number" },
+            "onsite": { "type": "number" },
+            "unclear": { "type": "number" }
+          }
+        },
+        "remote_hedge": { "type": "number" },
+        "senior_bonus": { "type": "number" },
+        "junior_penalty": { "type": "number" },
+        "intersection_term": { "type": "number" },
+        "intersection_title_multiplier": { "type": "number" },
+        "intersection_cap": { "type": "number" },
+        "penalty_term": { "type": "number" },
+        "penalty_cap": { "type": "number" },
+        "comp": {
+          "type": "object",
+          "required": ["in_band", "above_band", "partial_overlap", "below_band", "absent"],
+          "additionalProperties": false,
+          "properties": {
+            "in_band": { "type": "number" },
+            "above_band": { "type": "number" },
+            "partial_overlap": { "type": "number" },
+            "below_band": { "type": "number" },
+            "absent": { "type": "number" }
+          }
+        },
+        "freshness_days": { "type": "integer" },
+        "freshness_bonus": { "type": "number" }
+      }
+    },
+    "terms": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "intersection": { "type": "array", "items": { "type": "string" } },
+        "penalty": { "type": "array", "items": { "type": "string" } },
+        "junior": { "type": "array", "items": { "type": "string" } },
+        "senior": { "type": "array", "items": { "type": "string" } },
+        "remote_hedge": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "required": ["strong", "borderline"],
+      "additionalProperties": false,
+      "properties": {
+        "strong": { "type": "number" },
+        "borderline": { "type": "number" }
+      }
+    },
+    "comp_band": {
+      "type": "object",
+      "description": "Private. Lives only in data/local/scoring.local.json.",
+      "required": ["min", "max", "currency"],
+      "additionalProperties": false,
+      "properties": {
+        "min": { "type": "integer" },
+        "max": { "type": "integer" },
+        "currency": { "type": "string" }
+      }
+    }
+  }
+}
