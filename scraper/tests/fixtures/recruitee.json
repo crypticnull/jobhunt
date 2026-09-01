@@ -1,0 +1,41 @@
+{
+  "offers": [
+    {
+      "id": 2001,
+      "slug": "creative-engineer",
+      "title": "Creative Engineer",
+      "careers_url": "https://examplerecruitee.recruitee.com/o/creative-engineer",
+      "careers_apply_url": "https://examplerecruitee.recruitee.com/o/creative-engineer/c/new",
+      "department": "Product",
+      "location": "Amsterdam, Netherlands",
+      "city": "Amsterdam",
+      "country": "Netherlands",
+      "remote": true,
+      "hybrid": false,
+      "on_site": false,
+      "description": "<p>Ship the tooling behind our generative video product.</p>",
+      "requirements": "<p>ComfyUI, TouchDesigner, JavaScript.</p>",
+      "created_at": "2026-08-20 09:00:00",
+      "published_at": "2026-08-21 09:00:00",
+      "salary": { "min": 90000, "max": 120000, "currency": "EUR", "period": "year" }
+    },
+    {
+      "id": 2002,
+      "slug": "motion-designer",
+      "title": "Motion Designer",
+      "careers_url": "https://examplerecruitee.recruitee.com/o/motion-designer",
+      "department": "Marketing",
+      "location": "Berlin, Germany",
+      "city": "Berlin",
+      "country": "Germany",
+      "remote": false,
+      "hybrid": true,
+      "on_site": false,
+      "description": "<p>Brand motion for launches.</p>",
+      "requirements": "",
+      "created_at": "2026-08-25 09:00:00",
+      "published_at": "2026-08-26 09:00:00",
+      "salary": { "min": null, "max": null, "currency": "EUR", "period": "year" }
+    }
+  ]
+}

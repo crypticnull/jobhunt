@@ -1,0 +1,36 @@
+{
+  "offset": 0,
+  "limit": 100,
+  "totalFound": 2,
+  "content": [
+    {
+      "id": "743999900000001",
+      "name": "Technical Artist, Real-Time",
+      "uuid": "u1",
+      "refNumber": "REQ-1",
+      "company": { "identifier": "ExampleSR", "name": "Example SR" },
+      "releasedDate": "2026-08-19T12:00:00.000Z",
+      "location": { "city": "Remote", "region": "", "country": "us", "remote": true, "fullLocation": "Remote, United States" },
+      "industry": { "id": "media", "label": "Media" },
+      "department": { "id": "1", "label": "Studio" },
+      "function": { "id": "art", "label": "Art" },
+      "typeOfEmployment": { "id": "permanent", "label": "Full-time" },
+      "experienceLevel": { "id": "senior", "label": "Senior" },
+      "customField": [],
+      "ref": "https://api.smartrecruiters.com/v1/companies/ExampleSR/postings/743999900000001"
+    },
+    {
+      "id": "743999900000002",
+      "name": "Junior Motion Designer",
+      "uuid": "u2",
+      "refNumber": "REQ-2",
+      "company": { "identifier": "ExampleSR", "name": "Example SR" },
+      "releasedDate": "2026-08-27T12:00:00.000Z",
+      "location": { "city": "Los Angeles", "region": "CA", "country": "us", "remote": false, "fullLocation": "Los Angeles, CA, United States" },
+      "typeOfEmployment": { "id": "permanent", "label": "Full-time" },
+      "experienceLevel": { "id": "junior", "label": "Junior" },
+      "customField": [],
+      "ref": "https://api.smartrecruiters.com/v1/companies/ExampleSR/postings/743999900000002"
+    }
+  ]
+}

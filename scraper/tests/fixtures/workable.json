@@ -1,0 +1,40 @@
+{
+  "name": "Example Workable",
+  "description": "",
+  "jobs": [
+    {
+      "title": "Creative Technologist",
+      "shortcode": "AB12CD",
+      "code": "",
+      "employment_type": "Full-time",
+      "telecommuting": true,
+      "department": "Creative",
+      "url": "https://apply.workable.com/exampleworkable/j/AB12CD/",
+      "shortlink": "https://apply.workable.com/j/AB12CD",
+      "application_url": "https://apply.workable.com/exampleworkable/j/AB12CD/apply/",
+      "published_on": "2026-08-22",
+      "created_at": "2026-08-22",
+      "country": "United States",
+      "city": "",
+      "state": "",
+      "description": "<p>Own the generative pipeline and the tooling around it.</p>",
+      "requirements": "<ul><li>ComfyUI</li><li>Python</li></ul>",
+      "benefits": ""
+    },
+    {
+      "title": "Motion Designer",
+      "shortcode": "EF34GH",
+      "employment_type": "Full-time",
+      "telecommuting": false,
+      "workplace": "hybrid",
+      "department": "Brand",
+      "url": "https://apply.workable.com/exampleworkable/j/EF34GH/",
+      "published_on": "2026-08-28",
+      "country": "United States",
+      "city": "Austin",
+      "state": "Texas",
+      "description": "<p>Brand motion, three days in office.</p>",
+      "requirements": ""
+    }
+  ]
+}

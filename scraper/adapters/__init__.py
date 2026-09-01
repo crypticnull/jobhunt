@@ -1,15 +1,14 @@
 """Adapter registry and ATS detection.
 
-ADAPTERS holds the kinds that can be polled. PROBE_ENDPOINTS covers those plus
-the kinds that can only be detected and health-checked so far (workable,
-smartrecruiters, recruitee, adapters arrive in milestone 9)."""
+ADAPTERS holds the kinds that can be polled. PROBE_ENDPOINTS is the cheap
+health-check URL per kind; rss has none because its board is the feed URL."""
 
 import re
 
 from .. import http
-from . import ashby, greenhouse, lever
+from . import ashby, greenhouse, lever, recruitee, rss, smartrecruiters, workable
 
-ADAPTERS = {m.KIND: m for m in (greenhouse, lever, ashby)}
+ADAPTERS = {m.KIND: m for m in (greenhouse, lever, ashby, workable, smartrecruiters, recruitee, rss)}
 
 PROBE_ENDPOINTS = {
     "greenhouse": lambda b: f"https://boards-api.greenhouse.io/v1/boards/{b}/jobs",
@@ -52,7 +51,7 @@ def count_postings(kind, payload):
     if kind == "lever":
         return len(payload) if isinstance(payload, list) else 0
     if kind == "workable":
-        return len(payload.get("results", [])) if isinstance(payload, dict) else 0
+        return len(payload.get("jobs") or payload.get("results") or []) if isinstance(payload, dict) else 0
     if kind == "smartrecruiters":
         return len(payload.get("content", [])) if isinstance(payload, dict) else 0
     if kind == "recruitee":
