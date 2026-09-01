@@ -8,14 +8,18 @@
   digest         write this week's digest to data/local/digests, or --stdout
   score          rescore every open posting with the current ruleset
   mark ID STATE  record a status change for a posting
-  stats          counts from the store
+  stats          counts from the store, --markdown --since DATE for the monthly snapshot
+  discover       companies the discovery feeds keep surfacing, never written to the store
+  backup         copy postings.db to an off-disk directory, keep the newest fourteen
+  export         the status history as JSON, one file per month
+  fixture        refresh an adapter's test fixture from the live endpoint
 """
 
 import argparse
 import sys
 from pathlib import Path
 
-from . import adapters, companies, digest, manual
+from . import adapters, companies, digest, discover, maintain, manual
 from .poll import enrich, poll
 from .score import load_rules, score
 from .store import STATES, Store
@@ -154,12 +158,52 @@ def cmd_mark(args):
 def cmd_stats(args):
     store = Store(args.db)
     try:
-        s = store.stats()
+        s = store.stats(since=args.since)
     finally:
         store.close()
+    if args.markdown:
+        lines = ["Stats:" + (f" since {args.since}" if args.since else "")]
+        if "period" in s:
+            p = s["period"]
+            t = p["transitions"]
+            lines.append(f"- seen {p['seen']}, surfaced {p['surfaced']}, applied {t.get('applied', 0)}, "
+                         f"interviews {t.get('interview', 0)}, offers {t.get('offer', 0)}, rejected {t.get('rejected', 0)}, "
+                         f"polls {p['polls']} with {p['poll_errors']} errors")
+        lines.append(f"- store: {s['postings']} postings, {s['open']} open, {s['comp_found']} with comp, "
+                     + ", ".join(f"{k} {v}" for k, v in sorted(s["by_state"].items())))
+        print("\n".join(lines))
+        return 0
     print(f"postings {s['postings']}, open {s['open']}, with comp {s['comp_found']}")
     print("by state: " + ", ".join(f"{k} {v}" for k, v in sorted(s["by_state"].items())))
     print(f"polls {s['polls']}, errors {s['poll_errors']}")
+    if "period" in s:
+        p = s["period"]
+        print(f"since {p['since']}: seen {p['seen']}, surfaced {p['surfaced']}, " + ", ".join(f"{k} {v}" for k, v in sorted(p["transitions"].items())))
+    return 0
+
+
+def cmd_discover(args):
+    data = companies.load(args.companies)
+    found = discover.discover(known_slugs={c["slug"] for c in data["companies"]})
+    print(discover.render(found))
+    return 0
+
+
+def cmd_backup(args):
+    target = maintain.backup(args.db, args.to, keep=args.keep)
+    print(f"backed up to {target}")
+    return 0
+
+
+def cmd_export(args):
+    target, n = maintain.export_status(args.db, args.to)
+    print(f"exported {n} status rows to {target}")
+    return 0
+
+
+def cmd_fixture(args):
+    target = maintain.fixture(args.kind, args.board, args.out)
+    print(f"wrote {target}; run make test to see what moved")
     return 0
 
 
@@ -214,7 +258,27 @@ def main(argv=None):
     m.set_defaults(fn=cmd_mark)
 
     st = sub.add_parser("stats", help="counts from the store")
+    st.add_argument("--since", help="ISO date; adds period counts for the monthly snapshot")
+    st.add_argument("--markdown", action="store_true", help="a block to paste into the log")
     st.set_defaults(fn=cmd_stats)
+
+    dv = sub.add_parser("discover", help="companies the discovery feeds keep surfacing")
+    dv.set_defaults(fn=cmd_discover)
+
+    bk = sub.add_parser("backup", help="copy postings.db off the disk")
+    bk.add_argument("--to", required=True, help="destination directory, ideally not this disk")
+    bk.add_argument("--keep", type=int, default=14)
+    bk.set_defaults(fn=cmd_backup)
+
+    ex = sub.add_parser("export", help="status history as JSON")
+    ex.add_argument("--to", required=True)
+    ex.set_defaults(fn=cmd_export)
+
+    fx = sub.add_parser("fixture", help="refresh an adapter fixture from the live endpoint")
+    fx.add_argument("kind", choices=sorted(adapters.ADAPTERS))
+    fx.add_argument("board")
+    fx.add_argument("--out", default=str(ROOT / "scraper" / "tests" / "fixtures"))
+    fx.set_defaults(fn=cmd_fixture)
 
     args = ap.parse_args(argv)
     return args.fn(args)

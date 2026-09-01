@@ -196,14 +196,16 @@ class Store:
             seen.setdefault((r["company_slug"], r["source"]), []).append(r["postings_seen"])
         return [k for k, v in seen.items() if len(v) >= 2 and v[0] == 0 and v[1] == 0]
 
-    def stats(self):
+    def stats(self, since=None):
+        """Counts. With `since` (ISO date or datetime), the period fields count
+        only what happened on or after it; the totals stay whole-store."""
         q = lambda sql, *a: self.db.execute(sql, a).fetchone()[0]
         by_state = self.db.execute(
             "SELECT s.state, COUNT(*) AS n FROM status_log s "
             "JOIN (SELECT posting_id, MAX(id) AS id FROM status_log GROUP BY posting_id) last ON last.id = s.id "
             "GROUP BY s.state"
         ).fetchall()
-        return {
+        out = {
             "postings": q("SELECT COUNT(*) FROM postings"),
             "open": q("SELECT COUNT(*) FROM postings WHERE closed_at IS NULL"),
             "comp_found": q("SELECT COUNT(*) FROM postings WHERE comp_found = 1"),
@@ -211,3 +213,16 @@ class Store:
             "polls": q("SELECT COUNT(*) FROM poll_log"),
             "poll_errors": q("SELECT COUNT(*) FROM poll_log WHERE ok = 0"),
         }
+        if since:
+            transitions = self.db.execute(
+                "SELECT state, COUNT(*) AS n FROM status_log WHERE noted_at >= ? AND state != 'new' GROUP BY state", (since,)
+            ).fetchall()
+            out["period"] = {
+                "since": since,
+                "seen": q("SELECT COUNT(*) FROM postings WHERE first_seen >= ?", since),
+                "surfaced": q("SELECT COUNT(*) FROM postings WHERE digested_at >= ?", since),
+                "transitions": {r["state"]: r["n"] for r in transitions},
+                "polls": q("SELECT COUNT(*) FROM poll_log WHERE ran_at >= ?", since),
+                "poll_errors": q("SELECT COUNT(*) FROM poll_log WHERE ran_at >= ? AND ok = 0", since),
+            }
+        return out
