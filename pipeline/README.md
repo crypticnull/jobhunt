@@ -27,7 +27,22 @@ TODO markers, provided it carries a hero still.
 | `media.py` | png, jpeg, gif, webp and svg sizes from headers; ffprobe and ffmpeg for video |
 | `frontmatter.py` | read and rewrite the records' flow-style frontmatter without a YAML library |
 | `ingest.py` | the drop to record fields |
+| `encode.py` | a final to a web ladder under `data/local/encodes`, the R2 URLs into the record, the wrangler upload commands |
 | `validate.py` | JSON records against `data/schema`, `make validate` in CI |
+
+## Video
+
+```
+python -m pipeline.encode encode drop/quest_2025_logo-loop_final_v03.mp4 --slug quest-2025
+python -m pipeline.encode upload quest-2025 --bucket portfolio-media --run
+python -m pipeline.encode publish quest-2025 --base-url https://media.<domain>
+```
+
+Hand-tuned x264 at 1080 and 720 plus an HLS rendition, written under
+`data/local/encodes` so nothing heavy enters the repo (ADR-0007). publish
+sets `provider: r2` and the URLs on the record and leaves what ingest
+probed alone. The site's player is host-agnostic, so moving hosts is a
+different base URL and a re-upload.
 
 ## Validation
 
