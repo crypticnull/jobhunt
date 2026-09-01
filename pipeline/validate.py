@@ -23,6 +23,8 @@ SCHEMA = ROOT / "data" / "schema"
 TARGETS = [
     (ROOT / "data" / "companies.example.json", SCHEMA / "company.schema.json"),
     (ROOT / "data" / "local" / "companies.json", SCHEMA / "company.schema.json"),
+    (ROOT / "data" / "scoring.json", SCHEMA / "scoring.schema.json"),
+    (ROOT / "data" / "local" / "scoring.local.json", SCHEMA / "scoring.schema.json"),
 ]
 
 _TYPES = {

@@ -3,7 +3,9 @@
   add URL        detect the ATS behind a careers URL and add the company
   check          probe every company's endpoint, report dead ones
   stale          companies not reviewed in N days
-  poll           fetch every pollable company into postings.db
+  poll           fetch every pollable company into postings.db, scoring on the way in
+  digest         write this week's digest to data/local/digests, or --stdout
+  score          rescore every open posting with the current ruleset
   mark ID STATE  record a status change for a posting
   stats          counts from the store
 """
@@ -12,8 +14,9 @@ import argparse
 import sys
 from pathlib import Path
 
-from . import adapters, companies
+from . import adapters, companies, digest
 from .poll import poll
+from .score import load_rules, score
 from .store import STATES, Store
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -85,6 +88,36 @@ def cmd_poll(args):
     return 0
 
 
+def cmd_digest(args):
+    data = companies.load(args.companies)
+    names = {c["slug"]: c["name"] for c in data["companies"]}
+    rules = load_rules()
+    store = Store(args.db)
+    try:
+        if args.stdout:
+            md, _ = digest.build(store, rules, names)
+            print(md)
+            return 0
+        path, n = digest.write(store, rules, Path(args.db).parent / "digests", names)
+    finally:
+        store.close()
+    print(f"wrote {path}, {n} postings surfaced")
+    return 0
+
+
+def cmd_score(args):
+    rules = load_rules()
+    store = Store(args.db)
+    try:
+        rows = store.open_postings()
+        for row in rows:
+            store.set_score(row["id"], score(row, rules))
+    finally:
+        store.close()
+    print(f"rescored {len(rows)} open postings with ruleset {rules['version']}")
+    return 0
+
+
 def cmd_mark(args):
     store = Store(args.db)
     try:
@@ -134,6 +167,13 @@ def main(argv=None):
 
     p = sub.add_parser("poll", help="fetch every pollable company into the store")
     p.set_defaults(fn=cmd_poll)
+
+    d = sub.add_parser("digest", help="write this week's digest")
+    d.add_argument("--stdout", action="store_true", help="print instead of writing, and do not mark postings as surfaced")
+    d.set_defaults(fn=cmd_digest)
+
+    sc = sub.add_parser("score", help="rescore every open posting")
+    sc.set_defaults(fn=cmd_score)
 
     m = sub.add_parser("mark", help="record a status change")
     m.add_argument("id", type=int)

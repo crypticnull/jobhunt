@@ -31,7 +31,7 @@ CREATE TABLE postings (
   score REAL,
   score_json TEXT,
   ruleset_version TEXT
-);
+, digested_at TEXT, digest_hash TEXT);
 CREATE TABLE status_log (
   id INTEGER PRIMARY KEY,
   posting_id INTEGER NOT NULL REFERENCES postings(id),

@@ -16,7 +16,7 @@ def p(**kw):
 class Migrations(unittest.TestCase):
     def test_fresh_store_is_at_latest_version(self):
         s = Store(":memory:")
-        self.assertEqual(s.migrate(), 1)
+        self.assertEqual(s.migrate(), 2)
 
     def test_schema_matches_committed_reference(self):
         """data/schema/db/schema.sql is the readable contract; the migrations are

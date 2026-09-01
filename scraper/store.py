@@ -3,6 +3,7 @@ PRAGMA user_version. Status is a log, never a mutable column, because a
 nine-month search wants its history."""
 
 import hashlib
+import json
 import re
 import sqlite3
 from datetime import datetime, timezone
@@ -162,6 +163,38 @@ class Store:
     def get(self, posting_id):
         row = self.db.execute("SELECT * FROM postings WHERE id = ?", (posting_id,)).fetchone()
         return dict(row) if row else None
+
+    # scoring and digest
+
+    def set_score(self, posting_id, result):
+        self.db.execute(
+            "UPDATE postings SET score = ?, score_json = ?, ruleset_version = ? WHERE id = ?",
+            (result["score"], json.dumps(result), result["version"], posting_id),
+        )
+        self.db.commit()
+
+    def open_postings(self):
+        rows = self.db.execute("SELECT * FROM postings WHERE closed_at IS NULL ORDER BY score DESC, first_seen").fetchall()
+        return [dict(r) for r in rows]
+
+    def mark_digested(self, ids, at, hasher):
+        for pid in ids:
+            self.db.execute("UPDATE postings SET digested_at = ?, digest_hash = ? WHERE id = ?", (at, hasher(self.get(pid)), pid))
+        self.db.commit()
+
+    def poll_errors_since(self, since):
+        rows = self.db.execute(
+            "SELECT ran_at, source, company_slug, error FROM poll_log WHERE ok = 0 AND ran_at >= ? ORDER BY ran_at DESC", (since,)
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+    def zero_twice_running(self):
+        """(company_slug, source) pairs whose last two successful polls saw nothing."""
+        rows = self.db.execute("SELECT company_slug, source, postings_seen FROM poll_log WHERE ok = 1 ORDER BY id DESC").fetchall()
+        seen = {}
+        for r in rows:
+            seen.setdefault((r["company_slug"], r["source"]), []).append(r["postings_seen"])
+        return [k for k, v in seen.items() if len(v) >= 2 and v[0] == 0 and v[1] == 0]
 
     def stats(self):
         q = lambda sql, *a: self.db.execute(sql, a).fetchone()[0]
