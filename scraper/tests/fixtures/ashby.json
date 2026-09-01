@@ -1,0 +1,56 @@
+{
+  "apiVersion": "1",
+  "jobs": [
+    {
+      "id": "a1",
+      "title": "Creative Engineer",
+      "department": "Creative",
+      "team": "Product",
+      "employmentType": "FullTime",
+      "location": "Remote",
+      "secondaryLocations": [],
+      "publishedAt": "2026-08-18T00:00:00.000Z",
+      "isRemote": true,
+      "workplaceType": "Remote",
+      "jobUrl": "https://jobs.ashbyhq.com/example-ai/a1",
+      "applyUrl": "https://jobs.ashbyhq.com/example-ai/a1/application",
+      "descriptionHtml": "<p>Judge the frame.</p>",
+      "descriptionPlain": "Judge the frame.",
+      "compensation": {
+        "compensationTierSummary": "$160K – $210K • Offers Equity",
+        "scrapeableCompensationSalarySummary": "$160K - $210K",
+        "compensationTiers": [
+          {
+            "id": "t1",
+            "title": "US",
+            "additionalInformation": null,
+            "components": [
+              { "id": "c1", "summary": "$160K – $210K", "compensationType": "Salary", "interval": "1 YEAR", "currencyCode": "USD", "minValue": 160000, "maxValue": 210000 }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "a2",
+      "title": "Design Technologist",
+      "department": "Design",
+      "team": "Design",
+      "employmentType": "FullTime",
+      "location": "San Francisco",
+      "secondaryLocations": [],
+      "publishedAt": "2026-08-28T00:00:00.000Z",
+      "isRemote": false,
+      "workplaceType": "Hybrid",
+      "jobUrl": "https://jobs.ashbyhq.com/example-ai/a2",
+      "applyUrl": "https://jobs.ashbyhq.com/example-ai/a2/application",
+      "descriptionHtml": "<p>Hybrid, three days.</p>",
+      "descriptionPlain": "Hybrid, three days.",
+      "compensation": {
+        "compensationTierSummary": "$140K – $180K",
+        "scrapeableCompensationSalarySummary": "$140K - $180K",
+        "compensationTiers": []
+      }
+    }
+  ]
+}

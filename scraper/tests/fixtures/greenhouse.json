@@ -1,0 +1,35 @@
+{
+  "jobs": [
+    {
+      "id": 4001,
+      "internal_job_id": 1,
+      "title": "Senior Creative Technologist",
+      "updated_at": "2026-08-20T10:00:00-04:00",
+      "first_published": "2026-08-15T09:00:00-04:00",
+      "requisition_id": "R1",
+      "location": { "name": "Remote - US" },
+      "absolute_url": "https://boards.greenhouse.io/examplestudio/jobs/4001",
+      "metadata": [],
+      "content": "&lt;p&gt;We are hiring a &lt;strong&gt;creative technologist&lt;/strong&gt; to build our generative pipeline.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;ComfyUI&lt;/li&gt;&lt;li&gt;Houdini&lt;/li&gt;&lt;/ul&gt;",
+      "pay_input_ranges": [
+        { "min_cents": 14000000, "max_cents": 17500000, "currency_type": "USD", "title": "US", "blurb": "" }
+      ],
+      "departments": [{ "id": 1, "name": "Creative" }],
+      "offices": [{ "id": 1, "name": "Remote" }]
+    },
+    {
+      "id": 4002,
+      "internal_job_id": 2,
+      "title": "Motion Designer",
+      "updated_at": "2026-08-25T10:00:00-04:00",
+      "location": { "name": "New York, NY (Hybrid)" },
+      "absolute_url": "https://boards.greenhouse.io/examplestudio/jobs/4002",
+      "metadata": [],
+      "content": "&lt;p&gt;Production motion design.&lt;/p&gt;",
+      "pay_input_ranges": [],
+      "departments": [],
+      "offices": []
+    }
+  ],
+  "meta": { "total": 2 }
+}

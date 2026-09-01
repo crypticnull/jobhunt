@@ -1,0 +1,103 @@
+import unittest
+from pathlib import Path
+
+from scraper.posting import posting
+from scraper.store import Store, content_key, fingerprint
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def p(**kw):
+    base = dict(source="greenhouse", source_id="1", company_slug="acme", title="Creative Technologist", url="https://x/1", remote="remote")
+    base.update(kw)
+    return posting(**base)
+
+
+class Migrations(unittest.TestCase):
+    def test_fresh_store_is_at_latest_version(self):
+        s = Store(":memory:")
+        self.assertEqual(s.migrate(), 1)
+
+    def test_schema_matches_committed_reference(self):
+        """data/schema/db/schema.sql is the readable contract; the migrations are
+        the truth. Regenerate the reference when a migration lands."""
+        ref = (ROOT / "data" / "schema" / "db" / "schema.sql").read_text(encoding="utf-8")
+        self.assertEqual(Store(":memory:").schema_dump(), ref)
+
+
+class Upsert(unittest.TestCase):
+    def setUp(self):
+        self.s = Store(":memory:")
+
+    def test_new_then_seen(self):
+        pid, new = self.s.upsert(p(), "2026-09-01T00:00:00+00:00")
+        self.assertTrue(new)
+        self.assertEqual(self.s.state_of(pid), "new")
+        pid2, new2 = self.s.upsert(p(title="Creative Technologist II"), "2026-09-02T00:00:00+00:00")
+        self.assertEqual((pid2, new2), (pid, False))
+        row = self.s.get(pid)
+        self.assertEqual(row["title"], "Creative Technologist II")
+        self.assertEqual(row["first_seen"], "2026-09-01T00:00:00+00:00")
+        self.assertEqual(row["last_seen"], "2026-09-02T00:00:00+00:00")
+
+    def test_comp_found_flag(self):
+        pid, _ = self.s.upsert(p(comp_min=150000))
+        self.assertEqual(self.s.get(pid)["comp_found"], 1)
+        pid2, _ = self.s.upsert(p(source_id="2"))
+        self.assertEqual(self.s.get(pid2)["comp_found"], 0)
+
+    def test_same_role_through_new_ats_is_rekeyed_not_duplicated(self):
+        pid, _ = self.s.upsert(p(source="greenhouse", source_id="9"))
+        pid2, new = self.s.upsert(p(source="lever", source_id="abc"))
+        self.assertEqual((pid2, new), (pid, False))
+        self.assertEqual(self.s.get(pid)["fingerprint"], "lever:abc")
+
+    def test_same_title_same_source_new_id_is_a_second_opening(self):
+        a, _ = self.s.upsert(p(source_id="1"))
+        b, new = self.s.upsert(p(source_id="2"))
+        self.assertTrue(new)
+        self.assertNotEqual(a, b)
+
+    def test_fingerprint_without_source_id_uses_content_key(self):
+        q = p(source_id=None)
+        self.assertEqual(fingerprint(q), content_key("acme", "Creative Technologist"))
+        self.assertEqual(content_key("acme", "  creative   TECHNOLOGIST!"), content_key("acme", "Creative Technologist"))
+
+    def test_close_missing_then_reopen(self):
+        a, _ = self.s.upsert(p(source_id="1"))
+        b, _ = self.s.upsert(p(source_id="2", title="Motion Designer"))
+        closed = self.s.close_missing("acme", "greenhouse", [fingerprint(p(source_id="1"))], "2026-09-03T00:00:00+00:00")
+        self.assertEqual(closed, 1)
+        self.assertIsNone(self.s.get(a)["closed_at"])
+        self.assertEqual(self.s.get(b)["closed_at"], "2026-09-03T00:00:00+00:00")
+        self.s.upsert(p(source_id="2", title="Motion Designer"))
+        self.assertIsNone(self.s.get(b)["closed_at"], "a posting that comes back reopens")
+
+
+class Status(unittest.TestCase):
+    def setUp(self):
+        self.s = Store(":memory:")
+        self.pid, _ = self.s.upsert(p())
+
+    def test_mark_is_a_log(self):
+        self.s.mark(self.pid, "interested")
+        self.s.mark(self.pid, "applied", note="sent", letter_path="data/local/letters/acme.md")
+        self.assertEqual(self.s.state_of(self.pid), "applied")
+        rows = self.s.db.execute("SELECT state FROM status_log WHERE posting_id = ? ORDER BY id", (self.pid,)).fetchall()
+        self.assertEqual([r["state"] for r in rows], ["new", "interested", "applied"])
+
+    def test_bad_state_and_bad_id(self):
+        with self.assertRaises(ValueError):
+            self.s.mark(self.pid, "maybe")
+        with self.assertRaises(KeyError):
+            self.s.mark(999, "applied")
+
+    def test_stats(self):
+        self.s.mark(self.pid, "applied")
+        self.s.upsert(p(source_id="2", comp_min=1))
+        self.s.log_poll("2026-09-01T00:00:00+00:00", "greenhouse", "acme", True, 2, 2)
+        self.s.log_poll("2026-09-01T00:00:00+00:00", "lever", "other", False, error="boom")
+        st = self.s.stats()
+        self.assertEqual((st["postings"], st["open"], st["comp_found"]), (2, 2, 1))
+        self.assertEqual(st["by_state"], {"applied": 1, "new": 1})
+        self.assertEqual((st["polls"], st["poll_errors"]), (2, 1))
