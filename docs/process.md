@@ -16,7 +16,9 @@ before it runs.
 
 ## Every night, unattended
 
-`scripts/nightly.cmd` at 02:30: pull main, then `python -m scraper poll`,
+`scripts/nightly.cmd` at 02:30, registered to catch up rather than skip if
+the machine was off or asleep at the time: pull main, then `python -m
+scraper poll`,
 which reads the discovery feeds, adds the boards they give away, polls
 every board, and scores everything on the way in, then push the company
 list if it grew, then a backup to the directory in

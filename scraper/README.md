@@ -28,7 +28,9 @@ python -m scraper fixture KIND BOARD # refresh a test fixture from the live endp
 
 `docs/process.md` is the schedule these run on. On Windows, `setup.cmd`
 at the repo root does the whole install in one double-click and writes
-what happened to `setup.log`.
+what happened to `setup.log`. After that nothing is typed: both scheduled
+jobs pull before they run and push what they produce, and a job missed
+because the machine was off runs at the next opportunity.
 
 ## Discovery
 
