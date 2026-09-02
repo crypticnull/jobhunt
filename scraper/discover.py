@@ -225,17 +225,28 @@ def _generic(name, rules):
 
 
 def relevant(item, rules):
-    """The terms a creative-technical posting names and a backend, QA or sales
-    posting does not. The scoring legs are deliberately broad, which is right
-    for a company already on the list and wrong for an open feed: `api`,
-    `automation` and `rendering` match every software job ever written.
-    Returns the terms that hit, empty when the posting is not for Matt."""
+    """The terms that make a posting Matt's, or nothing.
+
+    The title carries the decision. In the live run of 2026-09-02 every false
+    positive had an ordinary engineering or operations title and every real
+    hit had a creative one, because `generative ai` is boilerplate in software
+    ads now: a Java engineer and an IT operations analyst both say it. So a
+    posting needs a creative title and one term, or, for the real role behind
+    a title nobody standardized, two distinct strong craft terms."""
     d = rules["discovery"]
     title = (item["title"] or "").lower()
     for pat in d["exclude_title_patterns"]:
         if _pattern(pat).search(title):
             return []
-    return _hits(item["title"] + "\n" + item["text"], d["require_any"])
+    text = item["title"] + "\n" + item["text"]
+    hits = _hits(text, d["require_any"])
+    if not hits:
+        return []
+    if any(_pattern(pat).search(title) for pat in d["title_patterns"]):
+        return hits
+    if len(set(_hits(text, d["strong_terms"]))) >= d["min_strong_without_title"]:
+        return hits
+    return []
 
 
 def _remote(item):
@@ -254,7 +265,7 @@ def discover(known=(), rules=None, get_json=None, get_text=None, sources=SOURCES
     rules = rules or load_rules()
     known_slugs = {c["slug"] for c in known}
     known_boards = {(c["ats"]["kind"], (c["ats"]["board"] or "").lower()) for c in known}
-    found, seen_urls, fetches = [], set(), 0
+    found, seen_urls, seen_roles, fetches = [], set(), set(), 0
     cap = rules["discovery"]["max_page_fetches"]
     items = collect(get_json, get_text, sources, errors)
     if scanned is not None:
@@ -268,6 +279,10 @@ def discover(known=(), rules=None, get_json=None, get_text=None, sources=SOURCES
         hits = relevant(item, rules)
         if not hits:
             continue
+        role = (companies.slugify(item["company"]), re.sub(r"[^a-z0-9]+", " ", item["title"].lower()).strip())
+        if role in seen_roles:
+            continue  # boards repost the same role under -1, -2, -3 URLs
+        seen_roles.add(role)
         ats = board_of(item)
         if ats is None and fetches < cap:
             fetches += 1

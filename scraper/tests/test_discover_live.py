@@ -122,3 +122,60 @@ class TheFortyEight(unittest.TestCase):
         """'notch' was in the first draft of the list. 'top-notch' is in half
         the job ads ever written."""
         self.assertEqual(discover.relevant(item("Some Co", "Engineer", "A top-notch team."), RULES), [])
+
+
+# The second live check, a dry run on 2026-09-02 after the first fix. Twenty-six
+# postings surfaced and nine were worth seeing, so precision was 35%. Every one
+# of the seventeen misses had an ordinary engineering or operations title, and
+# `generative ai` alone accounted for seven of them: it is boilerplate in
+# software ads now. That is the evidence behind title_patterns.
+DRY_RUN = [
+    (False, "Azumo", "Technical Leader - Latin America", "generative ai"),
+    (False, "Azumo", "Java Engineer - Latin America", "generative ai"),
+    (True, "CapsLock", "Generative AI Pipeline Engineer (Tech Lead)", "blender comfyui generative ai lora"),
+    (False, "CodePath", "Staff Software Engineer", "generative ai"),
+    (False, "Gartner", "Senior Principal Analyst, AI Cybersecurity, Remote United States", "generative ai"),
+    (True, "IISD", "Consultancy for the Design and Production of Four Animated Videos", "after effects motion graphics storyboard"),
+    (True, "iLogos", "2D Character Concept Artist", "art director"),
+    (False, "InfoHawk", "Software Engineer", "ai-generated video"),
+    (False, "Ischool", "Graphic Design instructor - Project Based", "blender"),
+    (False, "Jobgether", "Real Estate Photo Editor", "compositing"),
+    (True, "Kazaar Fragrances", "Brand & Creative Designer (Freelance, 100% Remote)", "after effects motion design blender"),
+    (False, "LaunchDarkly", "Engineering Manager, Experimentation", "redshift"),
+    (False, "Lemon.io", "Senior React Full-stack Developer", "unreal engine"),
+    (False, "Lemon.io", "Senior Golang Developer", "unreal engine"),
+    (False, "Lemon.io", "Senior AI Engineer", "unreal engine"),
+    (True, "Locals", "Video Editor", "motion graphics"),
+    (True, "LooseGrip", "Junior Designer (Part-Time Contract)", "after effects"),
+    (True, "Ondeckglobal", "iGaming UI/UX Designer", "motion design"),
+    (True, "Performancepixel GmbH", "Art Director Performance Creatives (m/w/d)", "motion designer art direction art director"),
+    (True, "Remote Talent LATAM", "Disenador Grafico con Motion Graphics | Remote | LATAM Only", "after effects motion graphics"),
+    (False, "Seeq", "REMOTE (Some crossover w/ PST required)", "generative ai"),
+    (False, "Stream", "Multiple Positions", "midjourney"),
+    (False, "Sumble", "Multiple Roles", "genai"),
+    (False, "SupportYourApp", "(fluent English) CX Operations Consultant (Kazakhstan, remote)", "generative ai"),
+    (False, "UpGuard", "IT Operations Analyst", "generative ai"),
+    (False, "Virtasant", "Virtasant.com", "redshift"),
+]
+
+
+class TheDryRun(unittest.TestCase):
+    def test_every_posting_in_the_real_dry_run_is_judged_right(self):
+        wrong = []
+        for want, company, title, text in DRY_RUN:
+            got = bool(discover.relevant(item(company, title, text), RULES))
+            if got != want:
+                wrong.append(f"{company}: {title!r} wanted {'keep' if want else 'drop'}, got {'keep' if got else 'drop'}")
+        self.assertEqual(wrong, [], "judged against the live feeds on 2026-09-02")
+
+    def test_generative_ai_alone_is_not_a_signal_any_more(self):
+        """Seven of the seventeen misses were software and operations roles
+        whose only hit was `generative ai`. Every company says it now."""
+        self.assertEqual(discover.relevant(item("Any Co", "Staff Software Engineer", "We work on generative AI."), RULES), [])
+        self.assertTrue(discover.relevant(item("Any Co", "Motion Designer", "We work on generative AI."), RULES))
+
+    def test_an_odd_title_still_gets_in_on_two_strong_terms(self):
+        """The escape hatch: a real role at a real studio behind a title nobody
+        standardized. One craft term is not enough, two is."""
+        self.assertEqual(discover.relevant(item("Studio", "Multiple Roles", "We use Houdini."), RULES), [])
+        self.assertTrue(discover.relevant(item("Studio", "Multiple Roles", "We use Houdini and ComfyUI daily."), RULES))

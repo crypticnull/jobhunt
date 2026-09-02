@@ -176,6 +176,16 @@ class Grow(unittest.TestCase):
         self.assertIsNotNone(hn["score"])
         self.assertEqual(len(out["postings"]), 2)
 
+    def test_the_same_role_reposted_is_one_role(self):
+        """We Work Remotely reposts under -1, -2, -3 URLs. CapsLock's one job
+        arrived three times in the live dry run."""
+        payload = {"jobs": [
+            {"id": i, "company_name": "Dup Co", "title": "Motion Designer", "url": f"https://r/dup{i}", "description": "After Effects."}
+            for i in (10, 11, 12)
+        ]}
+        found = discover.discover([], RULES, lambda u: payload if "remotive" in u else get_json(u), get_text, sources=("remotive",))
+        self.assertEqual(len(found), 1)
+
     def test_grow_reports_what_it_scanned(self):
         out = discover.grow(self.s, self.data, RULES, get_json, get_text, now=NOW)
         self.assertGreater(out["scanned"], out["found"], "the selectivity is the number to watch")
