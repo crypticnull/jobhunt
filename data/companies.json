@@ -2,6 +2,91 @@
   "version": 1,
   "companies": [
     {
+      "slug": "airbnb",
+      "name": "Airbnb",
+      "careers_url": "https://careers.airbnb.com",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "airbnb"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "anthropic",
+      "name": "Anthropic",
+      "careers_url": "https://www.anthropic.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "anthropic"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "away",
+      "name": "Away",
+      "careers_url": "https://www.away.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "away"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "black-forest-labs",
+      "name": "Black Forest Labs",
+      "careers_url": "https://blackforestlabs.ai/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "black-forest-labs"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "brand-new-school",
+      "name": "Brand New School",
+      "careers_url": "https://www.brand-new-school.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "brandnewschool"
+      },
+      "category": "studio-ai",
+      "tier": 2,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
       "slug": "calm",
       "name": "Calm",
       "careers_url": "https://www.calm.com/careers",
@@ -36,6 +121,57 @@
       "last_reviewed": "2026-09-01"
     },
     {
+      "slug": "coinbase",
+      "name": "Coinbase",
+      "careers_url": "https://www.coinbase.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "coinbase"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "corridor-digital",
+      "name": "Corridor Digital",
+      "careers_url": "https://www.corridordigital.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "corridor"
+      },
+      "category": "studio-ai",
+      "tier": 2,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "d-id",
+      "name": "D-ID",
+      "careers_url": "https://www.d-id.com/careers",
+      "ats": {
+        "kind": "workable",
+        "board": "d-id"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
       "slug": "descript",
       "name": "Descript",
       "careers_url": "https://www.descript.com/careers",
@@ -53,12 +189,97 @@
       "last_reviewed": "2026-09-01"
     },
     {
+      "slug": "discord",
+      "name": "Discord",
+      "careers_url": "https://discord.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "discord"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "dropbox",
+      "name": "Dropbox",
+      "careers_url": "https://www.dropbox.com/jobs",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "dropbox"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
       "slug": "duolingo",
       "name": "Duolingo",
       "careers_url": "https://careers.duolingo.com",
       "ats": {
         "kind": "greenhouse",
         "board": "duolingo"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "elastic",
+      "name": "Elastic",
+      "careers_url": "https://www.elastic.tv/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "elastic"
+      },
+      "category": "studio-ai",
+      "tier": 2,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "elevenlabs",
+      "name": "ElevenLabs",
+      "careers_url": "https://elevenlabs.io/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "elevenlabs"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "epic-games",
+      "name": "Epic Games",
+      "careers_url": "https://www.epicgames.com/site/en-US/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "epicgames"
       },
       "category": "product-inhouse",
       "tier": 3,
@@ -121,6 +342,23 @@
       "last_reviewed": "2026-09-01"
     },
     {
+      "slug": "foundry",
+      "name": "Foundry",
+      "careers_url": "https://www.foundry.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "foundry"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
       "slug": "framestore",
       "name": "Framestore",
       "careers_url": "https://www.framestore.com/careers",
@@ -155,6 +393,23 @@
       "last_reviewed": "2026-09-01"
     },
     {
+      "slug": "glossier",
+      "name": "Glossier",
+      "careers_url": "https://www.glossier.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "glossier"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
       "slug": "headspace",
       "name": "Headspace",
       "careers_url": "https://www.headspace.com/careers",
@@ -164,6 +419,40 @@
       },
       "category": "brand-inhouse",
       "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "hedra",
+      "name": "Hedra",
+      "careers_url": "https://www.hedra.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "hedra"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "heygen",
+      "name": "HeyGen",
+      "careers_url": "https://www.heygen.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "heygen"
+      },
+      "category": "ai-video",
+      "tier": 1,
       "size": null,
       "priority": 2,
       "lead_proof": null,
@@ -189,12 +478,97 @@
       "last_reviewed": "2026-09-01"
     },
     {
+      "slug": "ideogram",
+      "name": "Ideogram",
+      "careers_url": "https://ideogram.ai/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "ideogram"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "instacart",
+      "name": "Instacart",
+      "careers_url": "https://www.instacart.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "instacart"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "jellyfish-pictures",
+      "name": "Jellyfish Pictures",
+      "careers_url": "https://www.jellyfishpictures.co.uk/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "jellyfish"
+      },
+      "category": "studio-ai",
+      "tier": 2,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "kapwing",
+      "name": "Kapwing",
+      "careers_url": "https://www.kapwing.com/careers",
+      "ats": {
+        "kind": "lever",
+        "board": "kapwing"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
       "slug": "krea",
       "name": "Krea",
       "careers_url": "https://www.krea.ai/careers",
       "ats": {
         "kind": "ashby",
         "board": "krea"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "lightricks",
+      "name": "Lightricks",
+      "careers_url": "https://www.lightricks.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "lightricks"
       },
       "category": "ai-video",
       "tier": 1,
@@ -257,6 +631,108 @@
       "last_reviewed": "2026-09-01"
     },
     {
+      "slug": "manvsmachine",
+      "name": "ManvsMachine",
+      "careers_url": "https://mvsm.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "manvsmachine"
+      },
+      "category": "studio-ai",
+      "tier": 2,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "masterclass",
+      "name": "MasterClass",
+      "careers_url": "https://www.masterclass.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "masterclass"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "method-studios",
+      "name": "Method Studios",
+      "careers_url": "https://www.method-studios.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "method"
+      },
+      "category": "studio-ai",
+      "tier": 2,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "midjourney",
+      "name": "Midjourney",
+      "careers_url": "https://www.midjourney.com/jobs",
+      "ats": {
+        "kind": "ashby",
+        "board": "midjourney"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "miro",
+      "name": "Miro",
+      "careers_url": "https://www.miro.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "miro"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "monks",
+      "name": "Monks",
+      "careers_url": "https://www.monks.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "monks"
+      },
+      "category": "studio-ai",
+      "tier": 2,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
       "slug": "notion",
       "name": "Notion",
       "careers_url": "https://www.notion.com/careers",
@@ -291,12 +767,97 @@
       "last_reviewed": "2026-09-01"
     },
     {
+      "slug": "openai",
+      "name": "OpenAI",
+      "careers_url": "https://openai.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "openai"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "opusclip",
+      "name": "OpusClip",
+      "careers_url": "https://opusclip.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "opusclip"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
       "slug": "oura",
       "name": "Oura",
       "careers_url": "https://ouraring.com/careers",
       "ats": {
         "kind": "greenhouse",
         "board": "oura"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "parallel-teeth",
+      "name": "Parallel Teeth",
+      "careers_url": "https://www.parallelteeth.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "parallel"
+      },
+      "category": "studio-ai",
+      "tier": 2,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "patreon",
+      "name": "Patreon",
+      "careers_url": "https://www.patreon.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "patreon"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "peloton",
+      "name": "Peloton",
+      "careers_url": "https://www.onepeloton.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "peloton"
       },
       "category": "brand-inhouse",
       "tier": 4,
@@ -410,6 +971,40 @@
       "last_reviewed": "2026-09-01"
     },
     {
+      "slug": "robinhood",
+      "name": "Robinhood",
+      "careers_url": "https://www.robinhood.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "robinhood"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "roblox",
+      "name": "Roblox",
+      "careers_url": "https://careers.roblox.com",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "roblox"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
       "slug": "runway",
       "name": "Runway",
       "careers_url": "https://runwayml.com/careers",
@@ -444,6 +1039,57 @@
       "last_reviewed": "2026-09-01"
     },
     {
+      "slug": "spotify",
+      "name": "Spotify",
+      "careers_url": "https://www.lifeatspotify.com/jobs",
+      "ats": {
+        "kind": "lever",
+        "board": "spotify"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "squarespace",
+      "name": "Squarespace",
+      "careers_url": "https://www.squarespace.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "squarespace"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "stability-ai",
+      "name": "Stability AI",
+      "careers_url": "https://stability.ai/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "stabilityai"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
       "slug": "strava",
       "name": "Strava",
       "careers_url": "https://www.strava.com/careers",
@@ -461,12 +1107,63 @@
       "last_reviewed": "2026-09-01"
     },
     {
+      "slug": "stripe",
+      "name": "Stripe",
+      "careers_url": "https://stripe.com/jobs",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "stripe"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
       "slug": "suno",
       "name": "Suno",
       "careers_url": "https://suno.com/careers",
       "ats": {
         "kind": "ashby",
         "board": "suno"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "super-fiction",
+      "name": "Super Fiction",
+      "careers_url": "https://www.superfiction.co/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "super"
+      },
+      "category": "studio-ai",
+      "tier": 2,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "synthesia",
+      "name": "Synthesia",
+      "careers_url": "https://www.synthesia.io/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "synthesia"
       },
       "category": "ai-video",
       "tier": 1,
@@ -495,6 +1192,23 @@
       "last_reviewed": "2026-09-01"
     },
     {
+      "slug": "the-mill",
+      "name": "The Mill",
+      "careers_url": "https://www.theMill.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "mill"
+      },
+      "category": "studio-ai",
+      "tier": 2,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
       "slug": "topaz-labs",
       "name": "Topaz Labs",
       "careers_url": "https://www.topazlabs.com/careers",
@@ -504,6 +1218,23 @@
       },
       "category": "ai-video",
       "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "twitch",
+      "name": "Twitch",
+      "careers_url": "https://www.twitch.tv/jobs",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "twitch"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
       "size": null,
       "priority": 2,
       "lead_proof": null,
@@ -546,6 +1277,23 @@
       "last_reviewed": "2026-09-01"
     },
     {
+      "slug": "viggle",
+      "name": "Viggle",
+      "careers_url": "https://www.viggle.ai/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "viggle"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
       "slug": "webflow",
       "name": "Webflow",
       "careers_url": "https://webflow.com/careers",
@@ -555,6 +1303,23 @@
       },
       "category": "product-inhouse",
       "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "whoop",
+      "name": "Whoop",
+      "careers_url": "https://www.whoop.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "whoop"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
       "size": null,
       "priority": 2,
       "lead_proof": null,
