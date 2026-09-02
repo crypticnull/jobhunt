@@ -15,7 +15,7 @@ python -m scraper import FILE [--priority 1|2|3] [--manual]   # many companies f
 python -m scraper check              # probe every endpoint, exit 1 if any is dead
 python -m scraper stale --days 60    # companies nobody has looked at lately
 python -m scraper poll               # read the feeds, add what they give away, fetch every board, score on the way in
-python -m scraper digest [--stdout]  # this week's digest to data/local/digests/<week>.md
+python -m scraper digest [--stdout]  # this week's digest to data/digests/<week>.md, pushed on Sundays
 python -m scraper score              # rescore every open posting after tuning scoring.json
 python -m scraper mark ID STATE      # new | reviewed | applied | screen | loop | offer | rejected | skipped
 python -m scraper stats [--markdown --since 2026-09-01]   # the monthly snapshot block

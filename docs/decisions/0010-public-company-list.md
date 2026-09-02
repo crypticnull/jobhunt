@@ -1,4 +1,4 @@
-# 0010: The company list is public
+# 0010: The company list and the digests are public
 
 Date: 2026-09-02
 Status: accepted
@@ -16,6 +16,11 @@ the tiers say which kind of company he rates, which his site says too.
 
 `data/companies.json` is committed. The nightly task pushes it after
 discovery grows it, and edits made from chat merge into it the same way.
+The weekly digest is committed too, `data/digests/<week>.md`, pushed by
+the Sunday task, so the week can be talked through from chat. A digest
+is public postings plus their scores; the comp floor itself never prints
+in a reason string, and the letters brief, which carries the negotiation
+posture, stays private.
 Contacts and notes on a company are the private half and live in
 `data/local/companies.notes.json`, keyed by slug, merged in on load and
 split out on save; the public file never carries them, and the save path
@@ -24,4 +29,4 @@ letters and the brief stay private as before.
 
 ## Tradeoff accepted
 
-Anyone can read where he is looking. Matt decided that is fine.
+Anyone can read where he is looking and what surfaced each week. Matt decided that is fine.

@@ -176,13 +176,13 @@ def gate_comp(p, rules, company):
     mid = (lo + hi) / 2
     contract = p.get("employment_type") in ("contract", "freelance")
     if contract and c.get("hourly_floor") and hi < c["hourly_floor"] * c["annualize_hourly_multiplier"]:
-        return "fail", [f"contract max {hi:,.0f} is under {c['hourly_floor']}/hour annualized, the floor is firm"], mid
+        return "fail", [f"contract max {hi:,.0f} is under the hourly floor, annualized, and the floor is firm"], mid
     if hi >= c["pass_min_annual"]:
         return "pass", [f"max {hi:,.0f} clears the floor"], mid
     if hi >= c["flag_min_annual"]:
         note = "worth a look at this tier" if tier in (1, 2) else "soft drop at this tier, review only"
         return "flag", [f"max {hi:,.0f} under the floor, {note}"], mid
-    return "fail", [f"max {hi:,.0f} below {c['fail_below_annual']:,}"], mid
+    return "fail", [f"max {hi:,.0f} is below the floor"], mid
 
 
 def disqualify(p, rules, now):

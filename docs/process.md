@@ -22,7 +22,8 @@ postings are closed and reopened by what the next poll sees.
 ## Sunday, unattended
 
 `scripts/weekly.cmd` at 07:00: pull main, then `python -m scraper
-digest`, which writes `data/local/digests/<week>.md`.
+digest`, which writes `data/digests/<week>.md`, then push it, so the
+digest can be read and talked about from chat.
 
 ## Monday, fifteen minutes minimum
 

@@ -91,7 +91,8 @@ class Gates(unittest.TestCase):
         # 40 to 50 an hour annualizes to 83,200 to 104,000, which clears the demo salary floor of 100,000
         low = score(row(comp_min=40 * 2080, comp_max=50 * 2080, comp_found=1, employment_type="contract"), rules(), NOW, TIER2)
         self.assertEqual(low["pile"], "logged")
-        self.assertIn("under 60/hour", low["drop_reason"])
+        self.assertIn("under the hourly floor", low["drop_reason"])
+        self.assertNotIn("60", low["drop_reason"].split("is under")[1], "the hourly floor itself never prints")
         annual = score(row(comp_min=90000, comp_max=104000, comp_found=1, employment_type="freelance"), rules(), NOW, TIER2)
         self.assertEqual(annual["drop_reason"], low["drop_reason"].replace("104,000", "104,000"), "an annual figure on freelance work is held to the same floor")
         fine = score(row(comp_min=90 * 2080, comp_max=100 * 2080, comp_found=1, employment_type="contract"), rules(), NOW, TIER2)
@@ -117,7 +118,8 @@ class Gates(unittest.TestCase):
     def test_comp_gate_and_bands(self):
         low = score(row(comp_min=60000, comp_max=75000, comp_found=1), rules(), NOW, TIER2)
         self.assertEqual(low["pile"], "logged")
-        self.assertIn("below 80,000", low["drop_reason"])
+        self.assertIn("below the floor", low["drop_reason"])
+        self.assertNotIn("80,000", low["drop_reason"], "the floor itself never prints, digests are public")
         soft = score(row(comp_min=85000, comp_max=95000, comp_found=1), rules(), NOW, TIER2)
         self.assertEqual((soft["pile"], fired(soft, "comp")["value"]), ("review", 5))
         self.assertTrue(any("under the floor" in f for f in soft["flags"]))

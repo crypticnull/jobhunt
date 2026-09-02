@@ -30,6 +30,6 @@ echo Pushing the company list so the repo copy is the live one ...
 git add data/companies.json
 git diff --cached --quiet || (git commit --quiet -m "companies: first poll" && git push --quiet origin HEAD:main)
 echo.
-echo Done. The digest lands in data\local\digests every Sunday morning.
+echo Done. The digest lands in data\digests every Sunday morning and is pushed.
 echo Nothing else to run. The nightly task pulls updates and pushes the list on its own.
 pause

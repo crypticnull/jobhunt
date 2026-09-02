@@ -16,13 +16,13 @@ diagram.
 | `data/local/scoring.local.json` | `scoring.schema.json` | Matt | scraper (the comp floor and bands, merged over the public file) |
 | `data/voice/rules.json` | (milestone 5) | Matt | voicelint |
 | `data/local/postings.db` | `db/schema.sql` | `scraper/store.py` only | digest, letters read-only |
-| `data/local/digests/` | | `scraper/digest.py` | Matt |
+| `data/digests/` | | `scraper/digest.py`, pushed by the Sunday task | Matt, and Claude from chat |
 | `data/local/letters/` | | letters (milestone 7) | Matt |
 
 Two rules hold it together. No package imports another; they meet only
 here. And `data/local/` is the private half of the search: contacts and notes
-on companies, postings.db, digests, letters, and the brief's figures. It
-never touches git. The company list itself is public (ADR-0010). Create it locally; the ignore rule and the pre-commit
+on companies, postings.db, letters, and the brief's figures. It
+never touches git. The company list and the digests are public (ADR-0010). Create it locally; the ignore rule and the pre-commit
 guard keep it out.
 
 ## Validation

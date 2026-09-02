@@ -6,7 +6,7 @@
   check          probe every company's endpoint, report dead ones
   stale          companies not reviewed in N days
   poll           read the discovery feeds, add what they give away, then fetch every pollable company
-  digest         write this week's digest to data/local/digests, or --stdout
+  digest         write this week's digest to data/digests (public, pushed on Sundays), or --stdout
   score          rescore every open posting with the current ruleset
   mark ID STATE  new | reviewed | applied | screen | loop | offer | rejected | skipped
   stats          counts from the store, --markdown --since DATE for the monthly snapshot
@@ -187,7 +187,7 @@ def cmd_digest(args):
             md, _ = digest.build(store, rules, by_slug)
             print(md)
             return 0
-        path, n = digest.write(store, rules, Path(args.db).parent / "digests", by_slug)
+        path, n = digest.write(store, rules, Path(args.out), by_slug)
     finally:
         store.close()
     print(f"wrote {path}, {n} postings surfaced")
@@ -317,6 +317,7 @@ def main(argv=None):
 
     d = sub.add_parser("digest", help="write this week's digest")
     d.add_argument("--stdout", action="store_true", help="print instead of writing, and do not mark postings as surfaced")
+    d.add_argument("--out", default=str(ROOT / "data" / "digests"), help="directory for the digest files (default data/digests)")
     d.set_defaults(fn=cmd_digest)
 
     sc = sub.add_parser("score", help="rescore every open posting")
