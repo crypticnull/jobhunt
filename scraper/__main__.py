@@ -1,6 +1,7 @@
 """python -m scraper <command>
 
   add URL        detect the ATS behind a careers URL and add the company
+  import FILE    many companies at once from a text file, one per line: category | careers url | name
   add-posting    a posting from a URL or a file, for referrals and unpolled companies
   check          probe every company's endpoint, report dead ones
   stale          companies not reviewed in N days
@@ -45,6 +46,57 @@ def cmd_add(args):
     companies.save(args.companies, data)
     where = f"{kind}/{board}" if board else kind
     print(f"added {slug}: {where}" + (f", {count} postings live" if count is not None else ""))
+    return 0
+
+
+def parse_import_lines(text):
+    """[(category, url, name)] from lines like `ai-video | https://x.com/careers | X`.
+    Blank lines and # comments are skipped; a bad line raises with its number."""
+    out = []
+    for n, raw in enumerate(text.splitlines(), 1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = [x.strip() for x in line.split("|")]
+        if len(parts) != 3 or parts[0] not in companies.CATEGORIES or not parts[1].startswith("http"):
+            raise ValueError(f"line {n}: expected `category | careers url | name` with a category from {', '.join(companies.CATEGORIES)}, got {raw!r}")
+        out.append(tuple(parts))
+    return out
+
+
+def cmd_import(args):
+    try:
+        rows = parse_import_lines(Path(args.file).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    data = companies.load(args.companies)
+    known = {c["slug"] for c in data["companies"]}
+    added, skipped, missed = 0, 0, []
+    for category, url, name in rows:
+        slug = companies.slugify(name)
+        if slug in known:
+            skipped += 1
+            print(f"skip      {name}: already on the list")
+            continue
+        hit = adapters.detect(url)
+        if hit is None and not args.manual:
+            missed.append((category, url, name))
+            print(f"unknown   {name}: no ATS found behind {url}")
+            continue
+        kind, board, count = hit or ("manual", None, None)
+        rec = companies.record(slug, name, kind, board, category, args.priority, url)
+        companies.add(data, rec)
+        known.add(slug)
+        added += 1
+        where = f"{kind}/{board}" if board else kind
+        print(f"added     {name}: {where}" + (f", {count} postings live" if count is not None else ""))
+    companies.save(args.companies, data)
+    print(f"{added} added, {skipped} already there, {len(missed)} without a detectable ATS")
+    if missed:
+        print("Check the careers URL for these, or rerun with --manual to keep them on the list for hand checks:")
+        for category, url, name in missed:
+            print(f"  {category} | {url} | {name}")
     return 0
 
 
@@ -225,6 +277,12 @@ def main(argv=None):
     a.add_argument("--kind", choices=companies.KINDS, help="skip detection and set the ATS kind")
     a.add_argument("--board", help="board slug when --kind is given")
     a.set_defaults(fn=cmd_add)
+
+    im = sub.add_parser("import", help="many companies from a text file, one per line: category | careers url | name")
+    im.add_argument("file")
+    im.add_argument("--priority", type=int, default=2, choices=(1, 2, 3))
+    im.add_argument("--manual", action="store_true", help="keep companies with no detectable ATS on the list as manual")
+    im.set_defaults(fn=cmd_import)
 
     ap_ = sub.add_parser("add-posting", help="a posting from a URL or a file")
     ap_.add_argument("src", help="a URL to fetch, or a text file")

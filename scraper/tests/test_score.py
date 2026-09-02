@@ -75,6 +75,30 @@ class Gates(unittest.TestCase):
         west = score(row(location="Remote", description="Any US time zones, pacific hours preferred."), rules(), NOW, TIER2)
         self.assertEqual(fired(west, "remote")["value"], 25)
 
+    def test_pacific_outscores_nationwide(self):
+        us = score(row(), rules(), NOW, TIER2)
+        self.assertEqual(fired(us, "remote")["value"], 22)
+        pt = score(row(description="Core hours on Pacific time."), rules(), NOW, TIER2)
+        self.assertEqual(fired(pt, "remote")["value"], 25)
+        self.assertEqual(fired(pt, "remote")["why"], "pacific hours")
+        pnw = score(row(location="Remote (PA, WA, OR)"), rules(), NOW, TIER2)
+        self.assertEqual(fired(pnw, "remote")["value"], 25, "a state list naming WA or OR counts as pacific")
+        self.assertEqual(pnw["pile"], "review", "still a plain motion designer")
+        flagged = score(row(location="Remote (PA, NY, NJ)", description="Pacific hours."), rules(), NOW, TIER2)
+        self.assertEqual(fired(flagged, "remote")["value"], 12, "a flag still halves it")
+
+    def test_contract_floor_is_firm(self):
+        # 40 to 50 an hour annualizes to 83,200 to 104,000, which clears the demo salary floor of 100,000
+        low = score(row(comp_min=40 * 2080, comp_max=50 * 2080, comp_found=1, employment_type="contract"), rules(), NOW, TIER2)
+        self.assertEqual(low["pile"], "logged")
+        self.assertIn("under 60/hour", low["drop_reason"])
+        annual = score(row(comp_min=90000, comp_max=104000, comp_found=1, employment_type="freelance"), rules(), NOW, TIER2)
+        self.assertEqual(annual["drop_reason"], low["drop_reason"].replace("104,000", "104,000"), "an annual figure on freelance work is held to the same floor")
+        fine = score(row(comp_min=90 * 2080, comp_max=100 * 2080, comp_found=1, employment_type="contract"), rules(), NOW, TIER2)
+        self.assertEqual(fine["pile"], "review")
+        salaried = score(row(comp_min=40 * 2080, comp_max=50 * 2080, comp_found=1), rules(), NOW, TIER2)
+        self.assertNotEqual(salaried["pile"], "logged", "the hourly floor is for contract work only")
+
     def test_remote_in_body_only_is_a_flag_and_absent_is_a_drop(self):
         body = score(row(remote_class="unclear", location="", description="This role is remote."), rules(), NOW, TIER2)
         self.assertEqual(body["pile"], "review")
@@ -139,7 +163,7 @@ class Points(unittest.TestCase):
         r = score(
             row(
                 title="Senior Creative Technologist",
-                description="Build our generative pipeline in ComfyUI and Houdini, with Python tooling.",
+                description="Build our generative pipeline in ComfyUI and Houdini, with Python tooling. Pacific hours.",
                 comp_min=140000,
                 comp_max=165000,
                 comp_found=1,
@@ -161,7 +185,7 @@ class Points(unittest.TestCase):
         and no named human is exactly the posting a human should glance at."""
         r = score(row(), rules(), NOW, TIER2)
         self.assertEqual(r["pile"], "review")
-        self.assertEqual(r["score"], 58)
+        self.assertEqual(r["score"], 55)
         self.assertEqual(r["title_tier"], "C")
 
     def test_title_tier_b_needs_a_technical_leg(self):
@@ -194,7 +218,7 @@ class Points(unittest.TestCase):
     def test_under_threshold_is_logged_with_a_reason(self):
         r = score(row(title="Animator", posted_at="2026-08-01T00:00:00+00:00"), rules(), NOW, {"size": 300})
         self.assertEqual((r["pile"], r["drop_reason"]), ("logged", "under review threshold"))
-        self.assertEqual(r["score"], 40)
+        self.assertEqual(r["score"], 37)
 
     def test_flags_always_push_to_review(self):
         r = score(

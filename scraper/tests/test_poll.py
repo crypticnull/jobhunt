@@ -4,7 +4,7 @@ from pathlib import Path
 
 from scraper import companies
 from scraper.http import HttpError
-from scraper.poll import poll
+from scraper.poll import employment_type_of, enrich, poll
 from scraper.store import Store
 
 FIX = Path(__file__).parent / "fixtures"
@@ -51,3 +51,18 @@ class Poll(unittest.TestCase):
         out = poll(self.s, self.companies[:1], lambda u: {"jobs": [{"title": None, "id": 1}]}, now="2026-09-01T00:00:00+00:00")[0]
         self.assertFalse(out["ok"])
         self.assertIn("IntegrityError", out["error"])
+
+
+class Enrich(unittest.TestCase):
+    def test_hourly_pay_means_contract(self):
+        p = enrich({"title": "Motion Designer", "description": "Pays $60 to $75 per hour."})
+        self.assertEqual((p["comp_min"], p["comp_max"], p["employment_type"]), (124800, 156000, "contract"))
+
+    def test_employment_type_from_text(self):
+        self.assertEqual(employment_type_of("Motion Designer (Contract)", ""), "contract")
+        self.assertEqual(employment_type_of("Motion Designer", "This is a freelance engagement."), "contract")
+        self.assertEqual(employment_type_of("Motion Designer", "Full-time. We sometimes hire contractors too."), None)
+        self.assertEqual(employment_type_of("Motion Designer", "Part-time, 20 hours a week."), "part-time")
+        self.assertIsNone(employment_type_of("Motion Designer", "A salaried role."))
+        p = enrich({"title": "Motion Designer", "description": "Salary $150,000.", "employment_type": "full-time"})
+        self.assertEqual(p["employment_type"], "full-time", "an ATS value is kept")
