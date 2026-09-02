@@ -1,4 +1,379 @@
 {
   "version": 1,
-  "companies": []
+  "companies": [
+    {
+      "slug": "a-team",
+      "name": "A.Team",
+      "careers_url": "https://remotive.com/remote-jobs/software-development/senior-independent-ai-engineer-architect-1919266",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "alertmedia",
+      "name": "AlertMedia",
+      "careers_url": "https://jobicy.com/jobs/152341-marketing-operations-specialist",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "algaecal",
+      "name": "AlgaeCal",
+      "careers_url": "https://weworkremotely.com/remote-jobs/algaecal-automation-qa-engineer-lead",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "amplify-renewables",
+      "name": "Amplify Renewables",
+      "careers_url": "https://news.ycombinator.com/item?id=49526311",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "angi",
+      "name": "ANGI",
+      "careers_url": "https://jobicy.com/jobs/152320-principal-analytics-engineer",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "appsamurai",
+      "name": "AppSamurai",
+      "careers_url": "https://jobicy.com/jobs/152353-sales-account-executive-mena-region",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "ashby",
+      "name": "Ashby",
+      "careers_url": "https://news.ycombinator.com/item?id=49525831",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "assetwatch",
+      "name": "AssetWatch",
+      "careers_url": "https://jobicy.com/jobs/152329-quality-assurance-engineer-2",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "astoria-ai",
+      "name": "Astoria AI",
+      "careers_url": "https://news.ycombinator.com/item?id=49525603",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "astronomer",
+      "name": "Astronomer",
+      "careers_url": "https://news.ycombinator.com/item?id=49523408",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "azumo",
+      "name": "Azumo",
+      "careers_url": "https://weworkremotely.com/remote-jobs/azumo-technical-leader-latin-america",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "beacon-ai-builds-intelligent-systems-that-make-aviation-safer-and-more-autonomou",
+      "name": "Beacon AI builds intelligent systems that make aviation safer and more autonomou",
+      "careers_url": "https://news.ycombinator.com/item?id=49524180",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "binance",
+      "name": "Binance",
+      "careers_url": "https://jobicy.com/jobs/152307-bap-data-analyst",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "biobase",
+      "name": "Biobase",
+      "careers_url": "https://news.ycombinator.com/item?id=49528044",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "blackbird-interactive",
+      "name": "Blackbird Interactive",
+      "careers_url": "https://remoteOK.com/remote-jobs/remote-senior-level-designer-blackbird-interactive-1137156",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "breezeway",
+      "name": "Breezeway",
+      "careers_url": "https://himalayas.app/companies/breezeway/jobs/sales-development-representative",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "bright-vision-technologies",
+      "name": "Bright Vision Technologies",
+      "careers_url": "https://himalayas.app/companies/bright-vision-technologies/jobs/aem-technical-consultant",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "brilliant-org",
+      "name": "Brilliant.org",
+      "careers_url": "https://news.ycombinator.com/item?id=49526361",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "capslock",
+      "name": "CapsLock",
+      "careers_url": "https://weworkremotely.com/remote-jobs/capslock-generative-ai-pipeline-engineer-tech-lead-2",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "carters-inc",
+      "name": "Carters Inc.",
+      "careers_url": "https://remoteOK.com/remote-jobs/remote-store-manager-carters-inc-1137135",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "company",
+      "name": "?",
+      "careers_url": "https://himalayas.app/companies/starbond/jobs/senior-marketing-manager",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "fastly",
+      "name": "*Fastly",
+      "careers_url": "https://news.ycombinator.com/item?id=49523835",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    }
+  ]
 }
