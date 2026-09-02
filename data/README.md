@@ -11,8 +11,8 @@ diagram.
 | `data/projects/<slug>/index.md` + `assets/` | `project.schema.json` | Matt, helped by `pipeline ingest` (milestone 10) | site, letters |
 | `data/pipelines/<slug>/index.md` + `assets/` | `pipeline.schema.json` | Matt | site, letters |
 | `data/proof/<id>.md` | `proof.schema.json` | Matt | letters, site |
-| `data/scoring.json` | `scoring.schema.json` | Matt | scraper |
-| `data/local/scoring.local.json` | `scoring.schema.json` | Matt | scraper (the private comp band) |
+| `data/scoring.json` | `scoring.schema.json` | Matt, twin of `docs/search-protocol.md` | scraper, letters (the proof lead) |
+| `data/local/scoring.local.json` | `scoring.schema.json` | Matt | scraper (the comp floor and bands, merged over the public file) |
 | `data/voice/rules.json` | (milestone 5) | Matt | voicelint |
 | `data/local/postings.db` | `db/schema.sql` | `scraper/store.py` only | digest, letters read-only |
 | `data/local/digests/` | | `scraper/digest.py` | Matt |

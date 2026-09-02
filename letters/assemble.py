@@ -78,12 +78,15 @@ def hedges(posting):
     if posting.get("remote_class") in ("hybrid", "unclear"):
         return True
     detail = json.loads(posting.get("score_json") or "{}")
-    return "remote hedged" in detail.get("flags", [])
+    return any(f == "remote hedged" or f.startswith("remote:") for f in detail.get("flags", []))
 
 
-def choose_lead(company, lead=None, proof_root=PROOF):
+def choose_lead(company, lead=None, proof_root=PROOF, posting=None):
     if lead:
         return lead
+    detail = json.loads((posting or {}).get("score_json") or "{}")
+    if detail.get("proof_lead") and (Path(proof_root) / f"{detail['proof_lead']}.md").exists():
+        return detail["proof_lead"]
     if company.get("lead_proof"):
         return company["lead_proof"]
     cat = company.get("category")
@@ -110,7 +113,7 @@ def select(posting, company, lead=None, blocks=None, proof_root=PROOF):
     blocks = blocks or load_blocks()
     cat = company.get("category")
     claim = next(((m, b) for m, b in blocks["claim"] if m.get("for") == cat), None)
-    lead_id = choose_lead(company, lead, proof_root)
+    lead_id = choose_lead(company, lead, proof_root, posting)
     proof_meta, proof_body = load_proof(lead_id, proof_root)
     values = {"company": company.get("name", company.get("slug", "")), "role": posting.get("title", "")}
     return {
@@ -135,7 +138,9 @@ def _comp(p):
 def render_brief(posting, company, chosen, voice_rules, max_description=6000):
     detail = json.loads(posting.get("score_json") or "{}")
     why = [f"- {r['rule']} {r['value']:+d} ({r['why']})" for r in detail.get("rules", [])]
-    flags = ", ".join(detail.get("flags", []))
+    if detail.get("pile"):
+        why.insert(0, f"- pile: {detail['pile']}" + (f", title tier {detail.get('title_tier')}" if detail.get("title_tier") else "") + (f", legs {', '.join(detail['legs_hit'])}" if detail.get("legs_hit") else ""))
+    flags = "; ".join(detail.get("flags", []))
     desc = (posting.get("description") or "").strip()
     if len(desc) > max_description:
         desc = desc[:max_description] + "\n\n[trimmed]"

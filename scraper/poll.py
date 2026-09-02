@@ -20,6 +20,7 @@ def enrich(p):
 
 
 def poll(store, companies, get_json=None, now=None, rules=None):
+    """`companies` are the list records; each posting is scored against its own company's tier and size."""
     get_json = get_json or http.get_json
     now = now or utcnow()
     rules = rules or load_rules()
@@ -38,7 +39,7 @@ def poll(store, companies, get_json=None, now=None, rules=None):
                 p["company_slug"] = slug
                 enrich(p)
                 pid, is_new = store.upsert(p, now)
-                store.set_score(pid, score(store.get(pid), rules, score_now))
+                store.set_score(pid, score(store.get(pid), rules, score_now, company=c))
                 seen.append(fingerprint(p))
                 new += int(is_new)
             closed = store.close_missing(slug, kind, seen, now)

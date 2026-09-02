@@ -1,36 +1,170 @@
 {
-  "version": "2026-09-01",
-  "weights": {
-    "remote": { "remote": 30, "hybrid": -15, "onsite": -40, "unclear": 0 },
-    "remote_hedge": -15,
-    "senior_bonus": 10,
-    "junior_penalty": -40,
-    "intersection_term": 6,
-    "intersection_title_multiplier": 2,
-    "intersection_cap": 30,
-    "penalty_term": -8,
-    "penalty_cap": -30,
-    "comp": { "in_band": 20, "above_band": 25, "partial_overlap": 5, "below_band": -25, "absent": 0 },
-    "freshness_days": 14,
-    "freshness_bonus": 10
+  "version": "2.0",
+  "date": "2026-09-01",
+  "status": "final",
+  "twin": "docs/search-protocol.md",
+  "note": "The public half of the search protocol. Every number that describes the comp band lives in data/local/scoring.local.json and is merged at load; here those fields are null. Never loosen gates.remote.",
+
+  "candidate": {
+    "current_state": "PA",
+    "future_states": ["WA", "OR"],
+    "future_states_from": "2027-06",
+    "remote_only": true
   },
-  "terms": {
-    "intersection": [
-      "creative technologist", "technical artist", "design technologist", "creative engineer",
-      "pipeline", "tooling", "automation", "generative", "comfyui", "houdini", "touchdesigner",
-      "real-time", "realtime", "unreal", "after effects", "cinema 4d", "redshift", "octane",
-      "python", "extendscript", "workflow", "asset management", "metadata"
-    ],
-    "penalty": [
-      "agency", "fast-paced", "high volume", "high-volume", "long-form", "video editor", "social media",
-      "content creator", "unpaid", "intern", "internship", "contract", "freelance", "hourly", "quick turnaround"
-    ],
-    "junior": ["junior", "associate", "intern", "entry level", "entry-level", "coordinator", "assistant"],
-    "senior": ["senior", "sr.", "staff", "principal", "lead", "head of", "director"],
-    "remote_hedge": [
-      "remote for now", "hybrid", "days in office", "days in the office", "days per week in", "in-office",
-      "must be located", "relocat", "on-site", "onsite", "local candidates", "commutable"
+
+  "gates": {
+    "remote": {
+      "require_claim": ["remote"],
+      "fail_claims": ["hybrid", "onsite"],
+      "fail_phrases": [
+        "hybrid", "on-site", "onsite", "on site", "in-office", "in office", "in the office",
+        "remote for now", "remote to start", "initially remote", "temporarily remote",
+        "occasional office", "days in the office", "days per week in", "days a week in",
+        "commuting distance", "commutable", "local candidates", "within \\d+ miles",
+        "must be located in", "must reside in", "must live in", "based in the",
+        "relocate to", "relocation to", "return to office", "\\brto\\b"
+      ],
+      "fail_if_state_list_excludes": ["PA"],
+      "flag_if_state_list_excludes_all_of": ["WA", "OR"],
+      "flag_phrases": [
+        "remote \\(", "remote - [a-z]", "remote, [a-z]",
+        "eastern time", "et hours", "est hours", "east coast hours",
+        "central time", "ct hours"
+      ],
+      "ok_timezone_phrases": ["us time zones", "pacific", "pt hours", "pst", "west coast"],
+      "nationwide_tokens": ["us", "usa", "u\\.s\\.", "united states", "anywhere in the us", "all us states", "nationwide", "us-remote", "remote-us"]
+    },
+    "comp": {
+      "annualize_hourly_multiplier": 2080,
+      "gate_on": "salary_max",
+      "score_on": "midpoint",
+      "pass_min_annual": null,
+      "flag_min_annual": null,
+      "fail_below_annual": null,
+      "hourly_floor": null,
+      "unlisted_ok_if_tier_in": [1, 2, 3],
+      "unlisted_ok_if_size_over": 200,
+      "fail_phrases": [
+        "unpaid test", "unpaid assignment", "spec work", "on spec",
+        "design exercise \\(?\\d+ hours", "take-home.{0,40}(3|4|5|6|8|10|\\d{2}) hours",
+        "test project.{0,40}(3|4|5|6|8|10|\\d{2}) hours"
+      ]
+    }
+  },
+
+  "disqualifiers": {
+    "drop": {
+      "title_patterns": ["^video editor$", "^editor$", "^junior", "^associate", "^coordinator", "^intern"],
+      "phrases": [
+        "relocation required", "relocation assistance",
+        "travel (up to )?(1[1-9]|[2-9]\\d)%", "travel (up to )?\\d{2}%\\+",
+        "fixed fee", "flat fee", "per project rate", "full animated (short|film|piece|video)",
+        "pure ux", "user experience designer", "product designer \\(ux",
+        "research scientist", "ml researcher", "machine learning engineer"
+      ],
+      "stale_after_days": 30,
+      "stale_unseen_days": 7
+    },
+    "flag": {
+      "phrases": ["unreal", "unity", "ue5", "shader", "hlsl", "glsl", "react", "typescript", "frontend", "front-end"],
+      "reason": "engine or frontend primary, Matt decides"
+    }
+  },
+
+  "deductions": {
+    "per_hit": 3,
+    "cap": 15,
+    "phrases": [
+      "content creator", "social media video", "short-form content", "short form content",
+      "\\d+\\+? videos (a|per) week", "\\d+\\+? (pieces|assets) (a|per) week",
+      "wear many hats", "fast-paced", "fast paced", "scrappy", "startup mentality", "hustle",
+      "rockstar", "rock star", "ninja", "guru", "wizard", "unicorn",
+      "junior", "mid-level", "mid level", "associate", "coordinator",
+      "unlimited pto", "competitive salary", "competitive compensation", "salary commensurate",
+      "account manager", "client deliverables", "billable", "utilization",
+      "ai video editor", "ai content", "at scale", "content at scale", "high volume", "high-volume",
+      "confidential client", "our client is", "tight deadlines"
     ]
   },
-  "thresholds": { "strong": 45, "borderline": 15 }
+
+  "score": {
+    "remote": { "max": 25, "pass": 25, "flagged": 12 },
+    "comp": {
+      "max": 20,
+      "bands": [],
+      "unlisted_tier_1_3": 10,
+      "unlisted_size_over_200_no_tier": 8,
+      "flagged": 5
+    },
+    "intersection": {
+      "max": 20,
+      "per_leg": 5,
+      "max_legs": 4,
+      "legs": {
+        "3d": ["cinema 4d", "c4d", "redshift", "octane", "3d", "modeling", "modelling", "lighting", "texturing", "rendering", "houdini", "blender", "maya"],
+        "motion": ["after effects", "motion design", "motion designer", "motion graphics", "animation", "compositing", "premiere", "brand motion", "kinetic type", "logo animation"],
+        "generative": ["generative", "diffusion", "comfyui", "stable diffusion", "flux", "wan", "text-to-video", "text to video", "image-to-video", "image to video", "img2vid", "ai video", "ai image", "gen ai", "genai", "gen-ai", "lora", "controlnet", "upscal", "inpaint", "runway", "kling", "veo", "sora", "minimax", "ltx"],
+        "software": ["python", "javascript", "typescript", "extendscript", "cep", "plugin", "panel", "scripting", "automation", "api", "rest api", "restful", "node", "tooling", "agentic", "llm", "local models", "llama\\.cpp", "ollama", "cuda", "pytorch"],
+        "pipeline": ["pipeline", "asset management", "mam", "dam", "metadata", "taxonomy", "naming convention", "iconik", "frame\\.io", "workflow", "render farm", "versioning", "asana", "shotgrid", "ftrack"]
+      }
+    },
+    "title": {
+      "max": 15,
+      "tier_a": {
+        "points": 15,
+        "patterns": [
+          "creative technologist", "technical artist", "design technologist", "creative engineer",
+          "motion design engineer", "creative developer", "generative ai designer", "generative ai artist",
+          "generative artist", "ai creative lead", "ai creative director", "creative ai engineer", "creative ai",
+          "pipeline td", "pipeline technical director", "motion technologist", "technical director"
+        ]
+      },
+      "tier_b": {
+        "points": 10,
+        "patterns": [
+          "motion designer", "motion graphics designer", "3d motion designer", "3d artist", "3d generalist",
+          "art director", "design engineer", "motion lead", "head of motion", "animation director"
+        ],
+        "requires_any_leg": ["generative", "software", "pipeline"]
+      },
+      "tier_c": {
+        "points": 5,
+        "patterns": ["motion designer", "motion graphics designer", "3d artist", "animator", "3d generalist"],
+        "requires_any_leg": []
+      }
+    },
+    "company_tier": { "max": 10, "1": 10, "2": 8, "3": 6, "4": 4, "unknown": 2 },
+    "freshness": { "max": 5, "within_days": [ { "days": 7, "points": 5 }, { "days": 14, "points": 3 } ] },
+    "human": { "max": 5, "points_if_contact_hint": 5 }
+  },
+
+  "piles": {
+    "apply_min": 70,
+    "review_min": 50,
+    "flagged_always_review": true,
+    "apply_weekly_cap": 12,
+    "apply_sort": ["company_tier", "score.total"]
+  },
+
+  "proof_lead_by_tier": {
+    "1": "local-pipeline",
+    "2": "ae-llama",
+    "3": "keynote-extractor",
+    "4": "event-franchises",
+    "unknown": "ae-llama"
+  },
+
+  "status_values": ["new", "reviewed", "applied", "screen", "loop", "offer", "rejected", "skipped"],
+
+  "digest": {
+    "day": "monday",
+    "sections": ["new_by_source", "apply_pile", "review_pile_with_flags", "drops_by_reason"]
+  },
+
+  "tuning": {
+    "collect_only_until": "2026-10-05",
+    "checkpoint": "2026-11-16",
+    "loosen_order": ["comp.unlisted_salary_unknown_company", "title.tier_b"],
+    "never_loosen": ["gates.remote"]
+  }
 }

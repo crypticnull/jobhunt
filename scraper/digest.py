@@ -1,20 +1,19 @@
-"""The weekly digest: a markdown file that explains its own reasoning.
-
-Three lanes, strong, borderline, and comp not posted, each entry carrying
-the rules that put it there and the id to mark it with. Postings that
-carry a terminal status, or were already surfaced and have not changed,
-stay out. A footer names any source that errored or returned nothing twice
-running, so rot is visible within a week."""
+"""The Monday digest, per the search protocol: new listings by source, the
+apply pile sorted by company tier then score and capped for the week, the
+review pile with its flag reasons, drop counts by reason, and the source
+health footer. Postings past `reviewed`, or already surfaced and unchanged,
+stay out. During the collect-only window the piles still print, with a
+banner, so the gates can be checked against what they throw away."""
 
 import hashlib
+import json
 from datetime import datetime, timedelta, timezone
 
-from .score import lane
 from .store import TERMINAL, utcnow
 
 
 def digest_hash(row):
-    key = "|".join(str(row.get(k)) for k in ("title", "comp_min", "comp_max", "remote_class")) + f"|{round(row.get('score') or 0)}"
+    key = "|".join(str(row.get(k)) for k in ("title", "comp_min", "comp_max", "remote_class", "pile")) + f"|{round(row.get('score') or 0)}"
     return hashlib.sha256(key.encode()).hexdigest()[:16]
 
 
@@ -23,28 +22,30 @@ def _week(now):
     return f"{y}-W{w:02d}"
 
 
-def select(store, rules):
-    """Open, non-terminal, scored postings not already surfaced unchanged, split by lane."""
-    lanes = {"strong": [], "borderline": [], "no_comp": []}
-    below = 0
+def _tier(row, companies):
+    c = (companies or {}).get(row["company_slug"]) or {}
+    return c.get("tier") or 9
+
+
+def select(store, rules, companies=None, now=None):
+    """{"apply": rows, "review": rows, "overflow": rows} plus the ids surfaced.
+    Apply is sorted by tier then score and capped at the weekly cap; the rest
+    of it becomes overflow and prints under review."""
+    piles = {"apply": [], "review": []}
     for row in store.open_postings():
-        if row["score"] is None:
+        if row["score"] is None or row.get("pile") in (None, "logged"):
             continue
         if store.state_of(row["id"]) in TERMINAL:
             continue
         if row["digested_at"] and row["digest_hash"] == digest_hash(row):
             continue
-        which = lane({"score": row["score"]}, rules)
-        if which == "below":
-            below += 1
-            continue
-        if not row["comp_found"]:
-            lanes["no_comp"].append(row)
-        else:
-            lanes[which].append(row)
-    for k in lanes:
-        lanes[k].sort(key=lambda r: (-(r["score"] or 0), r["first_seen"]))
-    return lanes, below
+        piles[row["pile"]].append(row)
+    piles["apply"].sort(key=lambda r: (_tier(r, companies), -(r["score"] or 0), r["first_seen"]))
+    piles["review"].sort(key=lambda r: (-(r["score"] or 0), r["first_seen"]))
+    cap = rules["piles"]["apply_weekly_cap"]
+    piles["overflow"] = piles["apply"][cap:]
+    piles["apply"] = piles["apply"][:cap]
+    return piles
 
 
 def _comp(row):
@@ -56,71 +57,72 @@ def _comp(row):
     return f"{cur} {(lo if lo is not None else hi):,}".strip()
 
 
-def _entry(row, company_names):
-    import json
-
+def _entry(row, companies):
     detail = json.loads(row["score_json"] or "{}")
-    top = sorted(detail.get("rules", []), key=lambda r: -abs(r["value"]))[:4]
-    why = ", ".join(f"{r['rule']} {r['value']:+d} ({r['why']})" for r in top)
-    flags = ", ".join(detail.get("flags", []))
-    name = company_names.get(row["company_slug"], row["company_slug"])
+    sc = {r["rule"]: r for r in detail.get("rules", [])}
+    parts = [f"{k} {sc[k]['value']:+d}" for k in ("remote", "comp", "intersection", "title", "company", "freshness", "human", "deductions") if k in sc]
+    company = (companies or {}).get(row["company_slug"]) or {}
+    name = company.get("name", row["company_slug"])
+    tier = company.get("tier")
     lines = [
-        f"### {row['title']}, {name}",
-        f"{row['remote_class']} · {_comp(row)} · first seen {row['first_seen'][:10]} · score {round(row['score'])}",
-        f"Why: {why}" if why else "Why: no rules fired",
+        f"### {row['title']}, {name}" + (f" (tier {tier})" if tier else ""),
+        f"{row['remote_class']} · {_comp(row)} · first seen {row['first_seen'][:10]} · score {round(row['score'])}"
+        + (f" · legs {', '.join(detail.get('legs_hit') or [])}" if detail.get("legs_hit") else ""),
+        "Score: " + ", ".join(parts),
     ]
-    if flags:
-        lines.append(f"Flags: {flags}")
-    lines.append(f"{row['url']}  (id {row['id']}, mark with `python -m scraper mark {row['id']} interested`)")
+    if detail.get("flags"):
+        lines.append("Flags: " + "; ".join(detail["flags"]))
+    if detail.get("proof_lead"):
+        lines.append(f"Lead with: {detail['proof_lead']}")
+    lines.append(f"{row['url']}  (id {row['id']}, `python -m scraper mark {row['id']} reviewed`)")
     return "\n".join(lines) + "\n"
 
 
 def source_health(store, since):
-    """Sources that errored since `since`, or returned zero postings on their last two polls."""
-    problems = []
-    for r in store.poll_errors_since(since):
-        problems.append(f"{r['source']}/{r['company_slug']}: {r['error']} ({r['ran_at'][:10]})")
-    for slug, source in store.zero_twice_running():
-        problems.append(f"{source}/{slug}: zero postings on the last two polls")
+    problems = [f"{r['source']}/{r['company_slug']}: {r['error']} ({r['ran_at'][:10]})" for r in store.poll_errors_since(since)]
+    problems += [f"{source}/{slug}: zero postings on the last two polls" for slug, source in store.zero_twice_running()]
     return problems
 
 
-def build(store, rules, company_names=None, now=None, since=None):
-    """Returns (markdown, included_row_ids)."""
+def build(store, rules, companies=None, now=None, since=None):
+    """Returns (markdown, surfaced_ids). `companies` is {slug: record}."""
     now = now or datetime.now(timezone.utc)
     since = since or (now - timedelta(days=7)).isoformat()
-    company_names = company_names or {}
-    lanes, below = select(store, rules)
-    n = sum(len(v) for v in lanes.values())
+    piles = select(store, rules, companies, now)
+    by_source = store.new_by_source(since)
+    drops = store.drop_counts(since)
     stats = store.stats()
-    out = [
-        f"# Digest, week {_week(now)}",
+    collect_until = rules["tuning"].get("collect_only_until")
+    out = [f"# Digest, week {_week(now)}", ""]
+    if collect_until and now.date().isoformat() < collect_until:
+        out += [f"Collect-only until {collect_until}: nothing is applied to yet. Read the piles to check the gates aren't throwing away obvious fits.", ""]
+    out += [
+        f"{stats['open']} open postings. This week: {sum(by_source.values())} new, {len(piles['apply'])} to apply"
+        + (f" (+{len(piles['overflow'])} over the weekly cap of {rules['piles']['apply_weekly_cap']}, pushed to review)" if piles["overflow"] else "")
+        + f", {len(piles['review']) + len(piles['overflow'])} to review, {sum(drops.values())} logged. Ruleset {rules['version']}.",
         "",
-        f"{stats['open']} open postings, {n} surfaced ({len(lanes['strong'])} strong, {len(lanes['borderline'])} borderline, "
-        f"{len(lanes['no_comp'])} without comp), {below} below threshold. Ruleset {rules['version']}.",
+        "## New listings by source",
         "",
     ]
-    for title, key in (("Strong", "strong"), ("Borderline", "borderline"), ("Comp not posted", "no_comp")):
-        out.append(f"## {title}")
-        out.append("")
-        if not lanes[key]:
-            out.append("Nothing this week.")
-            out.append("")
-        for row in lanes[key]:
-            out.append(_entry(row, company_names))
-    out.append("## Source health")
-    out.append("")
+    out += [f"- {src}: {n}" for src, n in sorted(by_source.items(), key=lambda kv: -kv[1])] or ["- none"]
+    out += ["", "## Apply", ""]
+    out += [_entry(r, companies) for r in piles["apply"]] or ["Nothing this week.", ""]
+    out += ["## Review", ""]
+    review = piles["overflow"] + piles["review"]
+    out += [_entry(r, companies) for r in review] or ["Nothing this week.", ""]
+    out += ["## Logged, by reason", ""]
+    out += [f"- {n:>3}  {reason}" for reason, n in sorted(drops.items(), key=lambda kv: -kv[1])] or ["- none"]
+    out += ["", "## Source health", ""]
     problems = source_health(store, since)
-    out.extend(f"- {p}" for p in problems) if problems else out.append("All sources answered.")
+    out += [f"- {p}" for p in problems] or ["All sources answered."]
     out.append("")
-    ids = [r["id"] for v in lanes.values() for r in v]
+    ids = [r["id"] for r in piles["apply"] + review]
     return "\n".join(out), ids
 
 
-def write(store, rules, path_dir, company_names=None, now=None):
-    """Build, write data/local/digests/<week>.md, and mark the surfaced postings."""
+def write(store, rules, path_dir, companies=None, now=None):
     now = now or datetime.now(timezone.utc)
-    md, ids = build(store, rules, company_names, now)
+    md, ids = build(store, rules, companies, now)
     path_dir.mkdir(parents=True, exist_ok=True)
     path = path_dir / f"{_week(now)}.md"
     path.write_text(md, encoding="utf-8")

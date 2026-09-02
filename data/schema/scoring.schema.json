@@ -1,81 +1,59 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "scoring.schema.json",
-  "title": "Scoring config",
-  "description": "Shape of data/scoring.json (committed: weights, terms, thresholds) and of data/local/scoring.local.json (private: the comp band, merged at load). Scoring ranks, it never drops.",
+  "title": "Search protocol, scoring config",
+  "description": "Shape of data/scoring.json (public: gates, disqualifiers, deductions, score, piles, tuning) and of data/local/scoring.local.json (private: the comp numbers), merged at load. Structure is checked; the term lists are free.",
   "type": "object",
-  "additionalProperties": false,
+  "required": ["version", "gates", "disqualifiers", "deductions", "score", "piles", "proof_lead_by_tier", "status_values", "tuning"],
   "properties": {
-    "version": { "type": "string", "description": "Stamped on every scored posting as ruleset_version, so history can be rescored after tuning" },
-    "weights": {
+    "version": { "type": "string" },
+    "date": { "type": "string" },
+    "status": { "type": "string" },
+    "twin": { "type": "string" },
+    "note": { "type": "string" },
+    "candidate": { "type": "object" },
+    "gates": {
       "type": "object",
-      "additionalProperties": false,
+      "required": ["remote", "comp"],
       "properties": {
         "remote": {
           "type": "object",
-          "required": ["remote", "hybrid", "onsite", "unclear"],
-          "additionalProperties": false,
-          "properties": {
-            "remote": { "type": "number" },
-            "hybrid": { "type": "number" },
-            "onsite": { "type": "number" },
-            "unclear": { "type": "number" }
-          }
+          "required": ["require_claim", "fail_claims", "fail_phrases", "fail_if_state_list_excludes", "flag_if_state_list_excludes_all_of", "flag_phrases", "ok_timezone_phrases", "nationwide_tokens"]
         },
-        "remote_hedge": { "type": "number" },
-        "senior_bonus": { "type": "number" },
-        "junior_penalty": { "type": "number" },
-        "intersection_term": { "type": "number" },
-        "intersection_title_multiplier": { "type": "number" },
-        "intersection_cap": { "type": "number" },
-        "penalty_term": { "type": "number" },
-        "penalty_cap": { "type": "number" },
         "comp": {
           "type": "object",
-          "required": ["in_band", "above_band", "partial_overlap", "below_band", "absent"],
-          "additionalProperties": false,
+          "required": ["annualize_hourly_multiplier", "pass_min_annual", "flag_min_annual", "fail_below_annual", "hourly_floor", "unlisted_ok_if_tier_in", "unlisted_ok_if_size_over", "fail_phrases"],
           "properties": {
-            "in_band": { "type": "number" },
-            "above_band": { "type": "number" },
-            "partial_overlap": { "type": "number" },
-            "below_band": { "type": "number" },
-            "absent": { "type": "number" }
+            "pass_min_annual": { "type": ["integer", "null"] },
+            "flag_min_annual": { "type": ["integer", "null"] },
+            "fail_below_annual": { "type": ["integer", "null"] },
+            "hourly_floor": { "type": ["integer", "null"] }
           }
-        },
-        "freshness_days": { "type": "integer" },
-        "freshness_bonus": { "type": "number" }
+        }
       }
     },
-    "terms": {
+    "disqualifiers": { "type": "object", "required": ["drop", "flag"] },
+    "deductions": { "type": "object", "required": ["per_hit", "cap", "phrases"] },
+    "score": {
       "type": "object",
-      "additionalProperties": false,
+      "required": ["remote", "comp", "intersection", "title", "company_tier", "freshness", "human"],
       "properties": {
-        "intersection": { "type": "array", "items": { "type": "string" } },
-        "penalty": { "type": "array", "items": { "type": "string" } },
-        "junior": { "type": "array", "items": { "type": "string" } },
-        "senior": { "type": "array", "items": { "type": "string" } },
-        "remote_hedge": { "type": "array", "items": { "type": "string" } }
+        "comp": {
+          "type": "object",
+          "required": ["max", "bands", "unlisted_tier_1_3", "unlisted_size_over_200_no_tier", "flagged"],
+          "properties": {
+            "bands": {
+              "type": "array",
+              "items": { "type": "object", "required": ["midpoint_min", "points"], "properties": { "midpoint_min": { "type": "integer" }, "points": { "type": "integer" } } }
+            }
+          }
+        }
       }
     },
-    "thresholds": {
-      "type": "object",
-      "required": ["strong", "borderline"],
-      "additionalProperties": false,
-      "properties": {
-        "strong": { "type": "number" },
-        "borderline": { "type": "number" }
-      }
-    },
-    "comp_band": {
-      "type": "object",
-      "description": "Private. Lives only in data/local/scoring.local.json.",
-      "required": ["min", "max", "currency"],
-      "additionalProperties": false,
-      "properties": {
-        "min": { "type": "integer" },
-        "max": { "type": "integer" },
-        "currency": { "type": "string" }
-      }
-    }
+    "piles": { "type": "object", "required": ["apply_min", "review_min", "flagged_always_review", "apply_weekly_cap"] },
+    "proof_lead_by_tier": { "type": "object" },
+    "status_values": { "type": "array", "items": { "type": "string" } },
+    "digest": { "type": "object" },
+    "tuning": { "type": "object", "required": ["collect_only_until", "checkpoint", "never_loosen"] }
   }
 }

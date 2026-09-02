@@ -40,6 +40,12 @@ class Lead(unittest.TestCase):
         self.assertEqual(assemble.choose_lead(company(category="ai-video")), "local-pipeline")
         self.assertEqual(assemble.choose_lead(company(category="brand-inhouse")), "event-franchises")
 
+    def test_scored_posting_names_its_own_lead(self):
+        scored = posting(score_json=json.dumps({"rules": [], "flags": [], "proof_lead": "keynote-extractor"}))
+        self.assertEqual(assemble.choose_lead(company(category="ai-video"), posting=scored), "keynote-extractor")
+        self.assertEqual(assemble.choose_lead(company(), lead="dancekit", posting=scored), "dancekit", "--lead still wins")
+        self.assertEqual(assemble.choose_lead(company(lead_proof="game-project"), posting=scored), "keynote-extractor", "the scored tier beats the company default")
+
     def test_unknown_proof_is_an_error(self):
         with self.assertRaises(KeyError):
             assemble.select(posting(), company(), lead="nope")
@@ -52,6 +58,8 @@ class Remote(unittest.TestCase):
         self.assertTrue(assemble.hedges(posting(remote_class="unclear")))
         hedged = json.dumps({"rules": [], "flags": ["remote hedged"]})
         self.assertTrue(assemble.hedges(posting(score_json=hedged)))
+        v2 = json.dumps({"rules": [], "flags": ["remote: payroll-default or timezone language: eastern time"]})
+        self.assertTrue(assemble.hedges(posting(score_json=v2)))
 
 
 class Brief(unittest.TestCase):
