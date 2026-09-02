@@ -79,6 +79,19 @@ export const pipelineSchema = ({ image }) =>
     order: z.number().int().default(100),
   });
 
+// An inventory for a build whose scale is itself the proof. The counts live in
+// data rather than in a sentence, because a number written into prose goes
+// stale silently and a number computed from a record cannot. Categories carry
+// no tool names, which is what makes it publishable before a product ships.
+const manifest = z.object({
+  label: z.string(),
+  version: z.string().nullable().optional(),
+  updated: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  categories: z
+    .array(z.object({ name: z.string(), count: z.number().int().min(0) }))
+    .default([]),
+});
+
 export const proofSchema = () =>
   z.object({
     id: z.string().regex(/^[a-z0-9-]+$/),
@@ -88,6 +101,7 @@ export const proofSchema = () =>
     linked_pipelines: z.array(z.string()).default([]),
     repo: z.string().nullable().optional(),
     summary: z.string(),
+    manifest: manifest.nullable().optional(),
     order: z.number().int().default(100),
   });
 
