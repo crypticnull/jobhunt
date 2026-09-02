@@ -104,35 +104,54 @@ def _days_since(iso, now):
     return max(0, (now - then).days)
 
 
+def is_pacific(p, states, rules):
+    """Pacific hours, or a state list that names one of the states Matt is moving to."""
+    r = rules["gates"]["remote"]
+    text = (p.get("location") or "") + "\n" + (p.get("description") or "")
+    if any(_term(t).search(text.lower()) for t in r.get("pacific_phrases", [])):
+        return True
+    future = rules.get("candidate", {}).get("future_states", [])
+    return bool(states and states != ["US"] and any(s in states for s in future))
+
+
 def gate_remote(p, rules):
+    """(result, reasons, pacific). Pacific is only meaningful on a pass."""
     r = rules["gates"]["remote"]
     claim = p.get("remote_class") or "unclear"
     body = (p.get("description") or "").lower()
     loc = (p.get("location") or "").lower()
     reasons = []
     if claim in r["fail_claims"]:
-        return "fail", [f"remote claim is {claim}"]
+        return "fail", [f"remote claim is {claim}"], False
     fails = _hits(r["fail_phrases"], body + "\n" + loc)
     if fails:
-        return "fail", [f"fake-remote phrase: {', '.join(fails[:3])}"]
+        return "fail", [f"fake-remote phrase: {', '.join(fails[:3])}"], False
     states = parse_states((p.get("location") or "") + "\n" + (p.get("description") or ""), rules)
     if states and states != ["US"]:
         if any(s not in states for s in r["fail_if_state_list_excludes"]):
-            return "fail", [f"state list excludes {', '.join(r['fail_if_state_list_excludes'])}: {', '.join(states)}"]
+            return "fail", [f"state list excludes {', '.join(r['fail_if_state_list_excludes'])}: {', '.join(states)}"], False
         if all(s not in states for s in r["flag_if_state_list_excludes_all_of"]):
             reasons.append(f"state list has no {' or '.join(r['flag_if_state_list_excludes_all_of'])} yet: {', '.join(states)}")
     nationwide = states == ["US"] or any(_term(t).search(loc) for t in r["nationwide_tokens"])
     if not nationwide:
         tz_ok = any(_term(t).search(body + "\n" + loc) for t in r["ok_timezone_phrases"])
-        flagged = [f for f in _hits(r["flag_phrases"], loc + "\n" + body) if not (tz_ok and "time" in f)]
+        # A time zone phrase is excused by an ok phrase; a payroll-default shape like "Remote (…)" is excused by a real state list.
+        flagged = [
+            f for f in _hits(r["flag_phrases"], loc + "\n" + body)
+            if not (tz_ok and ("time" in f or "hours" in f)) and not (states and "time" not in f and "hours" not in f)
+        ]
         if flagged:
             reasons.append(f"payroll-default or timezone language: {', '.join(flagged[:2])}")
+    pacific = is_pacific(p, states, rules)
     if claim in r["require_claim"]:
-        return ("flag" if reasons else "pass"), reasons
+        result = "flag" if reasons else "pass"
+        if result == "pass" and pacific:
+            reasons.append("pacific hours")
+        return result, reasons, pacific
     if "remote" in body:
         reasons.append("remote in the body but not the location")
-        return "flag", reasons
-    return "fail", ["remote not stated"]
+        return "flag", reasons, False
+    return "fail", ["remote not stated"], False
 
 
 def gate_comp(p, rules, company):
@@ -155,9 +174,9 @@ def gate_comp(p, rules, company):
     hi = hi if hi is not None else lo
     lo = lo if lo is not None else hi
     mid = (lo + hi) / 2
-    hourly = (p.get("employment_type") in ("contract", "freelance")) and hi < 20000 * 2
-    if c.get("hourly_floor") and hourly and hi < c["hourly_floor"] * c["annualize_hourly_multiplier"]:
-        return "fail", [f"hourly under the floor"], mid
+    contract = p.get("employment_type") in ("contract", "freelance")
+    if contract and c.get("hourly_floor") and hi < c["hourly_floor"] * c["annualize_hourly_multiplier"]:
+        return "fail", [f"contract max {hi:,.0f} is under {c['hourly_floor']}/hour annualized, the floor is firm"], mid
     if hi >= c["pass_min_annual"]:
         return "pass", [f"max {hi:,.0f} clears the floor"], mid
     if hi >= c["flag_min_annual"]:
@@ -207,8 +226,8 @@ def evaluate(p, rules, company=None, now=None):
     tier = company.get("tier")
     out = {"version": rules["version"], "flags": [], "deduction_hits": [], "legs_hit": [], "title_tier": None, "proof_lead": rules["proof_lead_by_tier"].get(str(tier), rules["proof_lead_by_tier"]["unknown"])}
 
-    remote_result, remote_reasons = gate_remote(p, rules)
-    out["remote"] = {"result": remote_result, "reasons": remote_reasons}
+    remote_result, remote_reasons, pacific = gate_remote(p, rules)
+    out["remote"] = {"result": remote_result, "reasons": remote_reasons, "pacific": pacific}
     comp_result, comp_reasons, mid = gate_comp(p, rules, company)
     out["comp"] = {"result": comp_result, "reasons": comp_reasons, "midpoint": mid}
     out["disqualified"] = disqualify(p, rules, now)
@@ -261,7 +280,7 @@ def evaluate(p, rules, company=None, now=None):
     out["deduction_hits"] = hits
     deductions = min(len(hits) * rules["deductions"]["per_hit"], rules["deductions"]["cap"])
     score = {
-        "remote": s["remote"]["pass"] if remote_result == "pass" else s["remote"]["flagged"],
+        "remote": s["remote"]["flagged"] if remote_result != "pass" else (s["remote"]["pacific"] if pacific else s["remote"]["pass"]),
         "comp": comp_points,
         "intersection": min(len(legs), s["intersection"]["max_legs"]) * s["intersection"]["per_leg"],
         "title": title_points,

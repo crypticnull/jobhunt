@@ -11,6 +11,7 @@ the asset.
 
 ```
 python -m scraper add URL --category ai-video [--name N] [--priority 1|2|3] [--lead-proof ID]
+python -m scraper import FILE [--priority 1|2|3] [--manual]   # many companies from a text file
 python -m scraper check              # probe every endpoint, exit 1 if any is dead
 python -m scraper stale --days 60    # companies nobody has looked at lately
 python -m scraper poll               # fetch every pollable company, score on the way in
@@ -26,6 +27,11 @@ python -m scraper fixture KIND BOARD # refresh a test fixture from the live endp
 ```
 
 `docs/process.md` is the schedule these run on.
+
+`import` takes a text file with one company per line, `category | careers
+url | name`, and runs `add` on each, so a first list of eighty companies
+is one command. Anything without a detectable ATS is reported at the end
+rather than written, unless `--manual` says to keep it for hand checks.
 
 `add` works out the ATS from the careers URL, or from the board links
 embedded in the page, and confirms the guess against the live endpoint
@@ -46,7 +52,7 @@ change to one is a change to the other. `score.py` applies it in order.
    than two hundred people.
 2. Disqualifiers. Editor and junior titles, relocation, heavy travel, fixed
    fee work, pure UX, research roles, and anything stale.
-3. A score out of 100. Remote 25, comp 20, the intersection legs 20 at five
+3. A score out of 100. Remote 25 for Pacific hours or 22 US-wide, comp 20, the intersection legs 20 at five
    per leg (3D, motion, generative, software, pipeline), the title tier
    15, the company tier 10, freshness 5, a named human 5, and up to 15
    off for underpaid tells like fast-paced or rockstar.

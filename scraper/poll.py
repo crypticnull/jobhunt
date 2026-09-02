@@ -1,6 +1,7 @@
 """One poll: every pollable company on the list, each isolated, each logged,
 every posting enriched and scored on the way in."""
 
+import re
 from datetime import datetime
 
 from . import http, salary
@@ -9,13 +10,37 @@ from .score import load_rules, score
 from .store import fingerprint, utcnow
 
 
+_CONTRACT = re.compile(r"\b(contract|contractor|contract-to-hire|freelance|freelancer|1099|hourly)\b", re.IGNORECASE)
+_PART_TIME = re.compile(r"\bpart[- ]time\b", re.IGNORECASE)
+
+
+def employment_type_of(title, text):
+    """contract, part-time, or None when nothing says otherwise. The word
+    'contract' in a title is decisive; in the body it only counts when the
+    posting isn't plainly full-time."""
+    title, text = title or "", text or ""
+    if _CONTRACT.search(title):
+        return "contract"
+    if _PART_TIME.search(title + "\n" + text):
+        return "part-time"
+    if _CONTRACT.search(text) and not re.search(r"\bfull[- ]time\b", text, re.IGNORECASE):
+        return "contract"
+    return None
+
+
 def enrich(p):
-    """Fill comp from the description when the ATS gave none."""
+    """Fill comp from the description when the ATS gave none, and work out
+    the employment type, because the hourly floor only applies to contract
+    and freelance work and an hourly rate is contract pay by definition."""
+    hourly = False
     if p.get("comp_min") is None and p.get("comp_max") is None:
         found = salary.extract(p.get("description"))
         if found:
             p["comp_min"], p["comp_max"], p["comp_currency"], note = found
+            hourly = bool(note)
             p["comp_note"] = "from text" + (", hourly annualized" if note else "")
+    if not p.get("employment_type"):
+        p["employment_type"] = "contract" if hourly else employment_type_of(p.get("title"), p.get("description"))
     return p
 
 

@@ -80,7 +80,7 @@ Pass, flag, or fail. Fail drops the listing. Flag passes at half marks on the re
 - State list includes PA but neither WA nor OR. State lists change and it can be asked on the first call.
 - Location reads like "Remote (San Francisco)" or "Remote - New York" with no state list and no residency language. Usually a payroll default, not a requirement.
 - `remote_claim` is `unclear` but the body says remote and no fail phrase is present.
-- Time zone requirements tighter than "US time zones". Pacific-only is fine for someone moving to the Northwest, Eastern-only is a flag, not a fail.
+- Time zone requirements tighter than "US time zones". Pacific-only is fine for someone moving to the Northwest and earns the full remote marks, Eastern-only is a flag, not a fail.
 
 ## Gate 2: comp isn't insulting
 
@@ -95,7 +95,7 @@ Annualize first. Hourly times 2080. Ranges keep both ends. Gate on `salary_max`,
 
 **Fail**
 - `salary_max` < 110,000.
-- Hourly under $85 for contract or freelance.
+- Hourly under $85 for contract or freelance, annualized. The floor is firm, so a contract posting that lists an annual figure is held to the same number.
 - Salary not posted, company not in `targets.csv`, and size unknown or under 200. Most states with remote-hiring companies require posted ranges now, so a remote-US listing with no range is itself a signal.
 - Any unpaid test project, take-home or "design exercise" described as longer than two hours, or any spec work.
 
@@ -139,7 +139,7 @@ Drop, with reason logged. Distinct from gates because they're about the work, no
 
 | signal | max | rule |
 |---|---|---|
-| Remote clean | 25 | Pass with no flag: 25. Pass with any flag: 12. |
+| Remote clean | 25 | Pass with no flag and Pacific hours, or a state list naming WA or OR: 25. Pass with no flag, US-wide: 22. Pass with any flag: 12. |
 | Compensation | 20 | Midpoint ≥ 150k: 20. 130k–150k: 15. Unlisted at tier 1–3: 10. Unlisted, size > 200, no tier: 8. Flagged 110k–130k: 5. |
 | Intersection asks | 20 | 5 points per leg mentioned in the body, max 4 legs. Legs and their keyword lists are in `scoring.json`. A leg counts once no matter how many keywords hit. |
 | Title fit | 15 | Tier A title: 15. Tier B: 10. Tier C: 5. Lists below and in `scoring.json`. |
@@ -212,5 +212,5 @@ Every Monday morning, one file or message with: count of new listings by source,
 ## Open questions for Matt
 
 - Any companies where a state-list flag should be ignored because he'd move early for them?
-- Should Pacific-only time zone listings score higher than US-wide, given the move?
-- Is $85/hour the right contract floor, or is contract work out entirely for this search?
+
+Answered 2026-09-02: Pacific-only outscores US-wide, and $85/hour is a firm floor for contract work.

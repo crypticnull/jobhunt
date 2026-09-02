@@ -43,6 +43,11 @@ loosen, in that order. The remote gate never loosens.
 4. Send it yourself. Nothing here sends anything.
 5. `python -m scraper mark <id> applied --letter <saved path>`.
 
+New companies enter the list through `python -m scraper import <file>`,
+one per line as `category | careers url | name`, or one at a time with
+`python -m scraper add <careers url> --category <category>`. The tier
+follows the category, so nothing else needs setting.
+
 A referral or a company without a feed enters the same loop through
 `python -m scraper add-posting <url-or-file> --company <slug> --title "..."`.
 

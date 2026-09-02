@@ -3,7 +3,7 @@
   "date": "2026-09-01",
   "status": "final",
   "twin": "docs/search-protocol.md",
-  "note": "The public half of the search protocol. Every number that describes the comp band lives in data/local/scoring.local.json and is merged at load; here those fields are null. Never loosen gates.remote.",
+  "note": "The public half of the search protocol. Pacific hours or a state list naming WA or OR earn the full remote marks, US-wide earns 22, a flag earns 12. The hourly floor is firm for contract and freelance work. Every number that describes the comp band lives in data/local/scoring.local.json and is merged at load; here those fields are null. Never loosen gates.remote.",
 
   "candidate": {
     "current_state": "PA",
@@ -31,7 +31,8 @@
         "eastern time", "et hours", "est hours", "east coast hours",
         "central time", "ct hours"
       ],
-      "ok_timezone_phrases": ["us time zones", "pacific", "pt hours", "pst", "west coast"],
+      "ok_timezone_phrases": ["us time zones", "any us time zone", "pacific", "pt hours", "pst", "pdt", "west coast"],
+      "pacific_phrases": ["pacific", "pt hours", "pst", "pdt", "west coast", "pnw", "pacific northwest"],
       "nationwide_tokens": ["us", "usa", "u\\.s\\.", "united states", "anywhere in the us", "all us states", "nationwide", "us-remote", "remote-us"]
     },
     "comp": {
@@ -88,7 +89,7 @@
   },
 
   "score": {
-    "remote": { "max": 25, "pass": 25, "flagged": 12 },
+    "remote": { "max": 25, "pacific": 25, "pass": 22, "flagged": 12 },
     "comp": {
       "max": 20,
       "bands": [],
