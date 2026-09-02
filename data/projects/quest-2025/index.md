@@ -8,7 +8,7 @@ role: Senior motion designer
 disciplines: [key-art, 3d, motion, brand-system]
 tools: [Cinema 4D, After Effects]
 turnaround: null
-summary: Key art, animations and logo loop for the second cycle of a flagship event, the brand system extended rather than restarted.
+summary: Key art, animations and a new logo loop for a flagship event, a complete identity designed for the 2025 cycle.
 featured: true
 archive: false
 order: 1
@@ -18,4 +18,4 @@ stills: []
 process: []
 ---
 
-Quest came back for a second cycle in 2025, and the brief was the one every recurring event has: feel like the same family as last year, feel new anyway. The key art, the animation package and the logo loop all came from one system, so the pieces hold together on a stage, in a feed and in a deck without anyone having to police it.
+Quest came back in 2025 and got a new identity rather than a fresh coat on the old one. The key art, the animation package and the logo loop were all designed for this cycle, and they came out of a single system, so the pieces hold together on a stage, in a feed and in a deck without anyone having to police it.

@@ -51,3 +51,33 @@ in `data/schema` (a deliberate JSON Schema subset, see the module
 docstring). The markdown records are validated by the site build through
 zod mirrors of the same schemas, so `make site` after an ingest is the
 check that the record still builds.
+
+## Publishing a ComfyUI graph
+
+A workflow saved from the ComfyUI canvas carries the node positions, which is
+what makes the structure drawable rather than merely listable. It also carries
+`widgets_values`, which is every text box in the graph: prompts, model
+filenames, LoRA names, seeds and the absolute paths on the machine it ran on.
+Nothing raw goes in the repository.
+
+```
+python -m pipeline.graph sanitize raw-export.json data/pipelines/<slug>/graph.json
+python -m pipeline.graph stats data/pipelines/<slug>/graph.json
+python -m pipeline.graph svg data/pipelines/<slug>/graph.json site/public/graphs/<slug>.svg
+```
+
+`sanitize` rebuilds the export from an allowlist rather than deleting known-bad
+keys, so a field a future ComfyUI version invents is dropped by default instead
+of published by oversight. It prints the group titles it carried through, since
+those are typed by hand and are the one string worth reading before publishing,
+and it names any Note nodes it kept as empty boxes.
+
+`svg` writes a standalone drawing with its own light and dark styles, meant to
+be referenced from an `img`, which cannot inherit the page's tokens. Both
+commands refuse a file that still carries values, and
+`pipeline/tests/test_graph.py` re-checks every graph JSON committed under
+`data/` on every test run, so a raw export dropped in later fails in CI rather
+than on a stranger's screen.
+
+Save from ComfyUI in the **UI format**, not the API format. The API format has
+no node positions, so the graph can be counted but not drawn.

@@ -1,5 +1,7 @@
 ---
+import { Font } from "astro:assets";
 import { site } from "../site.config.mjs";
+import { build } from "../buildstamp.mjs";
 
 interface Props {
   title?: string;
@@ -22,6 +24,13 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     <link rel="canonical" href={Astro.url} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description ?? site.sub} />
+    {/* The display face sets the headline, which is the largest paint on every
+        page, so it is the one worth a preload. The reading face is preloaded
+        roman-only, keeping the italic off the critical path. The mono is small
+        and never in the first paint, so it is not preloaded at all. */}
+    <Font cssVariable="--font-display" preload />
+    <Font cssVariable="--font-body" preload={[{ style: "normal" }]} />
+    <Font cssVariable="--font-mono" />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -33,6 +42,13 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
         <a href="/#writing">Writing</a>
         <a href="/#about">About</a>
       </nav>
+      {
+        build.sha && (
+          <a class="stamp" href={build.href} title={`Built from commit ${build.sha} on ${build.date}`}>
+            {build.sha}
+          </a>
+        )
+      }
     </header>
     <main id="main">
       <slot />
@@ -43,56 +59,98 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
         <span aria-hidden="true">·</span>
         <span>{site.location}</span>
       </p>
+      <p class="colophon">
+        Set in Archivo, Source Serif 4 and IBM Plex Mono, self-hosted. Built static with Astro.
+        {build.sha && <> Deployed from <a href={build.href}>{build.sha}</a> on {build.date}.</>}
+      </p>
     </footer>
   </body>
 </html>
 
 <style is:global>
+  /* ---- Tokens -------------------------------------------------------------
+     Light is the base and lives on bare :root, so the un-stamped document (the
+     default "system" setting, which stamps nothing) always has a full palette.
+     The dark block only redefines; nothing is defined for the first time
+     inside a media query or a [data-theme] block.
+
+     Measured contrast against --paper, light / dark:
+       ink        16.1 / 15.3     body text
+       muted       5.1 /  7.2     secondary text, passes AA at any size
+       marker      5.4 /  6.4     the one accent, safe for text
+       blueprint   5.6 /  7.4     figure captions and code labels
+       rule        1.3 /  1.3     DECORATIVE ONLY. Never put text in it.
+     Plate tokens are fixed rather than themed: the plate is dark in both
+     themes, and the light marker on it measures 3.2, which fails. */
   :root {
-    --bg: #f7f6f2;
-    --fg: #161512;
-    --muted: #5f5d56;
-    --line: #dedbd2;
-    --card: #ffffff;
-    --accent: #c4501c;
-    --measure: 68ch;
+    --paper: #f1f2ef;
+    --ink: #141619;
+    --muted: #62676d;
+    --rule: #d3d6d3;
+    --field: #e6e8e5;
+    --marker: #b92d22;
+    --blueprint: #35648a;
+
+    /* Fixed in both themes. The plate is always a dark surface. */
+    --plate: #0b0c0d;
+    --plate-ink: #e6e8e4;
+    --plate-muted: #9aa0a6;
+    --plate-marker: #ff6157;
+
+    /* The generated variables already carry the metric-matched local fallback
+       and the stack declared in astro.config.mjs, so the value inside var() is
+       only for the case where the font CSS never loaded at all. */
+    --display: var(--font-display, "Helvetica Neue", Arial, sans-serif);
+    --body: var(--font-body, Georgia, "Times New Roman", serif);
+    --mono: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+
+    --content-max: 72rem;
     --gutter: clamp(1rem, 4vw, 3rem);
+    --grid-gap: 1.5rem;
+    --measure: 66ch;
     color-scheme: light dark;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #121210;
-      --fg: #ebe9e2;
-      --muted: #a09e95;
-      --line: #2b2a26;
-      --card: #1a1917;
-      --accent: #ff7c46;
+    :root:not([data-theme="light"]) {
+      --paper: #0f1113;
+      --ink: #e6e8e4;
+      --muted: #9aa0a6;
+      --rule: #262a2e;
+      --field: #171a1d;
+      --marker: #ff6157;
+      --blueprint: #7aa7cc;
     }
   }
+  :root[data-theme="dark"] {
+    --paper: #0f1113;
+    --ink: #e6e8e4;
+    --muted: #9aa0a6;
+    --rule: #262a2e;
+    --field: #171a1d;
+    --marker: #ff6157;
+    --blueprint: #7aa7cc;
+  }
+
+  /* ---- Base --------------------------------------------------------------- */
   *,
   *::before,
   *::after {
     box-sizing: border-box;
   }
   html {
-    background: var(--bg);
-    color: var(--fg);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.55;
     -webkit-text-size-adjust: 100%;
   }
   body {
+    background: var(--paper);
     margin: 0;
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
-  }
-  main {
-    flex: 1;
-    width: 100%;
-    max-width: 72rem;
-    margin: 0 auto;
-    padding: 0 var(--gutter) 4rem;
   }
   img,
   video,
@@ -107,149 +165,331 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     text-underline-offset: 0.15em;
   }
   a:hover {
-    color: var(--accent);
+    color: var(--marker);
   }
   :focus-visible {
-    outline: 3px solid var(--accent);
+    outline: 2px solid var(--marker);
     outline-offset: 3px;
   }
   h1,
   h2,
   h3 {
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    font-family: var(--display);
+    font-weight: 600;
     margin: 0 0 0.5em;
-    font-weight: 650;
+    text-wrap: balance;
+  }
+  h1 {
+    /* The width axis is the point of Archivo here: condensed for the headline,
+       normal everywhere else. */
+    font-stretch: 80%;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
   }
   h2 {
-    font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+    font-size: clamp(1.35rem, 2.2vw, 1.6rem);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
     margin-top: 0;
   }
   h3 {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
   }
   p {
     margin: 0 0 1em;
     max-width: var(--measure);
   }
+  code,
+  kbd,
+  samp {
+    font-family: var(--mono);
+    font-size: 0.85em;
+  }
+
+  /* ---- Page frame ---------------------------------------------------------
+     One grid carries the whole page: twelve columns capped at --content-max,
+     with a full-bleed track on each side. A plate that must run edge to edge
+     takes grid-column: full instead of a negative-margin breakout, which is
+     what used to overflow the body on narrow viewports. */
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns:
+      [full-start] minmax(var(--gutter), 1fr)
+      [content-start] repeat(12, minmax(0, calc((var(--content-max) - 11 * var(--grid-gap)) / 12)))
+      [content-end] minmax(var(--gutter), 1fr)
+      [full-end];
+    column-gap: var(--grid-gap);
+    align-content: start;
+    padding-bottom: 4rem;
+  }
+  main > * {
+    grid-column: content;
+  }
+  main > .bleed {
+    grid-column: full;
+  }
+
+  /* The masthead and footer sit outside the grid but share its measure: their
+     max-width includes the gutters, so their inner edge lands on the content
+     columns at every width. */
+  .top,
+  .foot {
+    width: 100%;
+    max-width: calc(var(--content-max) + 2 * var(--gutter));
+    margin: 0 auto;
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
   .skip {
     position: absolute;
     left: -999px;
     top: 0;
-    background: var(--fg);
-    color: var(--bg);
+    background: var(--ink);
+    color: var(--paper);
     padding: 0.5rem 1rem;
   }
   .skip:focus {
     left: var(--gutter);
     z-index: 10;
   }
+
+  /* ---- Masthead -----------------------------------------------------------
+     Fixed line-height and no wrapping: the header's height is decided before
+     any font arrives, so it cannot resize the page underneath the reader. */
   .top {
     display: flex;
-    flex-wrap: wrap;
-    gap: 1rem 2rem;
+    flex-wrap: nowrap;
     align-items: baseline;
     justify-content: space-between;
-    width: 100%;
-    max-width: 72rem;
-    margin: 0 auto;
-    padding: 1.25rem var(--gutter);
+    gap: 1.5rem;
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+    line-height: 1;
+    border-bottom: 1px solid var(--rule);
   }
   .top .name {
-    font-weight: 650;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: -0.01em;
     text-decoration: none;
+    white-space: nowrap;
   }
   .top nav {
     display: flex;
-    gap: 1.25rem;
+    flex-wrap: nowrap;
+    gap: clamp(0.75rem, 3vw, 1.75rem);
+    margin-left: auto;
   }
-  .top nav a {
-    text-decoration: none;
+  .top nav a,
+  .top .stamp {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--muted);
+    text-decoration: none;
+    white-space: nowrap;
   }
-  .top nav a:hover {
-    color: var(--accent);
+  .top nav a:hover,
+  .top .stamp:hover {
+    color: var(--marker);
   }
+  .top .stamp {
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+  /* Below 40rem the name and four nav words do not fit on one line, and they
+     were running into the right gutter. Two explicit rows rather than a wrap:
+     the header's height is then the same on every load, which is the whole
+     reason the nav does not wrap in the first place. */
+  @media (max-width: 40rem) {
+    .top {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.7rem;
+    }
+    .top nav {
+      margin-left: 0;
+      gap: 1.25rem;
+    }
+    .top .stamp {
+      display: none;
+    }
+  }
+
+  /* ---- Sections ----------------------------------------------------------- */
   section {
-    padding: 3rem 0;
-    border-top: 1px solid var(--line);
+    padding: 3.5rem 0 0;
   }
-  section:first-of-type {
-    border-top: 0;
+  section > h2 {
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+    margin-bottom: 1.25rem;
   }
   .hero {
-    padding: 4rem 0 3.5rem;
+    padding: 4.5rem 0 3.5rem;
   }
   .hero h1 {
-    font-size: clamp(2.2rem, 6.5vw, 4.6rem);
-    max-width: 18ch;
-    margin-bottom: 0.4em;
+    max-width: min(100%, 15ch);
+    margin-bottom: 0.35em;
   }
   .hero .sub {
-    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    font-size: clamp(1.05rem, 1.8vw, 1.25rem);
     color: var(--muted);
-    max-width: 44ch;
+    max-width: min(100%, 46ch);
+  }
+  /* Wide enough for two columns, the thesis takes the left seven and the deck
+     sits in the right margin rather than under it, so the first screen is a
+     composition instead of a headline with empty space beside it. The columns
+     line up with the page grid because they are the same twelve. */
+  @media (min-width: 64rem) {
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--grid-gap);
+      align-items: start;
+    }
+    .hero h1 {
+      grid-column: 1 / span 7;
+      max-width: none;
+    }
+    .hero .sub {
+      grid-column: 8 / -1;
+      max-width: none;
+      margin-top: 0.75rem;
+    }
   }
   .lede {
     color: var(--muted);
-    max-width: 60ch;
-    margin-bottom: 2rem;
+    max-width: 58ch;
+    margin-bottom: 1.75rem;
   }
+
+  /* ---- The index ----------------------------------------------------------
+     Builds and writing are rows, not cards: one rule between entries, the
+     title in the display face, the metadata in mono on the right. The same row
+     grammar carries both, so a build and a post read as the same kind of
+     object and neither looks like a promoted tile. */
   .cards {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    gap: 1.25rem;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--rule);
+  }
+  .cards > li {
+    border-bottom: 1px solid var(--rule);
   }
   .card {
-    display: block;
-    height: 100%;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 0.5rem;
-    padding: 1.25rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    column-gap: var(--grid-gap);
+    padding: 1.1rem 0;
     text-decoration: none;
+    transition: background-color 120ms ease;
   }
   .card:hover {
-    border-color: var(--accent);
+    background: var(--field);
     color: inherit;
   }
   .card h3 {
-    margin-bottom: 0.35em;
+    margin: 0 0 0.3em;
+  }
+  .card:hover h3 {
+    color: var(--marker);
   }
   .card p {
     color: var(--muted);
-    margin: 0 0 0.75em;
+    margin: 0;
     font-size: 0.95rem;
+    grid-column: 1;
+    max-width: 62ch;
   }
   .card .meta,
   .meta {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
     color: var(--muted);
-    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .card .meta {
+    grid-column: 2;
+    grid-row: 1;
+    text-align: right;
+    white-space: nowrap;
+  }
+  @media (max-width: 34rem) {
+    .card {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .card .meta {
+      grid-column: 1;
+      grid-row: auto;
+      text-align: left;
+      padding-top: 0.5rem;
+    }
+  }
+
+  /* Work is the exception, because a poster is the row's content rather than a
+     decoration on it. Two columns, and the still carries its own aspect ratio
+     so nothing shifts while it decodes. */
+  .cards.work-index {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+    gap: 2.5rem var(--grid-gap);
+    border-top: 0;
+  }
+  .cards.work-index > li {
+    border-bottom: 0;
   }
   .card.work {
+    display: block;
     padding: 0;
-    overflow: hidden;
-  }
-  .card.work .body {
-    padding: 1rem 1.25rem 1.25rem;
   }
   .card.work img {
     width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
+    background: var(--field);
   }
+  .card.work:hover {
+    background: none;
+  }
+  .card.work .body {
+    padding: 0.9rem 0 0;
+  }
+  .card.work .meta {
+    display: block;
+    text-align: left;
+    white-space: normal;
+    padding-top: 0.4rem;
+  }
+
+  /* ---- Study pages -------------------------------------------------------- */
   .facts {
     display: grid;
-    grid-template-columns: max-content 1fr;
-    gap: 0.35rem 1.25rem;
-    margin: 0 0 2rem;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 0.4rem 1.5rem;
+    margin: 0 0 2.5rem;
+    padding: 1rem 0 0;
+    border-top: 1px solid var(--rule);
     font-size: 0.95rem;
   }
   .facts dt {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--muted);
+    padding-top: 0.25em;
   }
   .facts dd {
     margin: 0;
@@ -258,46 +498,63 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     max-width: var(--measure);
   }
   .prose h2 {
-    font-size: 1.3rem;
-    margin-top: 2rem;
+    font-size: 1.25rem;
+    margin-top: 2.5rem;
+    border-top: 0;
+    padding-top: 0;
   }
   .frame {
-    margin: 0 0 2rem;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 0.5rem;
+    margin: 0 0 2.5rem;
+    background: var(--plate);
     overflow: hidden;
   }
   .frame img,
   .frame video {
     width: 100%;
   }
+  .frame figcaption {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--plate-muted);
+    padding: 0.75rem 1rem;
+  }
   .grid {
     display: grid;
-    gap: 1rem;
+    gap: var(--grid-gap);
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
-    margin: 0 0 2rem;
+    margin: 0 0 2.5rem;
     padding: 0;
     list-style: none;
   }
   .grid figcaption {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
     color: var(--muted);
-    font-size: 0.85rem;
     padding: 0.5rem 0;
   }
   .back {
     display: inline-block;
-    margin: 1rem 0 2rem;
+    margin: 1.5rem 0 2rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--muted);
+    text-decoration: none;
   }
+  .back:hover {
+    color: var(--marker);
+  }
+
+  /* ---- Footer ------------------------------------------------------------- */
   .foot {
-    width: 100%;
-    max-width: 72rem;
-    margin: 0 auto;
-    padding: 2rem var(--gutter);
+    padding-top: 2rem;
+    padding-bottom: 3rem;
     color: var(--muted);
-    font-size: 0.9rem;
-    border-top: 1px solid var(--line);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--rule);
   }
   .foot p {
     display: flex;
@@ -305,6 +562,24 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     gap: 0.75rem;
     margin: 0;
     max-width: none;
+  }
+  .foot .colophon {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    margin-top: 0.75rem;
+    max-width: 70ch;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
   @media (prefers-reduced-motion: no-preference) {
     html {

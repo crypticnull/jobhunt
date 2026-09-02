@@ -15,16 +15,36 @@ const writing = (await getCollection("writing", (w) => !w.data.draft)).sort((a, 
 // that section. Everything else is a build. A build links to its pipeline page
 // when one exists, else to its repo.
 const pipelineFor = new Map(pipelines.map((p) => [p.data.linked_proof, p]));
+
+// Scale, when a record carries an inventory. The total is summed here rather
+// than written into the record, so the only thing anyone edits is the per
+// category count and the arithmetic cannot disagree with itself. A manifest
+// with no categories yet renders nothing at all.
+const scaleOf = (p) => {
+  const m = p.data.manifest;
+  if (!m || !m.categories?.length) return null;
+  const total = m.categories.reduce((sum, c) => sum + c.count, 0);
+  return `${total} ${m.label} in ${m.categories.length} categories`;
+};
+
 const builds = proof
   .filter((p) => p.data.linked_projects.length === 0)
   .map((p) => {
     const pipe = pipelineFor.get(p.data.id);
+    const source = p.data.repo ? "public repo" : "closed source";
     return {
       id: p.data.id,
       title: p.data.title,
       summary: p.data.summary,
       href: pipe ? `/builds/${pipe.id}` : (p.data.repo ?? null),
-      meta: pipe ? [pipe.data.kind, pipe.data.nodes ? `${pipe.data.nodes} nodes` : null].filter(Boolean).join(" · ") : p.data.repo ? "public repo" : "closed source",
+      meta: [
+        scaleOf(p),
+        pipe ? pipe.data.kind : null,
+        pipe && pipe.data.nodes ? `${pipe.data.nodes} nodes` : null,
+        pipe ? null : source,
+      ]
+        .filter(Boolean)
+        .join(" · "),
     };
   });
 const workIntro = proof.find((p) => p.data.linked_projects.length > 0);
@@ -65,7 +85,7 @@ const workIntro = proof.find((p) => p.data.linked_projects.length > 0);
   <section id="work">
     <h2>Selected work</h2>
     {workIntro && <p class="lede">{workIntro.data.summary}</p>}
-    <ul class="cards">
+    <ul class="cards work-index">
       {
         projects.map((p) => (
           <li>

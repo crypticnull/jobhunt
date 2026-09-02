@@ -4,20 +4,114 @@
   "title": "Proof story",
   "description": "Frontmatter of data/proof/<id>.md. One source of facts for the site's What He Builds section and the letter generator's proof blocks. The body is the story in his voice, letter-profile linted.",
   "type": "object",
-  "required": ["id", "title", "leads_for", "summary"],
+  "required": [
+    "id",
+    "title",
+    "leads_for",
+    "summary"
+  ],
   "additionalProperties": false,
   "properties": {
-    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
-    "title": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "title": {
+      "type": "string"
+    },
     "leads_for": {
       "type": "array",
       "description": "Company categories this story leads for",
-      "items": { "type": "string", "enum": ["ai-video", "studio-ai", "product-inhouse", "brand-inhouse"] }
+      "items": {
+        "type": "string",
+        "enum": [
+          "ai-video",
+          "studio-ai",
+          "product-inhouse",
+          "brand-inhouse"
+        ]
+      }
     },
-    "linked_projects": { "type": "array", "items": { "type": "string" }, "default": [] },
-    "linked_pipelines": { "type": "array", "items": { "type": "string" }, "default": [] },
-    "repo": { "type": ["string", "null"] },
-    "summary": { "type": "string", "description": "One sentence for cards" },
-    "order": { "type": "integer", "default": 100 }
+    "linked_projects": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "linked_pipelines": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "repo": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "description": "One sentence for cards"
+    },
+    "order": {
+      "type": "integer",
+      "default": 100
+    },
+    "manifest": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Optional inventory for a build whose scale is part of the proof. Counts live here rather than in prose so a number can never go stale in a sentence: the site computes the total, and updating the product means editing this block only. Categories without names is deliberate for anything unreleased.",
+      "required": [
+        "label",
+        "categories"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "What is being counted, plural: tools, nodes, rules"
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Product version this inventory describes"
+        },
+        "updated": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "categories": {
+          "type": "array",
+          "description": "Empty until the real numbers are filled in. The site renders nothing rather than guessing.",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "count"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
