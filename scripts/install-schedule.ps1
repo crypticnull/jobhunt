@@ -32,6 +32,10 @@ Set-Content -Path (Join-Path $root "data\local\backup-dir.txt") -Value $BackupDi
 
 function Esc($s) { $s.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace('"', "&quot;") }
 
+# A logon trigger with no UserId means "any user who signs in", and that needs
+# elevation. Naming the current user is what keeps this a per-user task.
+$who = Esc([Security.Principal.WindowsIdentity]::GetCurrent().Name)
+
 function Task-Xml($script, $triggerXml) {
     $taskArgs = Esc("/c `"`"$root\$script`" >> `"$log`" 2>&1`"")
     $desc = Esc($script)
@@ -45,6 +49,7 @@ $triggerXml
   </Triggers>
   <Principals>
     <Principal id="Author">
+      <UserId>$who</UserId>
       <LogonType>InteractiveToken</LogonType>
       <RunLevel>LeastPrivilege</RunLevel>
     </Principal>
@@ -73,16 +78,31 @@ $triggerXml
 "@
 }
 
-function Register-Job($name, $script, $triggerXml, $fallback) {
+function Try-Xml($name, $script, $triggerXml) {
     $xml = Join-Path $env:TEMP "jobhunt-task.xml"
     # schtasks reads the file as UTF-16, which is what the header declares.
     Set-Content -Path $xml -Value (Task-Xml $script $triggerXml) -Encoding Unicode
-    schtasks /Create /F /TN $name /XML $xml 2>&1 | Out-Null
+    $out = (schtasks /Create /F /TN $name /XML $xml 2>&1) -join " "
     $ok = ($LASTEXITCODE -eq 0)
     Remove-Item $xml -ErrorAction SilentlyContinue
-    if ($ok) { return $true }
-    # Fall back to the plain form. It cannot carry the settings above, but it
-    # does at least put the job on the clock.
+    return @{ ok = $ok; message = $out.Trim() }
+}
+
+function Register-Job($name, $script, $triggerXml, $plainTriggerXml, $fallback) {
+    $r = Try-Xml $name $script $triggerXml
+    if ($r.ok) { return $true }
+    Write-Host "   $name, full settings refused: $($r.message)"
+    if ($plainTriggerXml) {
+        # Drop the sign-in trigger, the fussiest part, and keep catch-up and
+        # priority, which matter more.
+        $r = Try-Xml $name $script $plainTriggerXml
+        if ($r.ok) {
+            Write-Host "   $name registered without the sign-in trigger. Catch-up and priority are still set."
+            return $true
+        }
+        Write-Host "   $name, without the sign-in trigger, also refused: $($r.message)"
+    }
+    # Last resort: on the clock, with none of the settings.
     schtasks /Create /F /TN $name /TR "cmd /c `"`"$root\$script`" >> `"$log`" 2>&1`"" @fallback 2>&1 | Out-Null
     return $false
 }
@@ -97,7 +117,7 @@ $nightlyTriggers = @"
       <Enabled>true</Enabled>
       <ScheduleByDay><DaysInterval>1</DaysInterval></ScheduleByDay>
     </CalendarTrigger>
-    <LogonTrigger><Enabled>true</Enabled><Delay>PT10M</Delay></LogonTrigger>
+    <LogonTrigger><Enabled>true</Enabled><UserId>$who</UserId><Delay>PT10M</Delay></LogonTrigger>
 "@
 
 $weeklyTriggers = @"
@@ -108,9 +128,18 @@ $weeklyTriggers = @"
     </CalendarTrigger>
 "@
 
+# The same nightly task minus the sign-in trigger, as the middle rung.
+$clockOnlyTrigger = @"
+    <CalendarTrigger>
+      <StartBoundary>$start</StartBoundary>
+      <Enabled>true</Enabled>
+      <ScheduleByDay><DaysInterval>1</DaysInterval></ScheduleByDay>
+    </CalendarTrigger>
+"@
+
 $full = $true
-$full = (Register-Job "jobhunt nightly" "scripts\nightly.cmd" $nightlyTriggers @("/SC", "DAILY", "/ST", $NightlyAt)) -and $full
-$full = (Register-Job "jobhunt weekly" "scripts\weekly.cmd" $weeklyTriggers @("/SC", "WEEKLY", "/D", "SUN", "/ST", $WeeklyAt)) -and $full
+$full = (Register-Job "jobhunt nightly" "scripts\nightly.cmd" $nightlyTriggers $clockOnlyTrigger @("/SC", "DAILY", "/ST", $NightlyAt)) -and $full
+$full = (Register-Job "jobhunt weekly" "scripts\weekly.cmd" $weeklyTriggers $null @("/SC", "WEEKLY", "/D", "SUN", "/ST", $WeeklyAt)) -and $full
 
 foreach ($old in @("jobhunt poll", "jobhunt digest", "jobhunt backup")) {
     schtasks /Delete /F /TN $old 2>$null | Out-Null
