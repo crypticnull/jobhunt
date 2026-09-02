@@ -6,7 +6,7 @@ diagram.
 
 | Store | Schema | Writer | Readers |
 | --- | --- | --- | --- |
-| `data/local/companies.json` | `company.schema.json` | Matt, helped by `python -m scraper add` | scraper, letters |
+| `data/local/companies.json` | `company.schema.json` | the nightly discovery step, and Matt through `scraper add` or `import` | scraper, letters |
 | `data/companies.example.json` | `company.schema.json` | Matt | tests, the demo |
 | `data/projects/<slug>/index.md` + `assets/` | `project.schema.json` | Matt, helped by `pipeline ingest` (milestone 10) | site, letters |
 | `data/pipelines/<slug>/index.md` + `assets/` | `pipeline.schema.json` | Matt | site, letters |

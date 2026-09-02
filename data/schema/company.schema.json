@@ -28,8 +28,8 @@
             "board": { "type": ["string", "null"], "description": "The company's slug on that ATS, or a feed URL for rss, null for manual" }
           }
         },
-        "category": { "type": "string", "enum": ["ai-video", "studio-ai", "product-inhouse", "brand-inhouse"] },
-        "tier": { "type": "integer", "enum": [1, 2, 3, 4], "description": "The protocol's company tier; defaults from category" },
+        "category": { "type": "string", "enum": ["ai-video", "studio-ai", "product-inhouse", "brand-inhouse", "discovered"], "description": "discovered is what the feeds found on their own; give it a real category to tier it" },
+        "tier": { "type": ["integer", "null"], "enum": [1, 2, 3, 4, null], "description": "The protocol's company tier; defaults from category, null for a discovered company until Matt tiers it" },
         "size": { "type": ["integer", "null"], "description": "Headcount when known; over 200 makes an unlisted salary tolerable" },
         "priority": { "type": "integer", "enum": [1, 2, 3] },
         "lead_proof": { "type": ["string", "null"], "description": "proof story id to lead with for this company" },

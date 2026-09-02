@@ -105,6 +105,13 @@ def build(store, rules, companies=None, now=None, since=None):
         "",
     ]
     out += [f"- {src}: {n}" for src, n in sorted(by_source.items(), key=lambda kv: -kv[1])] or ["- none"]
+    new_companies = sorted(
+        (c for c in (companies or {}).values() if c.get("category") == "discovered" and c.get("added", "") >= since[:10]),
+        key=lambda c: (c["ats"]["kind"] == "manual", c["name"].lower()),
+    )
+    if new_companies:
+        out += ["", "## Companies the feeds found this week", ""]
+        out += [f"- {c['name']}: " + (f"{c['ats']['kind']} board, polled from now on" if c["ats"]["kind"] != "manual" else "no board, hand check") for c in new_companies]
     out += ["", "## Apply", ""]
     out += [_entry(r, companies) for r in piles["apply"]] or ["Nothing this week.", ""]
     out += ["## Review", ""]

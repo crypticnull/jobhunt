@@ -5,12 +5,12 @@
   add-posting    a posting from a URL or a file, for referrals and unpolled companies
   check          probe every company's endpoint, report dead ones
   stale          companies not reviewed in N days
-  poll           fetch every pollable company into postings.db, scoring on the way in
+  poll           read the discovery feeds, add what they give away, then fetch every pollable company
   digest         write this week's digest to data/local/digests, or --stdout
   score          rescore every open posting with the current ruleset
   mark ID STATE  new | reviewed | applied | screen | loop | offer | rejected | skipped
   stats          counts from the store, --markdown --since DATE for the monthly snapshot
-  discover       companies the discovery feeds keep surfacing, never written to the store
+  discover       what the feeds are surfacing right now, without writing anything
   backup         copy postings.db to an off-disk directory, keep the newest fourteen
   export         the status history as JSON, one file per month
   fixture        refresh an adapter's test fixture from the live endpoint
@@ -151,6 +151,16 @@ def cmd_poll(args):
     data = companies.load(args.companies)
     store = Store(args.db)
     try:
+        if not args.no_discover:
+            feed_errors = []
+            grown = discover.grow(store, data, errors=feed_errors)
+            companies.save(args.companies, data)
+            boards = [c for c in grown["companies"] if c["ats"]["kind"] != "manual"]
+            print(f"discover  {grown['found']} relevant postings across the feeds, {len(boards)} new boards to poll, {len(grown['postings'])} feed postings stored")
+            for c in boards:
+                print(f"  + {c['name']}: {c['ats']['kind']}/{c['ats']['board']}")
+            for e in feed_errors:
+                print(f"  feed error: {e}")
         results = poll(store, data["companies"])
     finally:
         store.close()
@@ -238,8 +248,9 @@ def cmd_stats(args):
 
 def cmd_discover(args):
     data = companies.load(args.companies)
-    found = discover.discover(known_slugs={c["slug"] for c in data["companies"]})
-    print(discover.render(found))
+    errors = []
+    found = discover.discover(data["companies"], errors=errors)
+    print(discover.render(found, errors))
     return 0
 
 
@@ -300,7 +311,8 @@ def main(argv=None):
     s.add_argument("--days", type=int, default=60)
     s.set_defaults(fn=cmd_stale)
 
-    p = sub.add_parser("poll", help="fetch every pollable company into the store")
+    p = sub.add_parser("poll", help="grow the list from the feeds, then fetch every pollable company into the store")
+    p.add_argument("--no-discover", dest="no_discover", action="store_true", help="skip the discovery feeds this run")
     p.set_defaults(fn=cmd_poll)
 
     d = sub.add_parser("digest", help="write this week's digest")

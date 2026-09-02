@@ -10,9 +10,9 @@ from pathlib import Path
 
 from . import adapters
 
-CATEGORIES = ("ai-video", "studio-ai", "product-inhouse", "brand-inhouse")
+CATEGORIES = ("ai-video", "studio-ai", "product-inhouse", "brand-inhouse", "discovered")
 # The protocol's company tiers map onto the four categories one to one.
-TIER_BY_CATEGORY = {"ai-video": 1, "studio-ai": 2, "product-inhouse": 3, "brand-inhouse": 4}
+TIER_BY_CATEGORY = {"ai-video": 1, "studio-ai": 2, "product-inhouse": 3, "brand-inhouse": 4, "discovered": None}
 KINDS = ("greenhouse", "lever", "ashby", "workable", "smartrecruiters", "recruitee", "rss", "manual")
 VERSION = 1
 
