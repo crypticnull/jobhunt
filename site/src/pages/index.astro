@@ -65,7 +65,7 @@ const workIntro = proof.find((p) => p.data.linked_projects.length > 0);
   <section id="work">
     <h2>Selected work</h2>
     {workIntro && <p class="lede">{workIntro.data.summary}</p>}
-    <ul class="cards">
+    <ul class="cards work-index">
       {
         projects.map((p) => (
           <li>
