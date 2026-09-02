@@ -177,7 +177,7 @@ One rule, stated in `data/README.md` and held by review: every store has exactly
 
 | Store | Writer | Readers |
 |---|---|---|
-| data/local/companies.json | Matt, helped by `scraper add` | scraper, letters |
+| data/companies.json (public since ADR-0010) | discovery nightly, Matt or Claude through `scraper add` | scraper, letters |
 | data/projects, assets | Matt, helped by `pipeline ingest` | site, letters |
 | data/proof | Matt | letters, site |
 | data/pipelines | Matt | site, letters |
@@ -353,13 +353,13 @@ Every milestone that could be built without assets, credentials or Matt's voice 
 | Milestone | State | What remains, and whose |
 |---|---|---|
 | 1 Foundation | done | |
-| 2 Target list v1 | tooling done | Matt: the live endpoint smoke test, the first 30 companies through `scraper add`, `data/local/scoring.local.json` with the band |
+| 2 Target list v1 | done, self-growing | The list grows from the discovery feeds nightly (ADR-0009). Matt: `setup.cmd` once, and tiers on the discovered companies worth targeting |
 | 3 Scraper walking skeleton | done | Matt: first real poll on the workstation |
 | 4 Scoring and digest | done, protocol v2 | Matt: install the schedule, write `data/local/scoring.local.json`, read the first collect-only digest |
 | 5 Voice lint | done | |
 | 6 Site skeleton | done | Matt: domain, Cloudflare account, the two secrets and `CLOUDFLARE_DEPLOY=true` for the first deploy |
 | 7 Letters live | tooling done | Matt: rewrite the ten blocks in his own words, the first brief, the first sent application |
-| 8 Loop on schedule | done | Matt: two weeks of the loop running unattended |
+| 8 Loop on schedule | done | Matt: double-click `setup.cmd`, then two weeks of the loop running unattended |
 | 9 Adapter breadth and rot watch | done | |
 | 10 Full work and video | tooling done | Matt: the asset drop for ten POWER projects plus the game, then `ingest`, `encode`, `upload`, `publish` |
 | 11 Writing and launch | one post live, case study drafted | Matt: the pipeline post needs the graph exports and details only he has, read the case study draft, launch on the domain |

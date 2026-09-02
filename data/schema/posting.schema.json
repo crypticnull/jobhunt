@@ -7,7 +7,7 @@
   "required": ["source", "company_slug", "title", "url", "remote"],
   "additionalProperties": false,
   "properties": {
-    "source": { "type": "string", "enum": ["greenhouse", "lever", "ashby", "workable", "smartrecruiters", "recruitee", "rss", "manual"] },
+    "source": { "type": "string", "enum": ["greenhouse", "lever", "ashby", "workable", "smartrecruiters", "recruitee", "rss", "manual", "remotive", "wwr", "himalayas", "jobicy", "arbeitnow", "remoteok", "hn"] },
     "source_id": { "type": ["string", "null"], "description": "The ATS's own id when it gives one; the fingerprint is source:source_id" },
     "company_slug": { "type": "string" },
     "title": { "type": "string" },

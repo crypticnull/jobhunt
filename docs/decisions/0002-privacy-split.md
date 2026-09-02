@@ -1,7 +1,7 @@
 # 0002: The privacy split
 
 Date: 2026-09-01
-Status: accepted
+Status: accepted, amended by 0010 (the company list is public; contacts and notes stay private)
 
 ## Context
 

@@ -6,7 +6,8 @@ diagram.
 
 | Store | Schema | Writer | Readers |
 | --- | --- | --- | --- |
-| `data/local/companies.json` | `company.schema.json` | Matt, helped by `python -m scraper add` | scraper, letters |
+| `data/companies.json` | `company.schema.json` | the nightly discovery step, and anyone through `scraper add` or `import`; the nightly task pushes it | scraper, letters |
+| `data/local/companies.notes.json` | (sidecar, keyed by slug) | Matt | merged into the list on load |
 | `data/companies.example.json` | `company.schema.json` | Matt | tests, the demo |
 | `data/projects/<slug>/index.md` + `assets/` | `project.schema.json` | Matt, helped by `pipeline ingest` (milestone 10) | site, letters |
 | `data/pipelines/<slug>/index.md` + `assets/` | `pipeline.schema.json` | Matt | site, letters |
@@ -15,13 +16,13 @@ diagram.
 | `data/local/scoring.local.json` | `scoring.schema.json` | Matt | scraper (the comp floor and bands, merged over the public file) |
 | `data/voice/rules.json` | (milestone 5) | Matt | voicelint |
 | `data/local/postings.db` | `db/schema.sql` | `scraper/store.py` only | digest, letters read-only |
-| `data/local/digests/` | | `scraper/digest.py` | Matt |
+| `data/digests/` | | `scraper/digest.py`, pushed by the Sunday task | Matt, and Claude from chat |
 | `data/local/letters/` | | letters (milestone 7) | Matt |
 
 Two rules hold it together. No package imports another; they meet only
-here. And `data/local/` is the private half of the search: the real company
-list, postings.db, digests, letters, contacts, and the brief's figures. It
-never touches git. Create it locally; the ignore rule and the pre-commit
+here. And `data/local/` is the private half of the search: contacts and notes
+on companies, postings.db, letters, and the brief's figures. It
+never touches git. The company list and the digests are public (ADR-0010). Create it locally; the ignore rule and the pre-commit
 guard keep it out.
 
 ## Validation

@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -21,6 +22,33 @@ class Records(unittest.TestCase):
             companies.record("a", "A", "lever", "a", "startup")
         with self.assertRaises(ValueError):
             companies.record("a", "A", "linkedin", "a", "ai-video")
+
+    def test_public_file_never_carries_notes_and_load_merges_them_back(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "companies.json"
+            data = companies.empty()
+            r = rec("acme")
+            r["notes"] = "met the head of studio at NAB"
+            r["contacts"] = [{"name": "Jane", "role": "Head of Studio"}]
+            companies.add(data, r)
+            companies.add(data, rec("plain"))
+            companies.save(path, data)
+            public = json.loads(path.read_text(encoding="utf-8"))
+            self.assertTrue(all("notes" not in c and "contacts" not in c for c in public["companies"]))
+            sidecar = json.loads(companies.notes_path(path).read_text(encoding="utf-8"))
+            self.assertEqual(sidecar, {"acme": {"contacts": [{"name": "Jane", "role": "Head of Studio"}], "notes": "met the head of studio at NAB"}})
+            back = {c["slug"]: c for c in companies.load(path)["companies"]}
+            self.assertEqual(back["acme"]["notes"], "met the head of studio at NAB")
+            self.assertEqual(back["plain"]["contacts"], [])
+            self.assertEqual(companies.notes_path(path), Path(d) / "local" / "companies.notes.json")
+
+    def test_no_sidecar_is_written_when_nothing_is_private(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "companies.json"
+            data = companies.empty()
+            companies.add(data, rec("acme"))
+            companies.save(path, data)
+            self.assertFalse(companies.notes_path(path).exists())
 
     def test_add_rejects_duplicate_slug(self):
         data = companies.empty()

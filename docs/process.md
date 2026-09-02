@@ -3,16 +3,27 @@
 The scraper and the letters exist so the search runs on schedule instead of
 willpower. This is the schedule.
 
+## Once, five minutes
+
+Double-click `setup.cmd` in the repo folder. It pulls the latest, seeds
+the company list from `assets/companies.txt` if one is there, registers
+the two scheduled tasks, and runs the first poll. Nothing else is ever
+typed; the nightly task pulls updates before it runs.
+
 ## Every night, unattended
 
-`python -m scraper poll` at 02:30, `python -m scraper backup --to <off-disk
-dir>` after it. `scripts/install-schedule.ps1` registers both in Task
-Scheduler along with the Sunday digest. A missed night costs nothing;
+`scripts/nightly.cmd` at 02:30: pull main, then `python -m scraper poll`,
+which reads the discovery feeds, adds the boards they give away, polls
+every board, and scores everything on the way in, then push the company
+list if it grew, then a backup to the directory in
+`data/local/backup-dir.txt`. A missed night costs nothing;
 postings are closed and reopened by what the next poll sees.
 
 ## Sunday, unattended
 
-`python -m scraper digest` writes `data/local/digests/<week>.md`.
+`scripts/weekly.cmd` at 07:00: pull main, then `python -m scraper
+digest`, which writes `data/digests/<week>.md`, then push it, so the
+digest can be read and talked about from chat.
 
 ## Monday, fifteen minutes minimum
 
@@ -43,10 +54,13 @@ loosen, in that order. The remote gate never loosens.
 4. Send it yourself. Nothing here sends anything.
 5. `python -m scraper mark <id> applied --letter <saved path>`.
 
-New companies enter the list through `python -m scraper import <file>`,
-one per line as `category | careers url | name`, or one at a time with
-`python -m scraper add <careers url> --category <category>`. The tier
-follows the category, so nothing else needs setting.
+New companies mostly enter the list on their own, through the discovery
+feeds the nightly poll reads. A hand-picked one goes in through
+`python -m scraper import <file>`, one per line as `category | careers
+url | name`, or `python -m scraper add <careers url> --category
+<category>`. The tier follows the category. A discovered company has no
+tier until it is given a category; the digest lists the ones found each
+week.
 
 A referral or a company without a feed enters the same loop through
 `python -m scraper add-posting <url-or-file> --company <slug> --title "..."`.

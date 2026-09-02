@@ -1,42 +1,147 @@
+import json
 import unittest
+from datetime import datetime, timezone
 
-from scraper import discover
+from scraper import companies, discover
+from scraper.http import HttpError
 from scraper.score import RULES_PATH, load_rules
+from scraper.store import Store
 
 RULES = load_rules(RULES_PATH, local="/nonexistent")
+NOW = datetime(2026, 9, 2, tzinfo=timezone.utc)
 
 REMOTIVE = {
     "jobs": [
-        {"company_name": "Frame Co", "title": "Creative Technologist", "url": "https://r/1", "description": "ComfyUI pipeline work"},
-        {"company_name": "Acme", "title": "Accountant", "url": "https://r/2", "description": "ledgers"},
+        {"id": 1, "company_name": "Frame Co", "title": "Creative Technologist", "url": "https://r/1", "description": "ComfyUI pipeline work. Apply at https://jobs.lever.co/frameco/abc", "publication_date": "2026-09-01T10:00:00"},
+        {"id": 2, "company_name": "Acme", "title": "Accountant", "url": "https://r/2", "description": "ledgers"},
     ]
 }
 WWR = """<rss><channel>
 <item><title>Frame Co: Technical Artist</title><link>https://w/1</link><description>Houdini and real-time</description></item>
 <item><title>Other Co: Copywriter</title><link>https://w/2</link><description>words</description></item>
 </channel></rss>"""
+HIMALAYAS = {"jobs": [{"title": "Motion Designer", "companyName": "Loose Co", "applicationLink": "https://h/1", "description": "<p>After Effects and Python scripting.</p>", "locationRestrictions": ["United States"], "pubDate": 1788249600}]}
+JOBICY = {"jobs": [{"id": 9, "jobTitle": "3D Generalist", "companyName": "Ashby Co", "url": "https://j/9", "jobDescription": "Houdini. <a href='https://jobs.ashbyhq.com/ashbyco/1'>apply</a>", "jobGeo": "USA", "pubDate": "2026-09-01 08:00:00"}]}
+ARBEITNOW = {"data": [{"slug": "x", "title": "Generative Artist", "company_name": "Onsite Co", "url": "https://a/1", "description": "ComfyUI", "remote": False}]}
+REMOTEOK = [
+    {"legal": "notice"},
+    {"id": "77", "position": "Pipeline TD", "company": "Green Co", "url": "https://ro/77", "description": "Pipeline and tooling", "apply_url": "https://boards.greenhouse.io/greenco/jobs/1", "date": "2026-09-01T00:00:00+00:00"},
+]
+HN_SEARCH = {"hits": [{"objectID": "500", "title": "Ask HN: Who wants to be hired? (September 2026)"}, {"objectID": "400", "title": "Ask HN: Who is hiring? (September 2026)"}]}
+HN_THREAD = {
+    "children": [
+        {"id": 401, "author": "a", "created_at": "2026-09-01T15:00:00Z", "text": "Tiny Labs (YC S26) | Creative Technologist | REMOTE (US) | $150k-$180k<p>We build a generative video pipeline in ComfyUI and Python."},
+        {"id": 402, "author": "b", "created_at": "2026-09-01T15:01:00Z", "text": "Desk Co | Motion Designer | ONSITE San Francisco | Houdini work"},
+        {"id": 403, "author": "[deleted]", "text": ""},
+    ]
+}
+
+
+def get_json(url):
+    if "remotive" in url:
+        return REMOTIVE
+    if "himalayas" in url:
+        return HIMALAYAS
+    if "jobicy" in url:
+        return JOBICY
+    if "arbeitnow" in url:
+        return ARBEITNOW
+    if "remoteok" in url:
+        return REMOTEOK
+    if "search_by_date" in url:
+        return HN_SEARCH
+    if "items/400" in url:
+        return HN_THREAD
+    raise HttpError(url, 404, "no fixture")
+
+
+def get_text(url):
+    return WWR
+
+
+def known(*records):
+    return list(records)
 
 
 class Discover(unittest.TestCase):
-    def test_hits_grouped_and_flagged(self):
-        found = discover.discover(known_slugs={"frame-co"}, rules=RULES, get_json=lambda u: REMOTIVE, get_text=lambda u: WWR)
-        self.assertEqual([(i["company"], i["title"], i["known"]) for i in found], [("Frame Co", "Creative Technologist", True), ("Frame Co", "Technical Artist", True)])
-        self.assertIn("comfyui", found[0]["terms"])
+    def test_boards_are_harvested_and_known_companies_marked(self):
+        frame = companies.record("frame-co", "Frame Co", "lever", "frameco", "studio-ai", today="2026-09-01")
+        found = discover.discover(known(frame), RULES, get_json, get_text)
+        by = {(i["company"], i["title"]): i for i in found}
+        self.assertTrue(by[("Frame Co", "Creative Technologist")]["known"])
+        self.assertEqual(by[("Frame Co", "Creative Technologist")]["ats"], ("lever", "frameco"))
+        self.assertEqual(by[("Green Co", "Pipeline TD")]["ats"], ("greenhouse", "greenco"), "the apply link gives the board away")
+        self.assertEqual(by[("Ashby Co", "3D Generalist")]["ats"], ("ashby", "ashbyco"), "links in the description survive to be harvested")
+        self.assertIsNone(by[("Loose Co", "Motion Designer")]["ats"])
+        self.assertNotIn(("Acme", "Accountant"), by)
+        self.assertNotIn(("Onsite Co", "Generative Artist"), by, "arbeitnow's remote flag is respected")
+        self.assertIn("comfyui", by[("Frame Co", "Creative Technologist")]["terms"])
 
-    def test_render_suggests_add_for_unknown(self):
-        found = discover.discover(known_slugs=set(), rules=RULES, get_json=lambda u: REMOTIVE, get_text=lambda u: WWR)
-        text = discover.render(found)
-        self.assertIn("Frame Co", text)
-        self.assertIn('add: python -m scraper add <careers-url> --category <cat> --name "Frame Co"', text)
-        self.assertNotIn("Accountant", text)
+    def test_hn_thread_is_parsed_and_only_remote_kept(self):
+        found = discover.discover([], RULES, get_json, get_text, sources=("hn",))
+        self.assertEqual([(i["company"], i["title"], i["location"]) for i in found], [("Tiny Labs", "Creative Technologist", "REMOTE (US)")])
+        self.assertEqual(found[0]["url"], "https://news.ycombinator.com/item?id=401")
+        self.assertEqual(found[0]["posted_at"], "2026-09-01T15:00:00+00:00")
+
+    def test_one_dead_feed_does_not_kill_the_rest(self):
+        def flaky(url):
+            if "himalayas" in url:
+                raise HttpError(url, 503, "down")
+            return get_json(url)
+
+        errors = []
+        found = discover.discover([], RULES, flaky, get_text, errors=errors)
+        self.assertEqual(errors, ["himalayas: HttpError: 503 down <https://himalayas.app/jobs/api?limit=100>"])
+        self.assertTrue(any(i["company"] == "Green Co" for i in found))
+
+    def test_render(self):
+        found = discover.discover([], RULES, get_json, get_text)
+        text = discover.render(found, ["hn: boom"])
+        self.assertIn("Green Co (board found: greenhouse/greenco, the next poll adds it)", text)
+        self.assertIn("Loose Co (no board found, the posting itself is stored)", text)
+        self.assertIn("feed error: hn: boom", text)
         self.assertEqual(discover.render([]), "Nothing hit the intersection terms today.")
 
-    def test_two_remotive_calls_only(self):
-        calls = []
+    def test_dates_are_normalized(self):
+        self.assertEqual(discover._iso(1788249600), "2026-09-01T08:00:00+00:00")
+        self.assertEqual(discover._iso("2026-09-01 08:00:00"), "2026-09-01T08:00:00")
+        self.assertIsNone(discover._iso("yesterday"))
 
-        def get_json(u):
-            calls.append(u)
-            return {"jobs": []}
 
-        discover.discover(rules=RULES, get_json=get_json, get_text=lambda u: "<rss><channel></channel></rss>")
-        self.assertEqual(len(calls), 2)
+class Grow(unittest.TestCase):
+    def setUp(self):
+        self.s = Store(":memory:")
+        self.data = companies.empty()
+        companies.add(self.data, companies.record("frame-co", "Frame Co", "lever", "frameco", "studio-ai", today="2026-09-01"))
+
+    def test_boards_become_companies_and_boardless_postings_are_stored(self):
+        out = discover.grow(self.s, self.data, RULES, get_json, get_text, now=NOW)
+        by_slug = {c["slug"]: c for c in self.data["companies"]}
+        self.assertEqual(by_slug["green-co"]["ats"], {"kind": "greenhouse", "board": "greenco"})
+        self.assertEqual((by_slug["green-co"]["category"], by_slug["green-co"]["tier"], by_slug["green-co"]["priority"]), ("discovered", None, 3))
+        self.assertEqual(by_slug["ashby-co"]["ats"]["kind"], "ashby")
+        self.assertEqual(by_slug["loose-co"]["ats"], {"kind": "manual", "board": None})
+        self.assertEqual(by_slug["tiny-labs"]["ats"]["kind"], "manual")
+        self.assertEqual(len(out["companies"]), 4)
+        rows = {(r["company_slug"], r["source"]): r for r in self.s.open_postings()}
+        self.assertIn(("loose-co", "himalayas"), rows)
+        self.assertIn(("tiny-labs", "hn"), rows)
+        self.assertNotIn(("green-co", "remoteok"), rows, "a pollable board's postings come from the poll, not the feed")
+        self.assertNotIn(("frame-co", "remotive"), rows, "a known pollable company is left to the poll")
+        hn = rows[("tiny-labs", "hn")]
+        self.assertEqual((hn["comp_min"], hn["comp_max"], hn["remote_class"]), (150000, 180000, "remote"))
+        self.assertIsNotNone(hn["score"])
+        self.assertEqual(len(out["postings"]), 2)
+
+    def test_second_run_adds_nothing_new(self):
+        discover.grow(self.s, self.data, RULES, get_json, get_text, now=NOW)
+        n = len(self.data["companies"])
+        out = discover.grow(self.s, self.data, RULES, get_json, get_text, now=NOW)
+        self.assertEqual((len(self.data["companies"]), out["companies"], out["postings"]), (n, [], []))
+
+    def test_caps_hold(self):
+        out = discover.grow(self.s, self.data, RULES, get_json, get_text, now=NOW, board_cap=1, posting_cap=1)
+        kinds = [c["ats"]["kind"] for c in out["companies"]]
+        self.assertEqual(kinds.count("manual"), 1)
+        self.assertEqual(len([k for k in kinds if k != "manual"]), 1)
+        self.assertEqual(len(out["postings"]), 1)

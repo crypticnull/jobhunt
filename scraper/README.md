@@ -14,19 +14,41 @@ python -m scraper add URL --category ai-video [--name N] [--priority 1|2|3] [--l
 python -m scraper import FILE [--priority 1|2|3] [--manual]   # many companies from a text file
 python -m scraper check              # probe every endpoint, exit 1 if any is dead
 python -m scraper stale --days 60    # companies nobody has looked at lately
-python -m scraper poll               # fetch every pollable company, score on the way in
-python -m scraper digest [--stdout]  # this week's digest to data/local/digests/<week>.md
+python -m scraper poll               # read the feeds, add what they give away, fetch every board, score on the way in
+python -m scraper digest [--stdout]  # this week's digest to data/digests/<week>.md, pushed on Sundays
 python -m scraper score              # rescore every open posting after tuning scoring.json
 python -m scraper mark ID STATE      # new | reviewed | applied | screen | loop | offer | rejected | skipped
 python -m scraper stats [--markdown --since 2026-09-01]   # the monthly snapshot block
 python -m scraper add-posting SRC --company SLUG --title T  # a referral, from a URL or a file
-python -m scraper discover           # companies the discovery feeds surface, never written
+python -m scraper discover           # what the feeds are surfacing right now, nothing written
 python -m scraper backup --to DIR    # postings.db off the disk, newest fourteen kept
 python -m scraper export --to DIR    # status history as JSON, one file per month
 python -m scraper fixture KIND BOARD # refresh a test fixture from the live endpoint
 ```
 
-`docs/process.md` is the schedule these run on.
+`docs/process.md` is the schedule these run on. On Windows, `setup.cmd`
+at the repo root registers it in one double-click.
+
+## Discovery
+
+The list grows on its own. Every night before the boards are polled, the
+poll reads six remote job feeds (Remotive, We Work Remotely, Himalayas,
+Jobicy, Arbeitnow, RemoteOK) and the month's Hacker News "Who is hiring"
+thread, and keeps every remote posting that hits the intersection terms.
+A posting whose links give away a Greenhouse, Lever, Ashby, Workable,
+SmartRecruiters or Recruitee board hands over the company's whole board,
+so the company is added to the list as pollable and everything it posts
+is watched from then on. A posting with no board behind it is stored as
+a posting in its own right, under a hand-check company record, so nothing
+relevant is lost for lack of an ATS. Discovered companies carry the
+category `discovered` and no tier until Matt gives them one, which means
+an unlisted salary fails the comp gate for them and a listed one competes
+on merit. Caps of fifteen new boards and thirty feed postings a night
+keep one wild evening from doubling the list. One dead feed never stops
+the others; the digest's source health footer names it.
+
+The hand-written list is still welcome, through `import` or `add`, and a
+tier on a record is what promotes a discovered company to a target.
 
 `import` takes a text file with one company per line, `category | careers
 url | name`, and runs `add` on each, so a first list of eighty companies
@@ -36,8 +58,11 @@ rather than written, unless `--manual` says to keep it for hand checks.
 `add` works out the ATS from the careers URL, or from the board links
 embedded in the page, and confirms the guess against the live endpoint
 before writing. `--kind manual` records a company that has to be checked by
-hand. The list lives at `data/local/companies.json` and is private;
-`--companies` and `--db` point anywhere else.
+hand. The list lives at `data/companies.json` in the repo, public, so it
+can be read and edited from anywhere; contacts and notes on a company sit
+in `data/local/companies.notes.json`, private, merged in on load. The
+nightly task pushes the list after discovery grows it. `--companies` and
+`--db` point anywhere else.
 
 ## Scoring
 
