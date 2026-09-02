@@ -91,6 +91,14 @@ PROJECT_HINTS = {
 # cannot survive into a deliverable.
 PROJECT_WORDS = {w for hint in PROJECT_HINTS for w in hint.split()} | set(PROJECT_HINTS.values())
 
+# Folder names that hold work rather than name a project, so they must never
+# become a slug.
+GENERIC_FOLDERS = {
+    "misc", "assets", "portfolio", "work", "projects", "untitled", "new-folder",
+    "temp", "tmp", "exports", "export", "footage", "media", "files", "output",
+    "outputs", "renders", "archive", "old", "stuff", "downloads", "desktop",
+}
+
 SEQ = re.compile(r"^(?P<base>.*?)[._-]?(?P<num>\d{3,})$")
 VERSION = re.compile(r"(?:^|[._\s-])v(\d{1,3})(?:$|[._\s-])", re.I)
 TRAILING_INDEX = re.compile(r"[._\s-](\d{1,3})$")
@@ -125,14 +133,49 @@ def skipped(path, root):
     return name.rpartition(".")[2] in SKIP_EXT
 
 
+def normalize(name):
+    """Folder names to slug shape: lowercase, one separator, no edge dashes."""
+    n = re.sub(r"[\s_]+", "-", name.strip().lower())
+    n = re.sub(r"[^a-z0-9-]+", "", n)
+    return re.sub(r"-{2,}", "-", n).strip("-")
+
+
+FOLDER_YEAR = re.compile(r"^(?P<slug>.+?)-(?P<year>(?:19|20)\d{2})$")
+
+
+def from_structure(rel):
+    """A curated drop is already <project>-<year>/<stage>/files, and that is the
+    whole answer. Read it before guessing anything from words, because a folder
+    literally named anthem-2026 should never come back as unknown.
+
+    Returns whatever the structure states and None for the rest."""
+    parts = rel.parts
+    project = year = stage = None
+    if len(parts) >= 2:
+        folder = normalize(parts[0])
+        m = FOLDER_YEAR.match(folder)
+        if m:
+            candidate, year = m.group("slug"), int(m.group("year"))
+        else:
+            candidate = folder
+        if candidate and candidate not in GENERIC_FOLDERS:
+            project = candidate
+    if len(parts) >= 3:
+        candidate = normalize(parts[1])
+        if candidate in STAGES or candidate in ("dev", "source", "audio"):
+            stage = candidate
+    return project, year, stage
+
+
 def guess_project(text):
     """Longest hint wins, so a folder named 'Nitro Create' does not read as
     'nitro' matching something else."""
-    low = text.lower()
+    low = re.sub(r"[\s_-]+", " ", text.lower())
     best = None
     for hint, slug in PROJECT_HINTS.items():
-        if hint in low and (best is None or len(hint) > len(best[0])):
-            best = (hint, slug)
+        spaced = hint.replace("-", " ")
+        if spaced in low and (best is None or len(spaced) > len(best[0])):
+            best = (spaced, slug)
     return best[1] if best else None
 
 
@@ -174,11 +217,17 @@ def guess_stage(text, kind):
     return "unknown"
 
 
-def guess_deliverable(stem):
+def guess_deliverable(stem, project=None):
     """The words left after the project, year, stage and version are taken out.
-    Two tokens at most, because a deliverable is 'logo-loop', not a sentence."""
+    Two tokens at most, because a deliverable is 'logo-loop', not a sentence.
+
+    The resolved project is dropped word by word as well as whole, or a file
+    inside anthem-2026 yields the deliverable 'anthem'."""
     tokens = [t for t in re.split(r"[\s_\-.]+", stem.lower()) if t]
     drop = set()
+    if project:
+        drop.add(project)
+        drop.update(project.split("-"))
     for stage, words in STAGE_HINTS:
         drop.add(stage)
         drop.update(w.replace(" ", "") for w in words)
@@ -247,13 +296,18 @@ def survey(folder):
         ext = path.name.rpartition(".")[2].lower()
         kind = kind_of(ext)
         context = str(rel)
-        project = guess_project(context)
-        year = guess_year(context)
-        stage = guess_stage(context, kind)
+        # Structure first, words only where the structure is silent.
+        project, year, stage = from_structure(rel)
+        structural = sum(x is not None for x in (project, year, stage))
+        project = project or guess_project(context)
+        year = year or guess_year(context)
+        if stage is None or kind in ("source", "dev", "audio"):
+            stage = guess_stage(context, kind)
         stem = path.name.rpartition(".")[0]
-        deliverable = guess_deliverable(stem)
+        deliverable = guess_deliverable(stem, project)
         known = sum(x is not None and x != "unknown" for x in (project, year, stage if stage != "unknown" else None))
-        confidence = ("high" if known == 3 else "medium" if known == 2 else "low")
+        # A row the folder tree stated outright is not a guess.
+        confidence = "high" if (structural == 3 or known == 3) else "medium" if known == 2 else "low"
         notes = []
         if count > 1:
             notes.append(f"sequence of {count} files")
@@ -275,7 +329,9 @@ def survey(folder):
             "bytes": size,
             "modified": datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).date().isoformat(),
             "project": project or "unknown",
-            "year": year or "",
+            # String, always: the column is blank when the year is unknown, and
+            # one type per column keeps a row a faithful preview of the file.
+            "year": str(year) if year else "",
             "deliverable": deliverable,
             "stage": stage,
             "confidence": confidence,
