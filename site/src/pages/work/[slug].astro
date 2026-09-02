@@ -3,15 +3,32 @@ import { getCollection, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import Still from "../../components/Still.astro";
 import Video from "../../components/Video.astro";
+import ChapterRail from "../../components/ChapterRail.astro";
+import { CHAPTER_ORDER } from "../../schemas.mjs";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
-  return projects.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+  const chapters = await getCollection("chapters");
+  return projects.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry, chapters: chapters.filter((c) => c.data.project === entry.id) },
+  }));
 }
 
-const { entry } = Astro.props;
+const { entry, chapters } = Astro.props;
 const d = entry.data;
 const { Content } = await render(entry);
+
+// Kind decides the sequence, not the file name, so a study cannot end up in a
+// different order from the one beside it. Final leads and the process follows.
+const rank = new Map(CHAPTER_ORDER.map((k, i) => [k, i]));
+const ordered = [...chapters].sort(
+  (a, b) => rank.get(a.data.kind) - rank.get(b.data.kind) || a.data.order - b.data.order,
+);
+const rendered = await Promise.all(
+  ordered.map(async (c) => ({ data: c.data, anchor: c.data.kind, Body: (await render(c)).Content })),
+);
+
 const kinds = ["storyboard", "styleframe", "wip", "breakdown"] as const;
 const labels = { storyboard: "Storyboards", styleframe: "Styleframes", wip: "In progress", breakdown: "Breakdown" };
 ---
@@ -38,8 +55,12 @@ const labels = { storyboard: "Storyboards", styleframe: "Styleframes", wip: "In 
     <dd>{d.role}</dd>
     <dt>Discipline</dt>
     <dd>{d.disciplines.join(", ")}</dd>
-    <dt>Tools</dt>
-    <dd>{d.tools.join(", ")}</dd>
+    {d.tools.length > 0 && (
+      <>
+        <dt>Tools</dt>
+        <dd>{d.tools.join(", ")}</dd>
+      </>
+    )}
     {d.turnaround && (
       <>
         <dt>Turnaround</dt>
@@ -48,9 +69,23 @@ const labels = { storyboard: "Storyboards", styleframe: "Styleframes", wip: "In 
     )}
   </dl>
 
+  <ChapterRail present={rendered.map((c) => ({ kind: c.data.kind, title: c.data.title, anchor: c.anchor }))} />
+
   <div class="prose">
     <Content />
   </div>
+
+  {
+    rendered.map(({ data, anchor, Body }) => (
+      <section class="chapter" id={anchor}>
+        <h2>{data.title}</h2>
+        {data.caption && <p class="lede">{data.caption}</p>}
+        <div class="prose">
+          <Body />
+        </div>
+      </section>
+    ))
+  }
 
   {
     d.stills.length > 0 && (
