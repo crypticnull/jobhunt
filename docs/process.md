@@ -5,7 +5,9 @@ willpower. This is the schedule.
 
 ## Once, five minutes
 
-Double-click `setup.cmd` in the repo folder. It checks that git knows a
+Double-click `setup.cmd` in the repo folder. It pulls before it works, so a
+change to `setup.ps1` itself lands on the following run rather than this
+one. It checks that git knows a
 name and email and that Python is on the PATH, pulls the latest, seeds
 the company list from `assets/companies.txt` if one is there, registers
 the two scheduled tasks, runs the first poll, and pushes the list. Every

@@ -57,7 +57,7 @@ class Digest(unittest.TestCase):
 
     def test_piles(self):
         piles = self.piles()
-        self.assertEqual(piles, {"apply": [self.ids["apply"]], "review": [self.ids["review"]], "overflow": []})
+        self.assertEqual(piles, {"apply": [self.ids["apply"]], "review": [self.ids["review"]], "overflow": [], "hidden": []})
         self.assertEqual(self.s.drop_counts(SEEN), {"comp: unlisted_salary_unknown_company": 1, "remote: remote claim is hybrid": 1})
         self.assertEqual(self.s.new_by_source(SEEN), {"greenhouse": 4})
 
@@ -119,6 +119,20 @@ class Digest(unittest.TestCase):
         self.r["piles"]["exceptional_min"] = 999
         md, _ = digest.build(self.s, self.r, COMPANIES, NOW)
         self.assertNotIn("will not wait", md)
+
+    def test_the_review_pile_is_capped_and_the_rest_are_not_marked_seen(self):
+        """Ninety companies put six thousand postings in the store. A digest
+        listing four hundred is a digest nobody reads, and marking them all as
+        surfaced would bury them for good."""
+        self.r["piles"]["review_weekly_cap"] = 1
+        for i in range(20, 25):
+            self.add(i, company_slug="brand", title=f"Senior Motion Designer {i}", description="", comp_min=85000, comp_max=95000, remote="remote", location="Remote - US")
+        piles = digest.select(self.s, self.r, COMPANIES, NOW)
+        self.assertEqual(len(piles["review"]), 1)
+        self.assertEqual(len(piles["hidden"]), 5)
+        md, ids = digest.build(self.s, self.r, COMPANIES, NOW)
+        self.assertIn("5 more scored below", md)
+        self.assertTrue(all(r["id"] not in ids for r in piles["hidden"]), "held back means it comes round again")
 
     def test_after_the_collect_window_the_banner_goes(self):
         later = datetime(2026, 10, 12, tzinfo=timezone.utc)  # past collect_only_until

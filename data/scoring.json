@@ -196,6 +196,7 @@
     "review_min": 50,
     "flagged_always_review": true,
     "apply_weekly_cap": 12,
+    "review_weekly_cap": 40,
     "exceptional_min": 85,
     "apply_sort": ["company_tier", "score.total"]
   },

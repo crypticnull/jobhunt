@@ -46,6 +46,13 @@ def select(store, rules, companies=None, now=None):
     cap = rules["piles"]["apply_weekly_cap"]
     piles["overflow"] = piles["apply"][cap:]
     piles["apply"] = piles["apply"][:cap]
+    # The review pile is unbounded by nature. Polling ninety companies put six
+    # thousand postings in the store, and a digest listing four hundred of them
+    # is a digest nobody reads. The rest stay in the store, unsurfaced, and come
+    # back next week rather than being marked as seen.
+    room = max(rules["piles"].get("review_weekly_cap", 40) - len(piles["overflow"]), 0)
+    piles["hidden"] = piles["review"][room:]
+    piles["review"] = piles["review"][:room]
     return piles
 
 
@@ -144,13 +151,16 @@ def build(store, rules, companies=None, now=None, since=None, heartbeat=None):
     out += ["## Review", ""]
     review = piles["overflow"] + piles["review"]
     out += [_entry(r, companies) for r in review] or ["Nothing this week.", ""]
+    if piles.get("hidden"):
+        lowest = round(min(r["score"] or 0 for r in piles["review"])) if piles["review"] else 0
+        out += [f"{len(piles['hidden'])} more scored below {lowest} and are held back rather than marked as seen. They return next week if nothing better arrives.", ""]
     out += ["## Logged, by reason", ""]
     out += [f"- {n:>3}  {reason}" for reason, n in sorted(drops.items(), key=lambda kv: -kv[1])] or ["- none"]
     out += ["", "## Source health", ""]
     problems = source_health(store, since)
     out += [f"- {p}" for p in problems] or ["All sources answered."]
     out.append("")
-    ids = [r["id"] for r in piles["apply"] + review]
+    ids = [r["id"] for r in piles["apply"] + review]  # held-back rows are deliberately not marked
     return "\n".join(out), ids
 
 
