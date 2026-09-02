@@ -53,7 +53,7 @@ def wwr(get_text=None):
 def discover(known_slugs=(), rules=None, get_json=None, get_text=None):
     """[{company, title, url, source, terms, known}] for every posting that hits the intersection terms."""
     rules = rules or load_rules()
-    terms = rules["terms"]["intersection"]
+    terms = [t for leg in rules["score"]["intersection"]["legs"].values() for t in leg]
     found, seen_urls = [], set()
     for item in remotive(get_json) + wwr(get_text):
         if item["url"] in seen_urls:

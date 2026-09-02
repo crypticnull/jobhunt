@@ -16,7 +16,7 @@ python -m scraper stale --days 60    # companies nobody has looked at lately
 python -m scraper poll               # fetch every pollable company, score on the way in
 python -m scraper digest [--stdout]  # this week's digest to data/local/digests/<week>.md
 python -m scraper score              # rescore every open posting after tuning scoring.json
-python -m scraper mark ID STATE      # new | interested | applied | rejected | ignored | interview | offer
+python -m scraper mark ID STATE      # new | reviewed | applied | screen | loop | offer | rejected | skipped
 python -m scraper stats [--markdown --since 2026-09-01]   # the monthly snapshot block
 python -m scraper add-posting SRC --company SLUG --title T  # a referral, from a URL or a file
 python -m scraper discover           # companies the discovery feeds surface, never written
@@ -35,22 +35,44 @@ hand. The list lives at `data/local/companies.json` and is private;
 
 ## Scoring
 
-The search protocol is `data/scoring.json`: weights, term lists and
-thresholds, committed and diffable. The comp band is private and lives in
-`data/local/scoring.local.json` as `{"comp_band": {"min": …, "max": …,
-"currency": "USD"}}`; without it, comp is flagged rather than scored.
-Every posting carries its per-rule breakdown and the ruleset version, so
-the digest can show its reasoning and history can be rescored after tuning.
-Scoring ranks. It never drops.
+The search protocol lives twice: `docs/search-protocol.md` is the version
+Matt reads and `data/scoring.json` is the version the scraper runs, and a
+change to one is a change to the other. `score.py` applies it in order.
+
+1. Two hard gates. Remote has to be real, so a hybrid claim, a fake-remote
+   phrase, or a state list that leaves out Pennsylvania fails the posting.
+   Comp has to clear a floor, so a posted max under it fails and an
+   unlisted salary passes only at a tier 1 to 3 company or one with more
+   than two hundred people.
+2. Disqualifiers. Editor and junior titles, relocation, heavy travel, fixed
+   fee work, pure UX, research roles, and anything stale.
+3. A score out of 100. Remote 25, comp 20, the intersection legs 20 at five
+   per leg (3D, motion, generative, software, pipeline), the title tier
+   15, the company tier 10, freshness 5, a named human 5, and up to 15
+   off for underpaid tells like fast-paced or rockstar.
+4. Piles. Seventy and up is apply, fifty to sixty-nine or anything flagged
+   is review, the rest is logged with a reason. Engine and frontend
+   language flags rather than drops, since Matt decides those.
+
+A failed gate is a row with a pile of `logged` and a `drop_reason`, never a
+deletion, so the digest counts drops by reason and the checkpoint can see
+what the gates threw away. Every number that describes the comp band is
+null in the committed file and comes from `data/local/scoring.local.json`,
+merged at load. Without that file, posted comp is flagged rather than
+scored. Every posting carries its per-rule breakdown, the ruleset version
+and the proof story to lead with, so history can be rescored after tuning.
 
 ## The digest
 
-Three lanes: strong, borderline, and comp not posted, each entry with the
-rules that put it there and the id to `mark` it with. Postings with a
-terminal status, or already surfaced and unchanged, stay out. The footer
-names any source that errored or returned nothing twice running. On
-Windows, `scripts/install-schedule.ps1` registers the nightly poll and the
-Sunday digest in Task Scheduler.
+The Monday read. New listings by source, the apply pile sorted by company
+tier then score and capped at twelve a week, the review pile with its
+flags, drops counted by reason, and a footer naming any source that
+errored or returned nothing twice running. Postings with a terminal
+status, or already surfaced and unchanged, stay out. Until the collect-only
+date in `tuning` the digest carries a banner and nothing is applied to;
+the piles are read to check the gates. On Windows,
+`scripts/install-schedule.ps1` registers the nightly poll and the digest in
+Task Scheduler.
 
 ## Shape
 
@@ -63,7 +85,7 @@ Sunday digest in Task Scheduler.
 | `store.py` | the only writer of postings.db, forward-only migrations, status as a log |
 | `poll.py` | one poll, every company isolated and logged, comp filled from text when the ATS gave none |
 | `salary.py` | the regex that pulls a range out of description text |
-| `score.py` | the rules, pure functions over a posting row and `scoring.json` |
+| `score.py` | the protocol: gates, disqualifiers, score, piles, pure functions over a posting row, its company record and `scoring.json` |
 | `digest.py` | the weekly markdown |
 | `manual.py` | a posting from a URL or a file |
 | `discover.py` | Remotive and We Work Remotely as suggestion feeds |

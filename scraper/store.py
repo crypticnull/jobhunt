@@ -10,10 +10,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 MIGRATIONS = Path(__file__).parent / "migrations"
-STATES = ("new", "interested", "applied", "rejected", "ignored", "interview", "offer")
-TERMINAL = ("applied", "rejected", "ignored")
+STATES = ("new", "reviewed", "applied", "screen", "loop", "offer", "rejected", "skipped")
+# Anything past reviewed is Matt's and never resurfaces in a digest.
+TERMINAL = ("applied", "screen", "loop", "offer", "rejected", "skipped")
 
-_REFRESH = ("title", "url", "location", "remote_class", "comp_min", "comp_max", "comp_currency", "comp_found", "description", "posted_at")
+_REFRESH = ("title", "url", "location", "remote_class", "comp_min", "comp_max", "comp_currency", "comp_found", "description", "posted_at", "contact_hint", "employment_type")
 
 
 def utcnow():
@@ -86,6 +87,8 @@ class Store:
             "comp_found": comp_found,
             "description": p.get("description"),
             "posted_at": p.get("posted_at"),
+            "contact_hint": p.get("contact_hint"),
+            "employment_type": p.get("employment_type"),
         }
         row = self.db.execute("SELECT id FROM postings WHERE fingerprint = ?", (fp,)).fetchone()
         if row is None:
@@ -168,10 +171,21 @@ class Store:
 
     def set_score(self, posting_id, result):
         self.db.execute(
-            "UPDATE postings SET score = ?, score_json = ?, ruleset_version = ? WHERE id = ?",
-            (result["score"], json.dumps(result), result["version"], posting_id),
+            "UPDATE postings SET score = ?, score_json = ?, ruleset_version = ?, pile = ?, drop_reason = ? WHERE id = ?",
+            (result["score"], json.dumps(result), result["version"], result.get("pile"), result.get("drop_reason"), posting_id),
         )
         self.db.commit()
+
+    def new_by_source(self, since):
+        rows = self.db.execute("SELECT source, COUNT(*) AS n FROM postings WHERE first_seen >= ? GROUP BY source", (since,)).fetchall()
+        return {r["source"]: r["n"] for r in rows}
+
+    def drop_counts(self, since):
+        rows = self.db.execute(
+            "SELECT drop_reason, COUNT(*) AS n FROM postings WHERE pile = 'logged' AND drop_reason IS NOT NULL AND first_seen >= ? GROUP BY drop_reason",
+            (since,),
+        ).fetchall()
+        return {r["drop_reason"]: r["n"] for r in rows}
 
     def open_postings(self):
         rows = self.db.execute("SELECT * FROM postings WHERE closed_at IS NULL ORDER BY score DESC, first_seen").fetchall()

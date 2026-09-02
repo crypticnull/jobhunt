@@ -1,10 +1,22 @@
 #!/bin/sh
-# Refuse commits that stage the private half of the search (ADR-0002).
-bad=$(git diff --cached --name-only | grep -E '(^|/)data/local/|\.db$')
+# Refuse commits that stage the private half of the search (ADR-0002), the
+# staging folder, or anything heavy enough to belong on R2 instead of git.
+bad=$(git diff --cached --name-only | grep -E '(^|/)data/local/|(^|/)assets/[^/]+/|\.db$' | grep -vE '^data/(projects|pipelines)/[^/]+/assets/')
 if [ -n "$bad" ]; then
-  echo "pre-commit: refusing to commit private files:" >&2
+  echo "pre-commit: refusing to commit private or staging files:" >&2
   echo "$bad" >&2
-  echo "pre-commit: data/local/ and .db files never touch git (ADR-0002)." >&2
+  echo "pre-commit: data/local/ and the assets/ staging folder never touch git (ADR-0002)." >&2
+  exit 1
+fi
+limit=$((50 * 1024 * 1024))
+heavy=""
+for f in $(git diff --cached --name-only --diff-filter=AM); do
+  size=$(git cat-file -s ":$f" 2>/dev/null || echo 0)
+  [ "$size" -gt "$limit" ] && heavy="$heavy
+$f ($((size / 1024 / 1024)) MB)"
+done
+if [ -n "$heavy" ]; then
+  echo "pre-commit: refusing files over 50 MB, video and finals belong on R2, not in git:$heavy" >&2
   exit 1
 fi
 exit 0

@@ -11,6 +11,8 @@ from pathlib import Path
 from . import adapters
 
 CATEGORIES = ("ai-video", "studio-ai", "product-inhouse", "brand-inhouse")
+# The protocol's company tiers map onto the four categories one to one.
+TIER_BY_CATEGORY = {"ai-video": 1, "studio-ai": 2, "product-inhouse": 3, "brand-inhouse": 4}
 KINDS = ("greenhouse", "lever", "ashby", "workable", "smartrecruiters", "recruitee", "rss", "manual")
 VERSION = 1
 
@@ -44,7 +46,7 @@ def slugify(name):
     return s or "company"
 
 
-def record(slug, name, kind, board, category, priority=2, careers_url=None, lead_proof=None, today=None):
+def record(slug, name, kind, board, category, priority=2, careers_url=None, lead_proof=None, today=None, tier=None, size=None):
     if category not in CATEGORIES:
         raise ValueError(f"category must be one of {CATEGORIES}, got {category!r}")
     if kind not in KINDS:
@@ -56,6 +58,8 @@ def record(slug, name, kind, board, category, priority=2, careers_url=None, lead
         "careers_url": careers_url,
         "ats": {"kind": kind, "board": board},
         "category": category,
+        "tier": int(tier) if tier else TIER_BY_CATEGORY[category],
+        "size": int(size) if size else None,
         "priority": int(priority),
         "lead_proof": lead_proof,
         "remote_notes": "",

@@ -4,3 +4,7 @@ data/local/
 # Python
 __pycache__/
 *.pyc
+
+# The local staging folder for drops: stills, boards, finals, exports.
+# pipeline ingest reads from it. Git never sees it.
+assets/

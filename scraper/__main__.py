@@ -7,7 +7,7 @@
   poll           fetch every pollable company into postings.db, scoring on the way in
   digest         write this week's digest to data/local/digests, or --stdout
   score          rescore every open posting with the current ruleset
-  mark ID STATE  record a status change for a posting
+  mark ID STATE  new | reviewed | applied | screen | loop | offer | rejected | skipped
   stats          counts from the store, --markdown --since DATE for the monthly snapshot
   discover       companies the discovery feeds keep surfacing, never written to the store
   backup         copy postings.db to an off-disk directory, keep the newest fourteen
@@ -57,14 +57,15 @@ def cmd_add_posting(args):
     p = manual.from_text(args.company, args.title, text, url=args.url or url, location=args.location or "", remote=args.remote)
     enrich(p)
     rules = load_rules()
+    company = next(c for c in data["companies"] if c["slug"] == args.company)
     store = Store(args.db)
     try:
         pid, is_new = store.upsert(p)
-        store.set_score(pid, score(store.get(pid), rules))
+        store.set_score(pid, score(store.get(pid), rules, company=company))
         row = store.get(pid)
     finally:
         store.close()
-    print(f"{'added' if is_new else 'updated'} posting {pid}: {row['title']} at {args.company}, {row['remote_class']}, score {round(row['score'])}")
+    print(f"{'added' if is_new else 'updated'} posting {pid}: {row['title']} at {args.company}, {row['remote_class']}, score {round(row['score'])}, pile {row['pile']}" + (f" ({row['drop_reason']})" if row['drop_reason'] else ""))
     print(f"next: python -m letters brief {pid}")
     return 0
 
@@ -116,15 +117,15 @@ def cmd_poll(args):
 
 def cmd_digest(args):
     data = companies.load(args.companies)
-    names = {c["slug"]: c["name"] for c in data["companies"]}
+    by_slug = {c["slug"]: c for c in data["companies"]}
     rules = load_rules()
     store = Store(args.db)
     try:
         if args.stdout:
-            md, _ = digest.build(store, rules, names)
+            md, _ = digest.build(store, rules, by_slug)
             print(md)
             return 0
-        path, n = digest.write(store, rules, Path(args.db).parent / "digests", names)
+        path, n = digest.write(store, rules, Path(args.db).parent / "digests", by_slug)
     finally:
         store.close()
     print(f"wrote {path}, {n} postings surfaced")
@@ -133,11 +134,12 @@ def cmd_digest(args):
 
 def cmd_score(args):
     rules = load_rules()
+    by_slug = {c["slug"]: c for c in companies.load(args.companies)["companies"]}
     store = Store(args.db)
     try:
         rows = store.open_postings()
         for row in rows:
-            store.set_score(row["id"], score(row, rules))
+            store.set_score(row["id"], score(row, rules, company=by_slug.get(row["company_slug"])))
     finally:
         store.close()
     print(f"rescored {len(rows)} open postings with ruleset {rules['version']}")
@@ -167,7 +169,7 @@ def cmd_stats(args):
             p = s["period"]
             t = p["transitions"]
             lines.append(f"- seen {p['seen']}, surfaced {p['surfaced']}, applied {t.get('applied', 0)}, "
-                         f"interviews {t.get('interview', 0)}, offers {t.get('offer', 0)}, rejected {t.get('rejected', 0)}, "
+                         f"screens {t.get('screen', 0)}, loops {t.get('loop', 0)}, offers {t.get('offer', 0)}, rejected {t.get('rejected', 0)}, "
                          f"polls {p['polls']} with {p['poll_errors']} errors")
         lines.append(f"- store: {s['postings']} postings, {s['open']} open, {s['comp_found']} with comp, "
                      + ", ".join(f"{k} {v}" for k, v in sorted(s["by_state"].items())))

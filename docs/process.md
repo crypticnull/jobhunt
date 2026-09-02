@@ -16,13 +16,23 @@ postings are closed and reopened by what the next poll sees.
 
 ## Monday, fifteen minutes minimum
 
-1. Read the digest. Strong, borderline, comp not posted, in that order.
+1. Read the digest. The apply pile first, then review, then the drop
+   counts by reason.
 2. Mark what you are not doing so it never comes back:
-   `python -m scraper mark <id> ignored` or `rejected`.
-3. Pick up to three. `python -m scraper mark <id> interested`.
+   `python -m scraper mark <id> skipped`.
+3. Pick what you will write to this week. `python -m scraper mark <id>
+   reviewed`. The apply pile is already capped at twelve; three is a good
+   week.
 
 That is the whole week when work is bad. The digest still arrives, the
 statuses still move, nothing rots.
+
+The first month is collect-only. Until 2026-10-05 the digest carries a
+banner and the piles are read for one reason: to check that the gates are
+not throwing away obvious fits. The first apply pile is the digest of
+2026-10-05. The checkpoint is 2026-11-16, when the drop counts and the
+response rate decide whether the unlisted-salary rule or the title tiers
+loosen, in that order. The remote gate never loosens.
 
 ## Any evening, one application
 
@@ -50,9 +60,10 @@ A referral or a company without a feed enters the same loop through
 
 Read the last three months of digests against what actually got a
 response. Tune `data/scoring.json` where the digest was wrong in the same
-direction twice, commit the change with the reason, and `python -m
-scraper score` to rescore history under the new ruleset. The
-`ruleset_version` on every row is what makes that honest.
+direction twice, change `docs/search-protocol.md` to match, commit both
+with the reason, and `python -m scraper score` to rescore history under
+the new ruleset. The `ruleset_version` on every row is what makes that
+honest.
 
 ## When an endpoint drifts
 

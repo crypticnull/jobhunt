@@ -18,6 +18,8 @@
     "comp_max": { "type": ["integer", "null"] },
     "comp_currency": { "type": ["string", "null"] },
     "description": { "type": ["string", "null"], "description": "Plain text" },
-    "posted_at": { "type": ["string", "null"], "description": "ISO 8601 when the ATS gives a date" }
+    "posted_at": { "type": ["string", "null"], "description": "ISO 8601 when the ATS gives a date" },
+    "contact_hint": { "type": ["string", "null"], "description": "A named human in the posting, worth five points" },
+    "employment_type": { "type": ["string", "null"], "enum": ["full-time", "contract", "freelance", "part-time", null] }
   }
 }

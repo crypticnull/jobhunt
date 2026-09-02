@@ -25,7 +25,8 @@ from scraper.score import RULES_PATH, load_rules  # noqa: E402
 from scraper.store import Store  # noqa: E402
 
 FIX = ROOT / "scraper" / "tests" / "fixtures"
-DEMO_BAND = {"min": 100000, "max": 150000, "currency": "USD"}  # a demo band, not the real one
+# A demo band, not the real one. The real numbers live in data/local/scoring.local.json.
+DEMO_BAND = {"gates": {"comp": {"pass_min_annual": 100000, "flag_min_annual": 80000, "fail_below_annual": 80000, "hourly_floor": 60}}, "score": {"comp": {"bands": [{"midpoint_min": 120000, "points": 20}, {"midpoint_min": 100000, "points": 15}, {"midpoint_min": 80000, "points": 5}]}}}
 
 
 def fixture_json(url):
@@ -46,10 +47,11 @@ def rule(title):
 def main():
     t0 = time.time()
     rules = load_rules(RULES_PATH, local="/nonexistent/scoring.local.json")
-    rules["comp_band"] = DEMO_BAND
+    from scraper.score import _deep_merge
+    _deep_merge(rules, DEMO_BAND)
     voice = load_voice()
     data = companies.load(ROOT / "data" / "companies.example.json")
-    names = {c["slug"]: c["name"] for c in data["companies"]}
+    names = {c["slug"]: c for c in data["companies"]}
     now = datetime(2026, 9, 7, tzinfo=timezone.utc)
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -61,11 +63,11 @@ def main():
             status = "skip " if r["ok"] is None else ("ok   " if r["ok"] else "ERROR")
             print(f"{status} {r['slug']:<18} {r['kind']:<12} seen {r['seen']} new {r['new']}  {r['error'] or ''}".rstrip())
 
-        rule("digest, three lanes, reasons on every entry")
+        rule("digest, apply and review piles, drops by reason")
         md, ids = digest.build(store, rules, names, now=now)
         print(md)
 
-        top = store.open_postings()[0]
+        top = next(r for r in store.open_postings() if r["pile"] == "apply")
         company = next(c for c in data["companies"] if c["slug"] == top["company_slug"])
         rule(f"brief for posting {top['id']}, {top['title']} at {company['name']}")
         chosen = assemble.select(top, company)

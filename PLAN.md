@@ -348,14 +348,14 @@ The capture happens as the work happens, with hard caps so it survives a full-ti
 **Session two, the first weekend.** Start with the ten-minute endpoint smoke test, two known board slugs each against Greenhouse, Lever and Ashby, since the endpoint research could not be live-probed during planning and any mismatch is a docs-drift note, never a design problem. Then build `scraper add` with ATS detection and `companies check`, and spend the rest of the weekend where the value is: seeding `data/local/companies.json` with the first 30 targets from the existing target-company research across all four categories, committing the redacted example, and writing the first cut of the contract table in `data/README.md`. By Sunday night the shared asset exists, both consumers have their source of truth, and milestone 3 has everything it needs to put real postings in SQLite the following weekend.
 ## 8. Status, 2026-09-01
 
-Every milestone that could be built without assets, credentials or Matt's voice is built, tested and merged. The clean-clone check passes: `make demo` in a quarter of a second, 138 tests, validation and both lint profiles green.
+Every milestone that could be built without assets, credentials or Matt's voice is built, tested and merged. The clean-clone check passes: `make demo` in a quarter of a second, 158 tests, validation and both lint profiles green. On 2026-09-02 Matt's own search protocol replaced the milestone 4 ranking as the scoring engine (ADR-0008), so the digest now has apply and review piles, drop counts by reason, and a collect-only window until 2026-10-05.
 
 | Milestone | State | What remains, and whose |
 |---|---|---|
 | 1 Foundation | done | |
 | 2 Target list v1 | tooling done | Matt: the live endpoint smoke test, the first 30 companies through `scraper add`, `data/local/scoring.local.json` with the band |
 | 3 Scraper walking skeleton | done | Matt: first real poll on the workstation |
-| 4 Scoring and digest | done | Matt: install the schedule, read the first digest |
+| 4 Scoring and digest | done, protocol v2 | Matt: install the schedule, write `data/local/scoring.local.json`, read the first collect-only digest |
 | 5 Voice lint | done | |
 | 6 Site skeleton | done | Matt: domain, Cloudflare account, the two secrets and `CLOUDFLARE_DEPLOY=true` for the first deploy |
 | 7 Letters live | tooling done | Matt: rewrite the ten blocks in his own words, the first brief, the first sent application |

@@ -31,11 +31,11 @@ CREATE TABLE postings (
   score REAL,
   score_json TEXT,
   ruleset_version TEXT
-, digested_at TEXT, digest_hash TEXT);
-CREATE TABLE status_log (
+, digested_at TEXT, digest_hash TEXT, pile TEXT, drop_reason TEXT, contact_hint TEXT, employment_type TEXT);
+CREATE TABLE "status_log" (
   id INTEGER PRIMARY KEY,
   posting_id INTEGER NOT NULL REFERENCES postings(id),
-  state TEXT NOT NULL CHECK (state IN ('new','interested','applied','rejected','ignored','interview','offer')),
+  state TEXT NOT NULL CHECK (state IN ('new','reviewed','applied','screen','loop','offer','rejected','skipped')),
   noted_at TEXT NOT NULL,
   letter_path TEXT,
   note TEXT

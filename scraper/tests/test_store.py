@@ -16,7 +16,7 @@ def p(**kw):
 class Migrations(unittest.TestCase):
     def test_fresh_store_is_at_latest_version(self):
         s = Store(":memory:")
-        self.assertEqual(s.migrate(), 2)
+        self.assertEqual(s.migrate(), 3)
 
     def test_schema_matches_committed_reference(self):
         """data/schema/db/schema.sql is the readable contract; the migrations are
@@ -80,11 +80,11 @@ class Status(unittest.TestCase):
         self.pid, _ = self.s.upsert(p())
 
     def test_mark_is_a_log(self):
-        self.s.mark(self.pid, "interested")
+        self.s.mark(self.pid, "reviewed")
         self.s.mark(self.pid, "applied", note="sent", letter_path="data/local/letters/acme.md")
         self.assertEqual(self.s.state_of(self.pid), "applied")
         rows = self.s.db.execute("SELECT state FROM status_log WHERE posting_id = ? ORDER BY id", (self.pid,)).fetchall()
-        self.assertEqual([r["state"] for r in rows], ["new", "interested", "applied"])
+        self.assertEqual([r["state"] for r in rows], ["new", "reviewed", "applied"])
 
     def test_bad_state_and_bad_id(self):
         with self.assertRaises(ValueError):

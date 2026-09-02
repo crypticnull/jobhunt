@@ -13,7 +13,7 @@
   "$defs": {
     "company": {
       "type": "object",
-      "required": ["slug", "name", "ats", "category", "priority", "added", "last_reviewed"],
+      "required": ["slug", "name", "ats", "category", "tier", "priority", "added", "last_reviewed"],
       "additionalProperties": false,
       "properties": {
         "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
@@ -29,6 +29,8 @@
           }
         },
         "category": { "type": "string", "enum": ["ai-video", "studio-ai", "product-inhouse", "brand-inhouse"] },
+        "tier": { "type": "integer", "enum": [1, 2, 3, 4], "description": "The protocol's company tier; defaults from category" },
+        "size": { "type": ["integer", "null"], "description": "Headcount when known; over 200 makes an unlisted salary tolerable" },
         "priority": { "type": "integer", "enum": [1, 2, 3] },
         "lead_proof": { "type": ["string", "null"], "description": "proof story id to lead with for this company" },
         "remote_notes": { "type": "string" },

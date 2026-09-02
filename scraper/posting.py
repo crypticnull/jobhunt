@@ -14,6 +14,8 @@ FIELDS = (
     "comp_currency",
     "description",
     "posted_at",
+    "contact_hint",
+    "employment_type",
 )
 
 REMOTE_CLASSES = ("remote", "hybrid", "onsite", "unclear")
