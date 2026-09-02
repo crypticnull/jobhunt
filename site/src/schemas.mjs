@@ -114,3 +114,22 @@ export const writingSchema = () =>
     draft: z.boolean().default(false),
     linked_pipelines: z.array(z.string()).default([]),
   });
+
+// A study is a sequence of chapters rather than one block of prose. The kinds
+// are fixed, because a study that invents its own sections stops being
+// comparable to the one beside it, and because the index can then say which
+// chapters a project is still missing.
+export const CHAPTER_KINDS = ["final", "brief", "boards", "frames", "build", "delivery"];
+
+// Final leads and the process follows. That is a deliberate choice: the work
+// earns the attention, then the build chapter explains what it took.
+export const CHAPTER_ORDER = CHAPTER_KINDS;
+
+export const chapterSchema = () =>
+  z.object({
+    project: z.string().regex(/^[a-z0-9-]+$/),
+    kind: z.enum(["final", "brief", "boards", "frames", "build", "delivery"]),
+    title: z.string(),
+    order: z.number().int().default(50),
+    caption: z.string().nullable().optional(),
+  });

@@ -14,6 +14,8 @@ those mirrors equal to the JSON Schemas.
 import json
 import re
 import sys
+
+from . import frontmatter as fm
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -90,6 +92,47 @@ def validate_file(instance_path, schema_path):
     return validate(instance, schema)
 
 
+CHAPTER_KINDS = ("final", "brief", "boards", "frames", "build", "delivery")
+PROJECTS = ROOT / "data" / "projects"
+
+
+def check_chapters(projects_dir=PROJECTS):
+    """Four things the JSON Schema cannot see, because they are about where a
+    file sits rather than what is inside it.
+
+    A chapter states its project, so a file copied into the wrong directory is
+    caught here instead of silently vanishing from both studies. The file name
+    carries the kind too, so the name and the frontmatter cannot disagree and
+    leave the reading order looking wrong on disk. And one kind appears at most
+    once per project, because two Boards chapters would both render while the
+    rail linked only the first."""
+    errors = []
+    base = Path(projects_dir)
+    for chapters in sorted(base.glob("*/chapters")):
+        slug = chapters.parent.name
+        seen = {}
+        for f in sorted(chapters.glob("*.md")):
+            rel = f.relative_to(ROOT) if f.is_relative_to(ROOT) else f.relative_to(base)
+            front, _ = fm.split(f.read_text(encoding="utf-8"))
+            declared = fm.get(front, "project")
+            kind = fm.get(front, "kind")
+            if declared != slug:
+                errors.append(f"{rel}: project is {declared!r} but the file sits in {slug!r}")
+            if kind not in CHAPTER_KINDS:
+                errors.append(f"{rel}: kind {kind!r} is not one of {', '.join(CHAPTER_KINDS)}")
+                continue
+            m = re.match(r"^(\d{2})-([a-z]+)$", f.stem)
+            if not m:
+                errors.append(f"{rel}: name it NN-kind.md, for example 01-{kind}.md")
+            elif m.group(2) != kind:
+                errors.append(f"{rel}: file says {m.group(2)!r} and frontmatter says {kind!r}")
+            if kind in seen:
+                errors.append(f"{rel}: a {kind!r} chapter already exists at {seen[kind]}")
+            else:
+                seen[kind] = rel
+    return errors
+
+
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     if len(argv) == 2:
@@ -110,6 +153,15 @@ def main(argv=None):
                 print(f"  {e}")
         else:
             print(f"{rel}: ok")
+    if not argv:
+        chapter_errors = check_chapters()
+        if chapter_errors:
+            failed += 1
+            print(f"chapters: {len(chapter_errors)} error(s)")
+            for e in chapter_errors:
+                print(f"  {e}")
+        else:
+            print("chapters: ok")
     return 1 if failed else 0
 
 

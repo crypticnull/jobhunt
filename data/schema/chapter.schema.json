@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "chapter.schema.json",
+  "title": "Case study chapter",
+  "description": "Frontmatter of data/projects/<slug>/chapters/NN-kind.md. A study is a sequence of these rather than one block of prose, so the process is structure instead of an appendix. The NN prefix orders them on disk; `order` is what the site sorts on.",
+  "type": "object",
+  "required": [
+    "project",
+    "kind",
+    "title"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "project": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Slug of the project this belongs to. Stated rather than inferred from the path, so validate can catch a chapter filed in the wrong directory."
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "final",
+        "brief",
+        "boards",
+        "frames",
+        "build",
+        "delivery"
+      ],
+      "description": "final the delivered work, brief what was asked for, boards the storyboards, frames the styleframes including the directions that lost, build what was made or automated to get it done, delivery what shipped and where"
+    },
+    "title": {
+      "type": "string"
+    },
+    "order": {
+      "type": "integer",
+      "default": 50
+    },
+    "caption": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
