@@ -144,7 +144,7 @@
     "require_any": [
       "after effects", "motion design", "motion designer", "motion graphics", "motion lead",
       "cinema 4d", "c4d", "houdini", "blender", "\\bmaya\\b", "\\bnuke\\b", "octane", "redshift render", "\\bredshift\\b(?!.{0,30}(warehouse|cluster|database|sql))",
-      "touchdesigner", "notch", "unreal engine", "\\bue5\\b", "cinema4d", "davinci resolve",
+      "touchdesigner", "unreal engine", "\\bue5\\b", "cinema4d", "davinci resolve",
       "comfyui", "stable diffusion", "midjourney", "diffusion model", "generative ai", "\\bgen ai\\b", "genai",
       "text-to-video", "text to video", "image-to-video", "image to video", "\\blora\\b", "controlnet", "ai video", "ai-generated video",
       "3d artist", "3d generalist", "3d motion", "3d animation", "character animation", "animation director", "animation pipeline",
@@ -152,7 +152,7 @@
       "pipeline td", "pipeline technical director", "technical director", "look dev", "lookdev", "shader artist",
       "environment artist", "concept art", "storyboard", "styleframe", "previs", "matte painting",
       "\\bvfx\\b", "visual effects", "compositing", "motion capture", "art direction", "art director",
-      "brand motion", "kinetic type", "broadcast design", "title design", "creative studio", "design studio"
+      "brand motion", "kinetic type", "broadcast design", "title design"
     ],
     "exclude_title_patterns": [
       "account executive", "account manager", "sales", "\\bsdr\\b", "\\bbdr\\b", "business development",

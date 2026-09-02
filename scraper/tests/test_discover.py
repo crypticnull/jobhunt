@@ -176,6 +176,10 @@ class Grow(unittest.TestCase):
         self.assertIsNotNone(hn["score"])
         self.assertEqual(len(out["postings"]), 2)
 
+    def test_grow_reports_what_it_scanned(self):
+        out = discover.grow(self.s, self.data, RULES, get_json, get_text, now=NOW)
+        self.assertGreater(out["scanned"], out["found"], "the selectivity is the number to watch")
+
     def test_second_run_adds_nothing_new(self):
         discover.grow(self.s, self.data, RULES, get_json, get_text, now=NOW)
         n = len(self.data["companies"])

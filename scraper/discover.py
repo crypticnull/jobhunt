@@ -245,7 +245,7 @@ def _remote(item):
     return True  # the other feeds are remote-only boards; the gate vets the wording
 
 
-def discover(known=(), rules=None, get_json=None, get_text=None, sources=SOURCES, errors=None):
+def discover(known=(), rules=None, get_json=None, get_text=None, sources=SOURCES, errors=None, scanned=None):
     """[{... terms, ats, known}] for every remote posting that names something
     only a creative-technical role names, unknown companies first. `known` is
     the company list's records. A posting whose own links do not give away a
@@ -256,7 +256,10 @@ def discover(known=(), rules=None, get_json=None, get_text=None, sources=SOURCES
     known_boards = {(c["ats"]["kind"], (c["ats"]["board"] or "").lower()) for c in known}
     found, seen_urls, fetches = [], set(), 0
     cap = rules["discovery"]["max_page_fetches"]
-    for item in collect(get_json, get_text, sources, errors):
+    items = collect(get_json, get_text, sources, errors)
+    if scanned is not None:
+        scanned.append(len(items))
+    for item in items:
         if not item["url"] or item["url"] in seen_urls:
             continue  # the same posting can sit in two categories or two feeds
         seen_urls.add(item["url"])
@@ -290,7 +293,8 @@ def grow(store, data, rules=None, get_json=None, get_text=None, today=None, now=
     rules = rules or load_rules()
     now = now or datetime.now(timezone.utc)
     today = today or now.date().isoformat()
-    found = discover(data["companies"], rules, get_json, get_text, errors=errors)
+    seen = []
+    found = discover(data["companies"], rules, get_json, get_text, errors=errors, scanned=seen)
     by_slug = {c["slug"]: c for c in data["companies"]}
     added, stored = [], []
     for item in found:
@@ -323,7 +327,7 @@ def grow(store, data, rules=None, get_json=None, get_text=None, today=None, now=
         store.set_score(pid, score(store.get(pid), rules, now, company=rec))
         if is_new:
             stored.append(pid)
-    return {"companies": added, "postings": stored, "found": len(found)}
+    return {"companies": added, "postings": stored, "found": len(found), "scanned": seen[0] if seen else 0}
 
 
 def render(found, errors=()):
