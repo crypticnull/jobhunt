@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "company.schema.json",
   "title": "Target company list",
-  "description": "Shape of data/local/companies.json (private) and data/companies.example.json (committed, redacted). One record per target company; the ATS slug is what the poller keys on.",
+  "description": "Shape of data/companies.json (public, ADR-0010) and data/companies.example.json. One record per target company; the ATS slug is what the poller keys on. contacts and notes never appear in the public file; they live in data/local/companies.notes.json keyed by slug and are merged on load.",
   "type": "object",
   "required": ["version", "companies"],
   "additionalProperties": false,

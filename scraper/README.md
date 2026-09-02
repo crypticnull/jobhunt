@@ -58,8 +58,11 @@ rather than written, unless `--manual` says to keep it for hand checks.
 `add` works out the ATS from the careers URL, or from the board links
 embedded in the page, and confirms the guess against the live endpoint
 before writing. `--kind manual` records a company that has to be checked by
-hand. The list lives at `data/local/companies.json` and is private;
-`--companies` and `--db` point anywhere else.
+hand. The list lives at `data/companies.json` in the repo, public, so it
+can be read and edited from anywhere; contacts and notes on a company sit
+in `data/local/companies.notes.json`, private, merged in on load. The
+nightly task pushes the list after discovery grows it. `--companies` and
+`--db` point anywhere else.
 
 ## Scoring
 

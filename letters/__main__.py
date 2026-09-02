@@ -19,7 +19,7 @@ from . import assemble
 from .voicelint import check_text, exit_code, load_rules
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_COMPANIES = ROOT / "data" / "local" / "companies.json"
+DEFAULT_COMPANIES = ROOT / "data" / "companies.json"
 DEFAULT_DB = ROOT / "data" / "local" / "postings.db"
 DEFAULT_LETTERS = ROOT / "data" / "local" / "letters"
 

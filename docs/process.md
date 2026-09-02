@@ -14,8 +14,9 @@ typed; the nightly task pulls updates before it runs.
 
 `scripts/nightly.cmd` at 02:30: pull main, then `python -m scraper poll`,
 which reads the discovery feeds, adds the boards they give away, polls
-every board, and scores everything on the way in, then a backup to the
-directory in `data/local/backup-dir.txt`. A missed night costs nothing;
+every board, and scores everything on the way in, then push the company
+list if it grew, then a backup to the directory in
+`data/local/backup-dir.txt`. A missed night costs nothing;
 postings are closed and reopened by what the next poll sees.
 
 ## Sunday, unattended

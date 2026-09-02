@@ -5,12 +5,13 @@ rem and runs the first poll so there is something to look at tomorrow.
 cd /d "%~dp0"
 echo.
 echo == jobhunt setup ==
-git pull --ff-only origin main
+git pull --rebase origin main
 if errorlevel 1 (
   echo git pull failed. Is this folder the clone of the jobhunt repo?
   pause
   exit /b 1
 )
+git config core.hooksPath .githooks
 if not exist "data\local" mkdir "data\local"
 if not exist "data\local\scoring.local.json" echo WARNING: data\local\scoring.local.json is missing, posted salaries will be flagged, not scored.
 if exist "assets\companies.txt" (
@@ -25,6 +26,10 @@ echo.
 echo First poll, this can take a few minutes ...
 python -m scraper poll
 echo.
+echo Pushing the company list so the repo copy is the live one ...
+git add data/companies.json
+git diff --cached --quiet || (git commit --quiet -m "companies: first poll" && git push --quiet origin HEAD:main)
+echo.
 echo Done. The digest lands in data\local\digests every Sunday morning.
-echo Nothing else to run. The nightly task pulls updates on its own.
+echo Nothing else to run. The nightly task pulls updates and pushes the list on its own.
 pause

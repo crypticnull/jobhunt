@@ -26,7 +26,7 @@ from .score import load_rules, score
 from .store import STATES, Store
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_COMPANIES = ROOT / "data" / "local" / "companies.json"
+DEFAULT_COMPANIES = ROOT / "data" / "companies.json"
 DEFAULT_DB = ROOT / "data" / "local" / "postings.db"
 
 
@@ -274,7 +274,7 @@ def cmd_fixture(args):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="python -m scraper", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--companies", default=str(DEFAULT_COMPANIES), help="companies file (default data/local/companies.json)")
+    ap.add_argument("--companies", default=str(DEFAULT_COMPANIES), help="companies file (default data/companies.json; contacts and notes come from data/local/companies.notes.json)")
     ap.add_argument("--db", default=str(DEFAULT_DB), help="postings database (default data/local/postings.db)")
     sub = ap.add_subparsers(dest="cmd", required=True)
 

@@ -177,7 +177,7 @@ One rule, stated in `data/README.md` and held by review: every store has exactly
 
 | Store | Writer | Readers |
 |---|---|---|
-| data/local/companies.json | Matt, helped by `scraper add` | scraper, letters |
+| data/companies.json (public since ADR-0010) | discovery nightly, Matt or Claude through `scraper add` | scraper, letters |
 | data/projects, assets | Matt, helped by `pipeline ingest` | site, letters |
 | data/proof | Matt | letters, site |
 | data/pipelines | Matt | site, letters |
