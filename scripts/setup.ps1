@@ -3,6 +3,8 @@
 # nothing. Each step reports pass or fail and the run keeps going, because a
 # failed push should never cost you the poll that came before it.
 
+param([string]$NightlyAt = "04:00", [string]$BackupDir = "")
+
 Set-Location (Join-Path $PSScriptRoot "..")
 $log = Join-Path (Get-Location) "setup.log"
 try { Start-Transcript -Path $log -Append | Out-Null } catch { }
@@ -75,7 +77,7 @@ if (Test-Path "assets\companies.txt") {
 }
 
 Step "Registering the nightly and Sunday tasks"
-& powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\install-schedule.ps1"
+& powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\install-schedule.ps1" -NightlyAt $NightlyAt -BackupDir $BackupDir
 if ($LASTEXITCODE -eq 0) { Ok "registered" } else { Bad "schedule" "the tasks were not registered, see above" }
 
 Step "First poll, this can take a few minutes"

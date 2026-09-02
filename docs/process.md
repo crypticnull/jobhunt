@@ -16,8 +16,12 @@ before it runs.
 
 ## Every night, unattended
 
-`scripts/nightly.cmd` at 02:30, registered to catch up rather than skip if
-the machine was off or asleep at the time: pull main, then `python -m
+The time is a setting, not a rule. `setup.cmd 03:00` or
+`.\scripts\install-schedule.ps1 -NightlyAt 03:00` moves it.
+
+`scripts/nightly.cmd` at 04:00, registered to catch up rather than skip if
+the machine was off or asleep at the time, and at the lowest scheduler
+priority so an overnight render keeps the CPU: pull main, then `python -m
 scraper poll`,
 which reads the discovery feeds, adds the boards they give away, polls
 every board, and scores everything on the way in, then push the company
