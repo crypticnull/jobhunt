@@ -8,7 +8,7 @@ role: Senior motion designer
 disciplines: [motion, brand-system, 3d]
 tools: [Cinema 4D, After Effects]
 turnaround: null
-summary: The second cycle of the Nitro Create identity, a logo loop carrying the 2025 branding forward.
+summary: A new identity and a new logo loop for the 2026 cycle, built around the one mark that stays fixed.
 featured: true
 archive: false
 order: 2
@@ -18,4 +18,4 @@ stills: []
 process: []
 ---
 
-The 2025 Nitro Create branding set the language, and 2026 had to carry it forward without repeating it. The logo loop is where that shows: the same identity, moved differently.
+Nitro Create runs every year and the logo is the one thing that carries over. Everything else in 2026 is new, the design language and the logo loop both, built for this cycle instead of inherited from 2025.
