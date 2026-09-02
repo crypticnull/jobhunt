@@ -35,13 +35,19 @@ what happened to `setup.log`.
 The list grows on its own. Every night before the boards are polled, the
 poll reads six remote job feeds (Remotive, We Work Remotely, Himalayas,
 Jobicy, Arbeitnow, RemoteOK) and the month's Hacker News "Who is hiring"
-thread, and keeps every remote posting that names something only a
-creative-technical role names. That list is `discovery.require_any` in
-the ruleset, and it is deliberately tighter than the scoring legs: `api`,
-`automation` and `rendering` are fair signals on a company already on the
-list and match every backend and QA job in an open feed. Sales, QA,
-marketing and support titles are excluded outright, and a posting with no
-usable company name is dropped rather than guessed at.
+thread. What it keeps is decided by the job title first. Two live runs
+taught that: the scoring legs match `api`, `automation` and `rendering`,
+which is fair on a company already on the list and useless in an open
+feed, and `generative ai` is boilerplate in software ads now, so a Java
+engineer and an IT operations analyst both name it. So a posting needs a
+creative title from `discovery.title_patterns` plus one term from
+`require_any`, or two distinct terms from `strong_terms` when the title
+is one nobody standardized. Sales, QA, marketing, support, instructor and
+operations titles are excluded outright, a posting with no usable company
+name is dropped rather than guessed at, and the same role reposted under
+three URLs counts once. `scraper/tests/test_discover_live.py` holds both
+live runs as fixtures, so a loosening that would let the old noise back
+in fails the build.
 A posting whose links give away a Greenhouse, Lever, Ashby, Workable,
 SmartRecruiters or Recruitee board hands over the company's whole board,
 and where the links give nothing away the job page itself is fetched once,
