@@ -156,7 +156,10 @@ def cmd_poll(args):
             grown = discover.grow(store, data, errors=feed_errors)
             companies.save(args.companies, data)
             boards = [c for c in grown["companies"] if c["ats"]["kind"] != "manual"]
-            print(f"discover  {grown['found']} relevant postings across the feeds, {len(boards)} new boards to poll, {len(grown['postings'])} feed postings stored")
+            pct = (100.0 * grown["found"] / grown["scanned"]) if grown["scanned"] else 0.0
+            print(f"discover  {grown['scanned']} postings read, {grown['found']} relevant ({pct:.1f}%), {len(boards)} new boards to poll, {len(grown['postings'])} stored")
+            if pct > 15:
+                print("          that share looks high. If the names below are not creative-technical roles, say so and the filter gets tightened.")
             for c in boards:
                 print(f"  + {c['name']}: {c['ats']['kind']}/{c['ats']['board']}")
             for e in feed_errors:
@@ -164,15 +167,17 @@ def cmd_poll(args):
         results = poll(store, data["companies"])
     finally:
         store.close()
-    errors = 0
+    errors, skipped = 0, 0
     for r in results:
         if r["ok"] is None:
-            print(f"skip   {r['slug']:<28} {r['error']}")
+            skipped += 1
         elif r["ok"]:
             print(f"ok     {r['slug']:<28} seen {r['seen']:>3}  new {r['new']:>3}  closed {r['closed']:>3}")
         else:
             errors += 1
             print(f"ERROR  {r['slug']:<28} {r['error']}")
+    if skipped:
+        print(f"skip   {skipped} companies have no pollable board, they are checked by hand")
     print(f"{len(results)} companies, {errors} errors")
     return 0
 

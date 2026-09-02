@@ -74,6 +74,19 @@ class Upsert(unittest.TestCase):
         self.assertIsNone(self.s.get(b)["closed_at"], "a posting that comes back reopens")
 
 
+class Unlisted(unittest.TestCase):
+    def test_postings_of_a_removed_company_are_closed(self):
+        """A bad discovery night is cleaned up by dropping the companies, so
+        the postings they brought must not linger open in the store."""
+        s = Store(":memory:")
+        keep, _ = s.upsert(p(company_slug="acme", source_id="1"))
+        drop, _ = s.upsert(p(company_slug="junk-co", source_id="2"))
+        self.assertEqual(s.close_unlisted({"acme"}, "2026-09-02T00:00:00+00:00"), 1)
+        self.assertIsNone(s.get(keep)["closed_at"])
+        self.assertEqual(s.get(drop)["closed_at"], "2026-09-02T00:00:00+00:00")
+        self.assertEqual(s.close_unlisted({"acme"}), 0, "already closed, nothing to do")
+
+
 class Status(unittest.TestCase):
     def setUp(self):
         self.s = Store(":memory:")

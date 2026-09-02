@@ -51,6 +51,8 @@ def poll(store, companies, get_json=None, now=None, rules=None):
     rules = rules or load_rules()
     score_now = datetime.fromisoformat(now)
     results = []
+    listed = {c["slug"] for c in companies}
+    store.close_unlisted(listed, now)
     for c in companies:
         slug, kind, board = c["slug"], c["ats"]["kind"], c["ats"]["board"]
         mod = ADAPTERS.get(kind)

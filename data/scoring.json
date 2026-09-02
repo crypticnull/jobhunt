@@ -139,6 +139,37 @@
     "human": { "max": 5, "points_if_contact_hint": 5 }
   },
 
+  "discovery": {
+    "note": "Discovery reads open feeds, where most postings are not remotely relevant. Scoring's intersection legs are deliberately broad, and terms like api, automation and rendering match every backend and QA job, so discovery uses this tighter list instead. A posting has to name something only a creative-technical role names.",
+    "require_any": [
+      "after effects", "motion design", "motion designer", "motion graphics", "motion lead",
+      "cinema 4d", "c4d", "houdini", "blender", "\\bmaya\\b", "\\bnuke\\b", "octane", "redshift render", "\\bredshift\\b(?!.{0,30}(warehouse|cluster|database|sql))",
+      "touchdesigner", "unreal engine", "\\bue5\\b", "cinema4d", "davinci resolve",
+      "comfyui", "stable diffusion", "midjourney", "diffusion model", "generative ai", "\\bgen ai\\b", "genai",
+      "text-to-video", "text to video", "image-to-video", "image to video", "\\blora\\b", "controlnet", "ai video", "ai-generated video",
+      "3d artist", "3d generalist", "3d motion", "3d animation", "character animation", "animation director", "animation pipeline",
+      "technical artist", "creative technologist", "design technologist", "creative engineer", "creative developer", "creative coder",
+      "pipeline td", "pipeline technical director", "technical director", "look dev", "lookdev", "shader artist",
+      "environment artist", "concept art", "storyboard", "styleframe", "previs", "matte painting",
+      "\\bvfx\\b", "visual effects", "compositing", "motion capture", "art direction", "art director",
+      "brand motion", "kinetic type", "broadcast design", "title design"
+    ],
+    "exclude_title_patterns": [
+      "account executive", "account manager", "sales", "\\bsdr\\b", "\\bbdr\\b", "business development",
+      "recruiter", "talent acquisition", "people operations", "human resources",
+      "marketing manager", "marketing specialist", "growth marketing", "content marketing", "\\bseo\\b", "demand generation",
+      "customer success", "customer support", "support specialist", "support engineer",
+      "quality assurance", "\\bqa\\b", "test engineer", "devops", "\\bsre\\b", "site reliability",
+      "cloud engineer", "platform engineer", "security engineer", "penetration test",
+      "data analyst", "data scientist", "data engineer", "analytics engineer", "business analyst",
+      "accountant", "bookkeeper", "controller", "estimator", "store manager", "maintenance technician",
+      "project manager", "program manager", "scrum master", "solutions architect", "sales engineer"
+    ],
+    "generic_company_names": ["company", "confidential", "n/a", "none", "unknown", "stealth", "?"],
+    "max_page_fetches": 12,
+    "max_company_name_words": 6
+  },
+
   "piles": {
     "apply_min": 70,
     "review_min": 50,

@@ -123,6 +123,18 @@ class Store:
         self.db.commit()
         return row["id"], False
 
+    def close_unlisted(self, listed, at=None):
+        """A posting whose company is no longer on the list is closed. Discovery
+        adds companies and a bad night gets cleaned up by removing them, so the
+        postings they brought must not linger in the store."""
+        at = at or utcnow()
+        rows = self.db.execute("SELECT id, company_slug FROM postings WHERE closed_at IS NULL").fetchall()
+        gone = [r["id"] for r in rows if r["company_slug"] not in set(listed)]
+        if gone:
+            self.db.executemany("UPDATE postings SET closed_at = ? WHERE id = ?", [(at, i) for i in gone])
+            self.db.commit()
+        return len(gone)
+
     def close_missing(self, company_slug, source, seen_fingerprints, at=None):
         """A posting that stopped appearing in a successful poll is closed, not deleted."""
         at = at or utcnow()
