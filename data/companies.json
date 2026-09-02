@@ -325,9 +325,128 @@
       "last_reviewed": "2026-09-02"
     },
     {
+      "slug": "cardog",
+      "name": "Cardog",
+      "careers_url": "https://news.ycombinator.com/item?id=49530464",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
       "slug": "carters-inc",
       "name": "Carters Inc.",
       "careers_url": "https://remoteOK.com/remote-jobs/remote-store-manager-carters-inc-1137135",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "caylent",
+      "name": "Caylent",
+      "careers_url": "https://jobicy.com/jobs/152325-senior-qa-engineer-2",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "chainsecurity",
+      "name": "ChainSecurity",
+      "careers_url": "https://news.ycombinator.com/item?id=49528002",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "chariot-claims",
+      "name": "Chariot Claims",
+      "careers_url": "https://news.ycombinator.com/item?id=49525348",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "charles-technology-africa",
+      "name": "Charles Technology Africa",
+      "careers_url": "https://weworkremotely.com/remote-jobs/charles-technology-africa-web-developer",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "chronograph",
+      "name": "Chronograph",
+      "careers_url": "https://news.ycombinator.com/item?id=49529957",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "codepath",
+      "name": "CodePath",
+      "careers_url": "https://jobicy.com/jobs/152299-staff-software-engineer-5",
       "ats": {
         "kind": "manual",
         "board": null
@@ -359,9 +478,332 @@
       "last_reviewed": "2026-09-02"
     },
     {
+      "slug": "complex-co",
+      "name": "Complex Co.",
+      "careers_url": "https://remoteOK.com/remote-jobs/remote-commercial-building-estimator-complex-co-1137228",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "creative-force",
+      "name": "Creative Force",
+      "careers_url": "https://remotive.com/remote-jobs/customer-service/saas-product-support-jedi-2091087",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "cyberatlas",
+      "name": "CyberAtlas",
+      "careers_url": "https://news.ycombinator.com/item?id=49523704",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "dart",
+      "name": "Dart",
+      "careers_url": "https://remoteOK.com/remote-jobs/remote-building-maintenance-technician-dart-1137212",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "denova-consulting",
+      "name": "Denova Consulting",
+      "careers_url": "https://himalayas.app/companies/denova-consulting/jobs/business-development-representative",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "deya",
+      "name": "Deya",
+      "careers_url": "https://news.ycombinator.com/item?id=49528637",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "dualentry",
+      "name": "DualEntry",
+      "careers_url": "https://news.ycombinator.com/item?id=49526938",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "dunetrace",
+      "name": "Dunetrace",
+      "careers_url": "https://www.arbeitnow.com/jobs/companies/dunetrace/technical-co-founder-cto-berlin-287353",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "ehvert-engineering-a-salas-o-brien-company",
+      "name": "Ehvert Engineering a Salas O'Brien company",
+      "careers_url": "https://weworkremotely.com/remote-jobs/ehvert-engineering-a-salas-o-brien-company-controls-design-engineer-electrical",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "enrollment123",
+      "name": "Enrollment123",
+      "careers_url": "https://news.ycombinator.com/item?id=49524406",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "entrust",
+      "name": "Entrust",
+      "careers_url": "https://himalayas.app/companies/entrust/jobs/principal-cloud-devops-engineer",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "faire",
+      "name": "Faire",
+      "careers_url": "https://weworkremotely.com/remote-jobs/faire-senior-staff-data-engineer-platform-data-and-analytics",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "fandom",
+      "name": "Fandom",
+      "careers_url": "https://jobicy.com/jobs/152304-director-revenue-strategy-commercial-innovation",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
       "slug": "fastly",
       "name": "*Fastly",
       "careers_url": "https://news.ycombinator.com/item?id=49523835",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "fico",
+      "name": "FICO",
+      "careers_url": "https://himalayas.app/companies/fico/jobs/business-operations-lead-analyst-scores",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "fisher-associates-p-e-l-s-l-a-d",
+      "name": "Fisher Associates, P.e., L.s., L.a., D.",
+      "careers_url": "https://weworkremotely.com/remote-jobs/fisher-associates-p-e-l-s-l-a-d-precast-design-engineer",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "fivetran",
+      "name": "Fivetran",
+      "careers_url": "https://jobicy.com/jobs/152317-senior-pricing-data-scientist",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "flex",
+      "name": "Flex",
+      "careers_url": "https://jobicy.com/jobs/152343-senior-software-engineer-backend-3",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "food-service-specialties",
+      "name": "Food Service Specialties",
+      "careers_url": "https://weworkremotely.com/remote-jobs/food-service-specialties-back-office-support-1",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "garden3d",
+      "name": "garden3d",
+      "careers_url": "https://remotive.com/remote-jobs/marketing/head-of-marketing-communications-2091068",
       "ats": {
         "kind": "manual",
         "board": null
