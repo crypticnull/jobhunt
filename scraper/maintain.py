@@ -8,6 +8,7 @@ from pathlib import Path
 
 from . import http
 from .adapters import ADAPTERS
+from .store import utcnow
 
 
 def backup(db_path, dest_dir, keep=14, today=None):
@@ -71,3 +72,32 @@ def fixture(kind, board, out_dir, get_json=None, get_text=None, keep=2):
     target = out_dir / f"{kind}.json"
     target.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return target
+
+
+def heartbeat(store, companies, path, ran_at=None, errors=0):
+    """A small public file saying when the scraper last ran and what it saw.
+    It is committed and pushed, because a scheduled job that quietly stopped
+    running is otherwise invisible: nothing arrives, and nothing says why."""
+    stats = store.stats()
+    data = {
+        "ran_at": ran_at or utcnow(),
+        "companies": len(companies),
+        "pollable": sum(1 for c in companies if c["ats"]["kind"] not in ("manual",) and c["ats"]["board"]),
+        "postings": stats["postings"],
+        "open": stats["open"],
+        "poll_errors": errors,
+    }
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+        f.write("\n")
+    return data
+
+
+def last_run(path):
+    path = Path(path)
+    if not path.exists():
+        return None
+    with path.open(encoding="utf-8") as f:
+        return json.load(f)

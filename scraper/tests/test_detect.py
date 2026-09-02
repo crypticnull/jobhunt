@@ -71,7 +71,10 @@ class Detect(unittest.TestCase):
 
 class Guess(unittest.TestCase):
     def test_slug_variants(self):
-        self.assertEqual(adapters.slug_variants("Black Forest Labs"), ["black-forest-labs", "blackforestlabs", "black"])
+        """The shapes come from the live run of 2026-09-02: Luma AI's board is
+        `lumaai`, Higgsfield's is `higgsfieldai`, Odyssey's is `odysseyml`."""
+        self.assertEqual(adapters.slug_variants("Luma AI"), ["lumaai", "luma-ai", "luma"])
+        self.assertEqual(adapters.slug_variants("Black Forest Labs"), ["blackforestlabs", "black-forest-labs", "blackforest", "black-forest", "black"])
         self.assertEqual(adapters.slug_variants("Runway"), ["runway"])
         self.assertEqual(adapters.slug_variants(""), [])
 

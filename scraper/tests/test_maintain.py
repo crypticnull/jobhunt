@@ -44,3 +44,20 @@ class Maintain(unittest.TestCase):
         self.assertEqual(len(json.loads(target.read_text(encoding="utf-8"))["jobs"]), 2)
         with self.assertRaises(KeyError):
             maintain.fixture("linkedin", "x", self.dir)
+
+
+class Heartbeat(unittest.TestCase):
+    def test_it_records_the_run_and_reads_back(self):
+        from scraper import companies as C
+        s = Store(":memory:")
+        s.upsert(posting(source="greenhouse", source_id="1", company_slug="acme", title="X", url="https://x/1", remote="remote"))
+        recs = [
+            C.record("acme", "Acme", "greenhouse", "acme", "ai-video", today="2026-09-01"),
+            C.record("hand", "Hand", "manual", None, "ai-video", today="2026-09-01"),
+        ]
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "last-run.json"
+            beat = maintain.heartbeat(s, recs, path, ran_at="2026-09-02T04:00:00+00:00", errors=2)
+            self.assertEqual((beat["companies"], beat["pollable"], beat["open"], beat["poll_errors"]), (2, 1, 1, 2))
+            self.assertEqual(maintain.last_run(path), beat)
+        self.assertIsNone(maintain.last_run(Path("/nonexistent/last-run.json")))

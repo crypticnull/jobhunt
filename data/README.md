@@ -17,6 +17,7 @@ diagram.
 | `data/voice/rules.json` | (milestone 5) | Matt | voicelint |
 | `data/local/postings.db` | `db/schema.sql` | `scraper/store.py` only | digest, letters read-only |
 | `data/digests/` | | `scraper/digest.py`, pushed by the Sunday task | Matt, and Claude from chat |
+| `data/last-run.json` | | `scraper/poll`, pushed nightly | the digest, and Claude, to see a job that stopped |
 | `data/local/letters/` | | letters (milestone 7) | Matt |
 
 Two rules hold it together. No package imports another; they meet only

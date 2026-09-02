@@ -16,12 +16,23 @@ before it runs.
 
 ## Every night, unattended
 
-`scripts/nightly.cmd` at 02:30: pull main, then `python -m scraper poll`,
+The time is a setting, not a rule. `setup.cmd 03:00` or
+`.\scripts\install-schedule.ps1 -NightlyAt 03:00` moves it.
+
+`scripts/nightly.cmd` at 04:00, registered to catch up rather than skip if
+the machine was off or asleep at the time, and at the lowest scheduler
+priority so an overnight render keeps the CPU: pull main, then `python -m
+scraper poll`,
 which reads the discovery feeds, adds the boards they give away, polls
 every board, and scores everything on the way in, then push the company
 list if it grew, then a backup to the directory in
 `data/local/backup-dir.txt`. A missed night costs nothing;
 postings are closed and reopened by what the next poll sees.
+
+Every poll writes `data/last-run.json` and the nightly job pushes it, so a
+job that quietly stopped is visible in the repo rather than only in its
+silence. The digest says so at the top when the last poll is two days old
+or more.
 
 ## Sunday, unattended
 

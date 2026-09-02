@@ -28,6 +28,7 @@ from .store import STATES, Store
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_COMPANIES = ROOT / "data" / "companies.json"
 DEFAULT_DB = ROOT / "data" / "local" / "postings.db"
+HEARTBEAT = ROOT / "data" / "last-run.json"
 
 
 def cmd_add(args):
@@ -182,7 +183,12 @@ def cmd_poll(args):
             print(f"ERROR  {r['slug']:<28} {r['error']}")
     if skipped:
         print(f"skip   {skipped} companies have no pollable board, they are checked by hand")
-    print(f"{len(results)} companies, {errors} errors")
+    store = Store(args.db)
+    try:
+        beat = maintain.heartbeat(store, data["companies"], HEARTBEAT, errors=errors)
+    finally:
+        store.close()
+    print(f"{len(results)} companies, {errors} errors, {beat['open']} open postings in the store")
     return 0
 
 
@@ -193,10 +199,10 @@ def cmd_digest(args):
     store = Store(args.db)
     try:
         if args.stdout:
-            md, _ = digest.build(store, rules, by_slug)
+            md, _ = digest.build(store, rules, by_slug, heartbeat=HEARTBEAT)
             print(md)
             return 0
-        path, n = digest.write(store, rules, Path(args.out), by_slug)
+        path, n = digest.write(store, rules, Path(args.out), by_slug, heartbeat=HEARTBEAT)
     finally:
         store.close()
     print(f"wrote {path}, {n} postings surfaced")
