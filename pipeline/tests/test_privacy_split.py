@@ -25,3 +25,12 @@ class PrivacySplit(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_project_assets_are_not_ignored(self):
+        """The staging folder rule must be root-anchored. A bare assets/ swallowed
+        data/projects/<slug>/assets/ for two days and nobody noticed because the
+        three hero files were committed before the rule existed."""
+        r = subprocess.run(["git", "check-ignore", "-q", "data/projects/example/assets/board01.png"], cwd=ROOT)
+        self.assertEqual(r.returncode, 1, "a new project asset must be committable")
+        r = subprocess.run(["git", "check-ignore", "-q", "assets/anything.mov"], cwd=ROOT)
+        self.assertEqual(r.returncode, 0, "the root staging folder must still be ignored")

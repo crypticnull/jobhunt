@@ -6,6 +6,8 @@ __pycache__/
 *.pyc
 
 # The local staging folder for drops: stills, boards, finals, exports.
-# pipeline ingest reads from it. Git never sees it.
-assets/
+# pipeline ingest reads from it. Git never sees it. Root-anchored on purpose:
+# a bare "assets/" would also match data/projects/<slug>/assets/, where every
+# poster, board and styleframe the site renders is meant to live.
+/assets/
 setup.log
