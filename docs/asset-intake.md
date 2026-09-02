@@ -15,13 +15,33 @@ A scan that returns 400 rows of honest candidates is a success. A scan that
 returns 12 rows because it guessed at relevance is a failure, and so is one
 that copies 80 GB of renders into a staging folder.
 
+## Start with the tool, not the reading
+
+Most of the first pass is mechanical, so a script does it:
+
+```
+python -m pipeline.survey "X:/_CLAUDE/26_09_01_Job_Hunt/jobhunt/assets/_PORTFOLIO"
+```
+
+It walks the folder, never writes to it, and produces the manifest below plus a
+summary short enough to paste into a chat. It drops caches, previews,
+auto-saves and proxies; it collapses a render sequence into one row carrying
+the frame count, so four thousand frames do not bury the six files that matter;
+and it proposes the `docs/naming.md` name each candidate would need. Project
+files are located and never given a proposed name, because they stay on the
+drive.
+
+Everything it fills in is a guess and the `confidence` column says so. Run it
+first, then spend the reading time on the rows it marked `low` and on the
+folders it could not place, which the summary lists.
+
 ## What the manifest looks like
 
 One TSV, one row per candidate file, written to `data/local/intake/<scan>.tsv`
 which is gitignored:
 
 ```
-path	bytes	modified	project	year	deliverable	stage	confidence	note
+path	bytes	modified	project	year	deliverable	stage	confidence	note	proposed
 ```
 
 - `path` absolute, exactly as found
@@ -35,6 +55,8 @@ path	bytes	modified	project	year	deliverable	stage	confidence	note
   honestly marked low costs nothing; a wrong row marked high costs a review
 - `note` anything that would help a human decide, especially "there are 40 more
   files like this in the same folder"
+- `proposed` the `docs/naming.md` name this file would take, blank where the
+  file is not something ingest accepts
 
 Where a folder holds an obvious sequence, one row for the folder with a count
 in the note beats 300 rows.
@@ -95,6 +117,10 @@ quest_2025_key-art_hero_v01.png
 nitro-create_2026_logo-loop_storyboard_v01.jpg
 summit_2025_opener_styleframe_v04.png
 ```
+
+`pipeline.survey` fills the `proposed` column in for every image and video it
+can place. Correct the wrong ones and delete the rows that should not come
+across.
 
 Once a manifest is approved, the accepted files are copied into one flat folder
 under those names and `python -m pipeline.ingest <folder>` writes them into the
