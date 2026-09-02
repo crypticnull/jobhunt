@@ -27,7 +27,8 @@ python -m scraper fixture KIND BOARD # refresh a test fixture from the live endp
 ```
 
 `docs/process.md` is the schedule these run on. On Windows, `setup.cmd`
-at the repo root registers it in one double-click.
+at the repo root does the whole install in one double-click and writes
+what happened to `setup.log`.
 
 ## Discovery
 

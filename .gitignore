@@ -8,3 +8,4 @@ __pycache__/
 # The local staging folder for drops: stills, boards, finals, exports.
 # pipeline ingest reads from it. Git never sees it.
 assets/
+setup.log
