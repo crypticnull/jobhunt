@@ -72,12 +72,23 @@ def probe(kind, board, get_json=None):
     return True, count_postings(kind, payload), None
 
 
+# Words a company puts in its name and leaves out of its board slug. The live
+# run of 2026-09-02 is the evidence: Luma AI is `lumaai`, Odyssey is
+# `odysseyml`, Higgsfield is `higgsfieldai`.
+_NOISE_WORDS = {"ai", "labs", "lab", "inc", "llc", "ltd", "co", "com", "studio", "studios", "the", "group", "technologies", "digital"}
+
+
 def slug_variants(name):
-    """The handful of board slugs a company name is likely to use."""
+    """The handful of board slugs a company name is likely to use, most likely
+    first: joined, hyphenated, then the same two with the marketing words
+    dropped, then the first word alone."""
     words = re.sub(r"[^a-z0-9 ]+", " ", (name or "").lower()).split()
     if not words:
         return []
-    out = ["-".join(words), "".join(words)]
+    out = ["".join(words), "-".join(words)]
+    trimmed = [w for w in words if w not in _NOISE_WORDS] or words
+    if trimmed != words:
+        out += ["".join(trimmed), "-".join(trimmed)]
     if len(words) > 1:
         out.append(words[0])
     return list(dict.fromkeys(out))
@@ -86,7 +97,7 @@ def slug_variants(name):
 GUESS_KINDS = ("greenhouse", "lever", "ashby", "workable")
 
 
-def guess(name, get_json=None, kinds=GUESS_KINDS, variants=2):
+def guess(name, get_json=None, kinds=GUESS_KINDS, variants=4):
     """When a careers URL gives nothing away, try the company's name as a board
     slug against each ATS. A slug that answers with live postings is the board;
     an empty answer is not taken, because a wrong slug and an empty board look

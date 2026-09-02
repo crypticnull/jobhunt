@@ -6,4 +6,4 @@ echo ==== %date% %time% weekly
 git -c rebase.autoStash=true pull --rebase --quiet origin main
 python -m scraper digest
 git add data/digests
-git diff --cached --quiet || (git commit --quiet -m "digest: this week" && git push --quiet origin HEAD:main)
+git diff --cached --quiet || (git commit --quiet -m "digest: this week" && (git push --quiet origin HEAD:main || (git -c rebase.autoStash=true pull --rebase --quiet origin main && git push --quiet origin HEAD:main)))

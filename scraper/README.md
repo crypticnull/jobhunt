@@ -71,9 +71,12 @@ url | name`, and runs `add` on each, so a first list of a hundred and
 seventy companies is one command. Most careers pages render their board
 in JavaScript, so the HTML gives nothing away; when that happens the
 company name is tried as a board slug against Greenhouse, Lever, Ashby
-and Workable, and a slug that answers with live postings is the board. An
-empty answer is never taken, because a wrong slug and a company with no
-openings look identical. Anything still unfound is reported at the end
+and Workable, four shapes of it, joined and hyphenated and both again with
+the marketing words dropped. The live run of 2026-09-02 is where those
+shapes come from: Luma AI's board is `lumaai`, Higgsfield's is
+`higgsfieldai`, Odyssey's is `odysseyml`. A slug that answers with live
+postings is the board, and an empty answer is never taken, because a wrong
+slug and a company with no openings look identical. Anything still unfound is reported at the end
 rather than written, unless `--manual` says to keep it for hand checks.
 
 `add` works out the ATS from the careers URL, or from the board links

@@ -47,6 +47,24 @@ class Poll(unittest.TestCase):
         st = self.s.stats()
         self.assertEqual((st["postings"], st["open"]), (2, 1))
 
+    def test_one_board_is_polled_once(self):
+        """The starter list named Figma twice, so the same 162 postings were
+        fetched twice on the first live run."""
+        twins = [
+            companies.record("figma", "Figma", "greenhouse", "figma", "product-inhouse", today="2026-09-01"),
+            companies.record("figma-board", "Figma Board", "greenhouse", "figma", "product-inhouse", today="2026-09-01"),
+        ]
+        calls = []
+
+        def get_json(url):
+            calls.append(url)
+            return fixture("greenhouse.json")
+
+        out = {r["slug"]: r for r in poll(self.s, twins, get_json, now="2026-09-01T00:00:00+00:00")}
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(out["figma-board"]["error"], "duplicate board")
+        self.assertIsNone(out["figma-board"]["ok"])
+
     def test_parse_bug_is_isolated(self):
         out = poll(self.s, self.companies[:1], lambda u: {"jobs": [{"title": None, "id": 1}]}, now="2026-09-01T00:00:00+00:00")[0]
         self.assertFalse(out["ok"])

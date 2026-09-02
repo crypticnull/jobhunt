@@ -91,7 +91,13 @@ if ($identity) {
   } else {
     git commit --quiet -m "companies: first poll"
     git push origin HEAD:main
-    if ($LASTEXITCODE -eq 0) { Ok "pushed" } else { Bad "push" "the push was refused, the list is committed locally and will go up on the next nightly run" }
+    if ($LASTEXITCODE -ne 0) {
+      # main can move while the poll runs, which takes minutes. Rebase onto it and try once more.
+      Write-Host "   the push was refused, pulling what moved and trying again ..."
+      git -c rebase.autoStash=true pull --rebase origin main
+      git push origin HEAD:main
+    }
+    if ($LASTEXITCODE -eq 0) { Ok "pushed" } else { Bad "push" "the push was refused twice, the list is committed locally and goes up on the next nightly run" }
   }
 } else {
   Write-Host "   skipped, git has no name and email yet"

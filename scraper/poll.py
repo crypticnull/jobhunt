@@ -53,9 +53,16 @@ def poll(store, companies, get_json=None, now=None, rules=None):
     results = []
     listed = {c["slug"] for c in companies}
     store.close_unlisted(listed, now)
+    seen_boards = set()
     for c in companies:
         slug, kind, board = c["slug"], c["ats"]["kind"], c["ats"]["board"]
         mod = ADAPTERS.get(kind)
+        if board and (kind, str(board).lower()) in seen_boards:
+            # two list entries can name one board; polling it twice is wasted requests
+            results.append({"slug": slug, "kind": kind, "ok": None, "seen": 0, "new": 0, "closed": 0, "error": "duplicate board"})
+            continue
+        if board:
+            seen_boards.add((kind, str(board).lower()))
         if mod is None or not board:
             results.append({"slug": slug, "kind": kind, "ok": None, "seen": 0, "new": 0, "closed": 0, "error": "no adapter"})
             continue
