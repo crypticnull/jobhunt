@@ -258,7 +258,7 @@ class LocalOverlay(unittest.TestCase):
         self.assertEqual(r["gates"]["comp"]["pass_min_annual"], 1)
         self.assertIsNone(r["gates"]["comp"]["flag_min_annual"], "untouched keys survive")
         self.assertEqual(r["tuning"]["apply_weekly_cap"], 3)
-        self.assertEqual(r["tuning"]["collect_only_until"], "2026-10-05")
+        self.assertEqual(r["tuning"]["collect_only_until"], "2026-09-06")
 
     def test_public_ruleset_carries_no_numbers(self):
         r = rules(band=False)

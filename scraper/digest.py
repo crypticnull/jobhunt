@@ -96,6 +96,11 @@ def build(store, rules, companies=None, now=None, since=None):
     out = [f"# Digest, week {_week(now)}", ""]
     if collect_until and now.date().isoformat() < collect_until:
         out += [f"Collect-only until {collect_until}: nothing is applied to yet. Read the piles to check the gates aren't throwing away obvious fits.", ""]
+        rare = [r for r in piles["apply"] + piles["overflow"] if (r["score"] or 0) >= rules["piles"].get("exceptional_min", 999)]
+        if rare:
+            out += ["**These will not wait for the window to close.** A posting scoring this well is rare, and a job this good is gone in a fortnight.", ""]
+            out += [f"- {r['title']}, {((companies or {}).get(r['company_slug']) or {}).get('name', r['company_slug'])}, score {round(r['score'])}, {r['url']}" for r in rare]
+            out += [""]
     out += [
         f"{stats['open']} open postings. This week: {sum(by_source.values())} new, {len(piles['apply'])} to apply"
         + (f" (+{len(piles['overflow'])} over the weekly cap of {rules['piles']['apply_weekly_cap']}, pushed to review)" if piles["overflow"] else "")
