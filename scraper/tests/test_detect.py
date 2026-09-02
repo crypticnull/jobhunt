@@ -1,5 +1,6 @@
 import unittest
 
+from scraper import adapters
 from scraper.adapters import candidates, detect, probe
 from scraper.http import HttpError
 
@@ -66,3 +67,25 @@ class Detect(unittest.TestCase):
 
     def test_probe_unknown_kind(self):
         self.assertFalse(probe("manual", None, lambda u: {})[0])
+
+
+class Guess(unittest.TestCase):
+    def test_slug_variants(self):
+        self.assertEqual(adapters.slug_variants("Black Forest Labs"), ["black-forest-labs", "blackforestlabs", "black"])
+        self.assertEqual(adapters.slug_variants("Runway"), ["runway"])
+        self.assertEqual(adapters.slug_variants(""), [])
+
+    def test_the_name_is_tried_as_a_board_slug(self):
+        """Most careers pages hide their board behind JavaScript, so the URL
+        gives nothing away. The company name usually is the slug."""
+        def get_json(url):
+            if "lever" in url and "lumaai" in url:
+                return [{"id": "1", "text": "Motion Designer", "hostedUrl": "https://x/1", "categories": {}}]
+            raise HttpError(url, 404, "not found")
+
+        self.assertEqual(adapters.guess("Luma AI", get_json), ("lever", "lumaai", 1))
+
+    def test_an_empty_board_is_not_a_match(self):
+        """A wrong slug and a company with no openings answer the same way, so
+        only a board with live postings counts."""
+        self.assertIsNone(adapters.guess("Nobody Co", lambda u: []))

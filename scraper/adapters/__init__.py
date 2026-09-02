@@ -72,6 +72,33 @@ def probe(kind, board, get_json=None):
     return True, count_postings(kind, payload), None
 
 
+def slug_variants(name):
+    """The handful of board slugs a company name is likely to use."""
+    words = re.sub(r"[^a-z0-9 ]+", " ", (name or "").lower()).split()
+    if not words:
+        return []
+    out = ["-".join(words), "".join(words)]
+    if len(words) > 1:
+        out.append(words[0])
+    return list(dict.fromkeys(out))
+
+
+GUESS_KINDS = ("greenhouse", "lever", "ashby", "workable")
+
+
+def guess(name, get_json=None, kinds=GUESS_KINDS, variants=2):
+    """When a careers URL gives nothing away, try the company's name as a board
+    slug against each ATS. A slug that answers with live postings is the board;
+    an empty answer is not taken, because a wrong slug and an empty board look
+    the same. Returns (kind, board, count) or None."""
+    for slug in slug_variants(name)[:variants]:
+        for kind in kinds:
+            ok, count, _ = probe(kind, slug, get_json)
+            if ok and count > 0:
+                return kind, slug, count
+    return None
+
+
 def detect(url, get_json=None, get_text=None):
     """Work out which ATS a careers URL runs on. Tries the URL itself, then the
     page's HTML for embedded board links, and confirms each candidate against
