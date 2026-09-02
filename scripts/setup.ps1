@@ -52,7 +52,9 @@ if ($identity) {
 }
 
 Step "Getting the latest from GitHub"
-git pull --rebase origin main
+# autoStash so a half-finished earlier run, which can leave the company list
+# staged but uncommitted, never blocks the pull.
+git -c rebase.autoStash=true pull --rebase origin main
 if ($LASTEXITCODE -eq 0) { Ok "up to date" } else { Bad "pull" "git pull failed, see above" }
 
 Step "Settings"

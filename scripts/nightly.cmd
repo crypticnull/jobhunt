@@ -5,7 +5,7 @@ rem then back up. Run by Task Scheduler from the repo root; the log is
 rem data\local\scheduler.log.
 cd /d "%~dp0.."
 echo ==== %date% %time% nightly
-git pull --rebase --quiet origin main
+git -c rebase.autoStash=true pull --rebase --quiet origin main
 python -m scraper poll
 git add data/companies.json
 git diff --cached --quiet || (git commit --quiet -m "companies: nightly discovery" && git push --quiet origin HEAD:main)
