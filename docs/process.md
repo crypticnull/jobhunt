@@ -16,6 +16,10 @@ record lands in `setup.log`, so a closed window loses nothing. Running it
 again is safe. Nothing else is ever typed; the nightly task pulls updates
 before it runs.
 
+`schedule.cmd` installs or repairs just the two tasks in seconds, without
+polling anything, and prints the next run time so the answer is visible
+rather than asserted.
+
 ## Every night, unattended
 
 The time is a setting, not a rule. `setup.cmd 03:00` or

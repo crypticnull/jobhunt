@@ -77,7 +77,12 @@ if (Test-Path "assets\companies.txt") {
 }
 
 Step "Registering the nightly and Sunday tasks"
-& powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\install-schedule.ps1" -NightlyAt $NightlyAt -BackupDir $BackupDir
+# Build the argument list rather than interpolating. PowerShell drops an
+# empty string argument to -File entirely, so passing an unset -BackupDir
+# leaves the switch with nothing after it and the script refuses to start.
+$scheduleArgs = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\install-schedule.ps1", "-NightlyAt", $NightlyAt)
+if ($BackupDir -ne "") { $scheduleArgs += @("-BackupDir", $BackupDir) }
+& powershell @scheduleArgs
 if ($LASTEXITCODE -eq 0) { Ok "registered" } else { Bad "schedule" "the tasks were not registered, see above" }
 
 Step "First poll, this can take a few minutes"
