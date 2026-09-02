@@ -196,6 +196,7 @@
     "review_min": 50,
     "flagged_always_review": true,
     "apply_weekly_cap": 12,
+    "exceptional_min": 85,
     "apply_sort": ["company_tier", "score.total"]
   },
 
@@ -215,8 +216,8 @@
   },
 
   "tuning": {
-    "collect_only_until": "2026-10-05",
-    "checkpoint": "2026-11-16",
+    "collect_only_until": "2026-09-06",
+    "checkpoint": "2026-10-05",
     "loosen_order": ["comp.unlisted_salary_unknown_company", "title.tier_b"],
     "never_loosen": ["gates.remote"]
   }

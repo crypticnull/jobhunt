@@ -72,7 +72,7 @@ def cmd_import(args):
         return 2
     data = companies.load(args.companies)
     known = {c["slug"] for c in data["companies"]}
-    added, skipped, missed = 0, 0, []
+    added, skipped, guessed, missed = 0, 0, 0, []
     for category, url, name in rows:
         slug = companies.slugify(name)
         if slug in known:
@@ -80,9 +80,13 @@ def cmd_import(args):
             print(f"skip      {name}: already on the list")
             continue
         hit = adapters.detect(url)
+        if hit is None and not args.no_guess:
+            hit = adapters.guess(name)
+            if hit:
+                guessed += 1
         if hit is None and not args.manual:
             missed.append((category, url, name))
-            print(f"unknown   {name}: no ATS found behind {url}")
+            print(f"unknown   {name}: no board found behind {url}, and the name is not a board slug either")
             continue
         kind, board, count = hit or ("manual", None, None)
         rec = companies.record(slug, name, kind, board, category, args.priority, url)
@@ -92,7 +96,7 @@ def cmd_import(args):
         where = f"{kind}/{board}" if board else kind
         print(f"added     {name}: {where}" + (f", {count} postings live" if count is not None else ""))
     companies.save(args.companies, data)
-    print(f"{added} added, {skipped} already there, {len(missed)} without a detectable ATS")
+    print(f"{added} added ({guessed} found by guessing the board slug), {skipped} already there, {len(missed)} with no board found")
     if missed:
         print("Check the careers URL for these, or rerun with --manual to keep them on the list for hand checks:")
         for category, url, name in missed:
@@ -298,6 +302,7 @@ def main(argv=None):
     im.add_argument("file")
     im.add_argument("--priority", type=int, default=2, choices=(1, 2, 3))
     im.add_argument("--manual", action="store_true", help="keep companies with no detectable ATS on the list as manual")
+    im.add_argument("--no-guess", dest="no_guess", action="store_true", help="skip trying the company name as a board slug when the URL gives nothing away")
     im.set_defaults(fn=cmd_import)
 
     ap_ = sub.add_parser("add-posting", help="a posting from a URL or a file")

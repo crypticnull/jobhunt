@@ -9,7 +9,7 @@ from scraper.posting import posting
 from scraper.score import RULES_PATH, _deep_merge, load_rules, score
 from scraper.store import Store
 
-NOW = datetime(2026, 9, 6, tzinfo=timezone.utc)
+NOW = datetime(2026, 9, 5, tzinfo=timezone.utc)  # inside the collect-only window, which closes on the 6th
 SEEN = "2026-09-01T00:00:00+00:00"
 BAND = {
     "gates": {"comp": {"pass_min_annual": 100000, "flag_min_annual": 80000, "fail_below_annual": 80000, "hourly_floor": 60}},
@@ -85,7 +85,7 @@ class Digest(unittest.TestCase):
             self.assertEqual(n, 2)
             text = path.read_text(encoding="utf-8")
         for needle in (
-            "Collect-only until 2026-10-05",
+            "Collect-only until 2026-09-06",
             "## New listings by source",
             "- greenhouse: 4",
             "## Apply",
@@ -108,8 +108,20 @@ class Digest(unittest.TestCase):
         self.rescore(pid)
         self.assertIn(pid, self.piles()["apply"])
 
+    def test_an_exceptional_posting_is_called_out_during_the_window(self):
+        """Matt may not have this job in two months. A posting scoring 85 or
+        better is named in the digest even while the window is open, because
+        it will be gone before the window closes."""
+        self.r["piles"]["exceptional_min"] = 70
+        md, _ = digest.build(self.s, self.r, COMPANIES, NOW)
+        self.assertIn("will not wait for the window to close", md)
+        self.assertIn("Senior Creative Technologist, Acme", md.split("will not wait")[1])
+        self.r["piles"]["exceptional_min"] = 999
+        md, _ = digest.build(self.s, self.r, COMPANIES, NOW)
+        self.assertNotIn("will not wait", md)
+
     def test_after_the_collect_window_the_banner_goes(self):
-        later = datetime(2026, 10, 12, tzinfo=timezone.utc)
+        later = datetime(2026, 10, 12, tzinfo=timezone.utc)  # past collect_only_until
         md, _ = digest.build(self.s, self.r, COMPANIES, later)
         self.assertNotIn("Collect-only", md)
         self.assertIn("# Digest, week 2026-W42", md)

@@ -205,9 +205,9 @@ Every Monday morning, one file or message with: count of new listings by source,
 
 ## Tuning schedule
 
-- Sep 8 to Oct 5: collect only. Nothing is applied to. Use the digests to check the gates aren't throwing away obvious fits.
-- Oct 5: first apply pile.
-- Nov 16 checkpoint: if tier 1 and 2 response rate is under 10% after 20 applications, the problem is the materials, not the rules. If the apply pile is thin, loosen `unlisted_salary_unknown_company` first, then title tier B, in that order. Never loosen gate 1.
+- Sep 2 to Sep 6: collect only, compressed from a month on 2026-09-02 because Matt does not expect to still be in his current job in two. Use the first digests to check the gates aren't throwing away obvious fits. A posting scoring 85 or better is named in the digest anyway; it will not wait.
+- Sep 6: first apply pile, the very first digest.
+- Oct 5 checkpoint: if tier 1 and 2 response rate is under 10% after 20 applications, the problem is the materials, not the rules. If the apply pile is thin, loosen `unlisted_salary_unknown_company` first, then title tier B, in that order. Never loosen gate 1.
 
 ## Open questions for Matt
 

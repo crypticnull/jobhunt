@@ -42,12 +42,16 @@ digest can be read and talked about from chat.
 That is the whole week when work is bad. The digest still arrives, the
 statuses still move, nothing rots.
 
-The first month is collect-only. Until 2026-10-05 the digest carries a
-banner and the piles are read for one reason: to check that the gates are
-not throwing away obvious fits. The first apply pile is the digest of
-2026-10-05. The checkpoint is 2026-11-16, when the drop counts and the
-response rate decide whether the unlisted-salary rule or the title tiers
-loosen, in that order. The remote gate never loosens.
+The collect-only window is four days, not a month. It was a month, and it
+was compressed on 2026-09-02 because Matt does not expect to still be in
+his current job in two. The first digest, Sunday 2026-09-06, already
+carries an apply pile. Until then the digest carries a banner and the
+piles are read to check that the gates are not throwing away obvious
+fits, and any posting scoring 85 or better is named in the digest anyway,
+because a job that good is gone in a fortnight. The checkpoint is
+2026-10-05, when the drop counts and the response rate decide whether the
+unlisted-salary rule or the title tiers loosen, in that order. The remote
+gate never loosens.
 
 ## Any evening, one application
 

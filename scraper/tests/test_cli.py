@@ -61,17 +61,26 @@ class Cli(unittest.TestCase):
         src.write_text("# comment\nai-video | https://acme.com/careers | Acme\n\nstudio-ai | https://nowhere.com/jobs | Nowhere\nai-video | https://acme.com/careers | Acme\n", encoding="utf-8")
         detect = lambda url: ("greenhouse", "acme", 5) if "acme" in url else None
         with mock.patch("scraper.adapters.detect", side_effect=detect):
-            code, out = self.run_cli("import", str(src), "--priority", "1")
+            code, out = self.run_cli("import", str(src), "--priority", "1", "--no-guess")
         self.assertEqual(code, 0, out)
         self.assertIn("added     Acme: greenhouse/acme, 5 postings live", out)
         self.assertIn("unknown   Nowhere", out)
-        self.assertIn("1 added, 1 already there, 1 without a detectable ATS", out)
+        self.assertIn("1 added (0 found by guessing the board slug), 1 already there, 1 with no board found", out)
         data = companies.load(self.path)
         self.assertEqual([(c["slug"], c["tier"], c["priority"]) for c in data["companies"]], [("acme", 1, 1)])
         with mock.patch("scraper.adapters.detect", side_effect=detect):
-            code, out = self.run_cli("import", str(src), "--manual")
+            code, out = self.run_cli("import", str(src), "--manual", "--no-guess")
         self.assertIn("added     Nowhere: manual", out)
         self.assertEqual(len(companies.load(self.path)["companies"]), 2)
+
+    def test_import_falls_back_to_guessing_the_slug(self):
+        src = Path(self.tmp.name) / "companies.txt"
+        src.write_text("ai-video | https://nowhere.example/careers | Luma AI\n", encoding="utf-8")
+        with mock.patch("scraper.adapters.detect", return_value=None), mock.patch("scraper.adapters.guess", return_value=("lever", "lumaai", 4)):
+            code, out = self.run_cli("import", str(src))
+        self.assertEqual(code, 0, out)
+        self.assertIn("added     Luma AI: lever/lumaai, 4 postings live", out)
+        self.assertIn("1 added (1 found by guessing the board slug)", out)
 
     def test_import_refuses_a_bad_line(self):
         src = Path(self.tmp.name) / "companies.txt"
