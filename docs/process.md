@@ -5,7 +5,9 @@ willpower. This is the schedule.
 
 ## Once, five minutes
 
-Double-click `setup.cmd` in the repo folder. It checks that git knows a
+Double-click `setup.cmd` in the repo folder. It pulls before it works, so a
+change to `setup.ps1` itself lands on the following run rather than this
+one. It checks that git knows a
 name and email and that Python is on the PATH, pulls the latest, seeds
 the company list from `assets/companies.txt` if one is there, registers
 the two scheduled tasks, runs the first poll, and pushes the list. Every
@@ -13,6 +15,10 @@ step says pass or fail and the run continues either way, and the whole
 record lands in `setup.log`, so a closed window loses nothing. Running it
 again is safe. Nothing else is ever typed; the nightly task pulls updates
 before it runs.
+
+`schedule.cmd` installs or repairs just the two tasks in seconds, without
+polling anything, and prints the next run time so the answer is visible
+rather than asserted.
 
 ## Every night, unattended
 

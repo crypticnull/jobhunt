@@ -1,0 +1,7 @@
+# Windows shells need CRLF. A .cmd file with bare newlines is mis-parsed by
+# cmd.exe, and the symptom is obscure: the last token on a line gets run as a
+# command of its own, which is where "'*' is not recognized" came from.
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
