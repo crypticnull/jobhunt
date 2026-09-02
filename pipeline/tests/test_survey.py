@@ -120,3 +120,61 @@ class Survey(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Structure(unittest.TestCase):
+    """A curated drop is already <project>-<year>/<stage>/files. Reading that
+    tree is the whole job; the keyword guessing is only for what it omits."""
+
+    def rows(self, tree):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        build(tmp.name, tree)
+        rows, _ = survey.survey(tmp.name)
+        return {Path(r["path"]).name: r for r in rows}
+
+    def test_a_named_folder_is_the_project_not_a_guess(self):
+        """anthem-2026/final came back as 'unknown' because the tool only knew a
+        hardcoded list of projects and ignored the tree it was handed."""
+        rows = self.rows({"anthem-2026/final/clip.mp4": 10})
+        r = rows["clip.mp4"]
+        self.assertEqual((r["project"], r["year"], r["stage"]), ("anthem", "2026", "final"))
+        self.assertEqual(r["confidence"], "high")
+
+    def test_a_slug_with_hyphens_keeps_them_and_loses_only_the_year(self):
+        rows = self.rows({"bill-of-rights-2024/storyboard/p1.png": 10})
+        r = rows["p1.png"]
+        self.assertEqual(r["project"], "bill-of-rights")
+        self.assertEqual(r["year"], "2024")
+
+    def test_a_folder_with_no_year_says_so_rather_than_inventing_one(self):
+        rows = self.rows({"power-camp/styleframe/a.png": 10})
+        r = rows["a.png"]
+        self.assertEqual(r["project"], "power-camp")
+        self.assertEqual(r["year"], "")
+        self.assertEqual(r["confidence"], "medium")
+
+    def test_a_container_folder_is_never_a_project(self):
+        for folder in ("Misc", "assets", "New Folder", "exports"):
+            rows = self.rows({f"{folder}/thing.png": 10})
+            self.assertEqual(rows["thing.png"]["project"], "unknown", folder)
+
+    def test_the_project_name_does_not_repeat_into_the_deliverable(self):
+        rows = self.rows({"anthem-2026/final/anthem_2026_opener.mp4": 10})
+        r = rows["anthem_2026_opener.mp4"]
+        self.assertEqual(r["deliverable"], "opener")
+        self.assertEqual(r["proposed"], "anthem_2026_opener_final_v01.mp4")
+
+    def test_a_project_file_still_beats_the_folder_it_sits_in(self):
+        """A .aep inside a folder called final is a project file, and the folder
+        name must not talk the tool into proposing it as a deliverable."""
+        rows = self.rows({"anthem-2026/final/anthem.aep": 10})
+        r = rows["anthem.aep"]
+        self.assertEqual(r["stage"], "source")
+        self.assertEqual(r["proposed"], "")
+
+    def test_spaces_and_underscores_read_the_same_as_hyphens(self):
+        for folder in ("Nitro Create 2026", "nitro_create_2026", "nitro-create-2026"):
+            rows = self.rows({f"{folder}/final/a.mp4": 10})
+            self.assertEqual(rows["a.mp4"]["project"], "nitro-create", folder)
+            self.assertEqual(rows["a.mp4"]["year"], "2026", folder)
