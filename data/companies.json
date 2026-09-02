@@ -1,4 +1,736 @@
 {
   "version": 1,
-  "companies": []
+  "companies": [
+    {
+      "slug": "calm",
+      "name": "Calm",
+      "careers_url": "https://www.calm.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "calm"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "captions",
+      "name": "Captions",
+      "careers_url": "https://www.captions.ai/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "mirage"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "descript",
+      "name": "Descript",
+      "careers_url": "https://www.descript.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "descript"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "duolingo",
+      "name": "Duolingo",
+      "careers_url": "https://careers.duolingo.com",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "duolingo"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "figma",
+      "name": "Figma",
+      "careers_url": "https://www.figma.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "figma"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "figma-board",
+      "name": "Figma Board",
+      "careers_url": "https://boards.greenhouse.io/figma",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "figma"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "flawless-ai",
+      "name": "Flawless AI",
+      "careers_url": "https://flawlessai.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "flawless"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "framestore",
+      "name": "Framestore",
+      "careers_url": "https://www.framestore.com/careers",
+      "ats": {
+        "kind": "recruitee",
+        "board": "framestore"
+      },
+      "category": "studio-ai",
+      "tier": 2,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "genmo",
+      "name": "Genmo",
+      "careers_url": "https://www.genmo.ai/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "genmo"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "headspace",
+      "name": "Headspace",
+      "careers_url": "https://www.headspace.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "hs"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "higgsfield",
+      "name": "Higgsfield",
+      "careers_url": "https://higgsfield.ai/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "higgsfieldai"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "krea",
+      "name": "Krea",
+      "careers_url": "https://www.krea.ai/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "krea"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "linear",
+      "name": "Linear",
+      "careers_url": "https://linear.app/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "Linear"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "liquid-death",
+      "name": "Liquid Death",
+      "careers_url": "https://liquiddeath.com/pages/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "liquiddeath"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "luma-ai",
+      "name": "Luma AI",
+      "careers_url": "https://lumalabs.ai/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "lumaai"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "notion",
+      "name": "Notion",
+      "careers_url": "https://www.notion.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "notion"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "odyssey",
+      "name": "Odyssey",
+      "careers_url": "https://odyssey.ml/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "odysseyml"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "oura",
+      "name": "Oura",
+      "careers_url": "https://ouraring.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "oura"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "pika",
+      "name": "Pika",
+      "careers_url": "https://pika.art/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "pika"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "pixomondo",
+      "name": "Pixomondo",
+      "careers_url": "https://www.pixomondo.com/careers",
+      "ats": {
+        "kind": "workable",
+        "board": "pxo"
+      },
+      "category": "studio-ai",
+      "tier": 2,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "polaroid",
+      "name": "Polaroid",
+      "careers_url": "https://www.polaroid.com/careers",
+      "ats": {
+        "kind": "recruitee",
+        "board": "polaroid"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "ramp",
+      "name": "Ramp",
+      "careers_url": "https://ramp.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "ramp"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "recraft",
+      "name": "Recraft",
+      "careers_url": "https://www.recraft.ai/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "recraft"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "ro",
+      "name": "Ro",
+      "careers_url": "https://www.ro.co/careers",
+      "ats": {
+        "kind": "lever",
+        "board": "ro"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "runway",
+      "name": "Runway",
+      "careers_url": "https://runwayml.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "runway-ml"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "skillshare",
+      "name": "Skillshare",
+      "careers_url": "https://www.skillshare.com/careers",
+      "ats": {
+        "kind": "workable",
+        "board": "skillshare"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "strava",
+      "name": "Strava",
+      "careers_url": "https://www.strava.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "strava"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "suno",
+      "name": "Suno",
+      "careers_url": "https://suno.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "suno"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "tavus",
+      "name": "Tavus",
+      "careers_url": "https://www.tavus.io/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "tavus"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "topaz-labs",
+      "name": "Topaz Labs",
+      "careers_url": "https://www.topazlabs.com/careers",
+      "ats": {
+        "kind": "lever",
+        "board": "topazlabs"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "udio",
+      "name": "Udio",
+      "careers_url": "https://www.udio.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "udio"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "vercel",
+      "name": "Vercel",
+      "careers_url": "https://vercel.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "vercel"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "webflow",
+      "name": "Webflow",
+      "careers_url": "https://webflow.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "webflow"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "world-labs",
+      "name": "World Labs",
+      "careers_url": "https://www.worldlabs.ai/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "worldlabs"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-01",
+      "last_reviewed": "2026-09-01"
+    },
+    {
+      "slug": "capslock",
+      "name": "CapsLock",
+      "careers_url": "https://weworkremotely.com/remote-jobs/capslock-generative-ai-pipeline-engineer-tech-lead-2",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "iisd",
+      "name": "IISD",
+      "careers_url": "https://weworkremotely.com/remote-jobs/iisd-consultancy-for-the-design-and-production-of-four-animated-videos-showcasing-suncasa-s-achievements-and",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "ilogos",
+      "name": "iLogos",
+      "careers_url": "https://weworkremotely.com/remote-jobs/ilogos-2d-character-concept-artist",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "kazaar-fragrances",
+      "name": "Kazaar Fragrances",
+      "careers_url": "https://weworkremotely.com/remote-jobs/kazaar-fragrances-brand-creative-designer-freelance-100-remote",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "locals",
+      "name": "Locals",
+      "careers_url": "https://remoteOK.com/remote-jobs/remote-video-editor-locals-1137158",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "loosegrip",
+      "name": "LooseGrip",
+      "careers_url": "https://weworkremotely.com/remote-jobs/loosegrip-junior-designer-part-time-contract",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "ondeckglobal",
+      "name": "Ondeckglobal",
+      "careers_url": "https://weworkremotely.com/remote-jobs/ondeckglobal-igaming-ui-ux-designer",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "performancepixel-gmbh",
+      "name": "Performancepixel GmbH",
+      "careers_url": "https://weworkremotely.com/remote-jobs/performancepixel-gmbh-art-director-performance-creatives-m-w-d",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    },
+    {
+      "slug": "remote-talent-latam",
+      "name": "Remote Talent LATAM",
+      "careers_url": "https://weworkremotely.com/remote-jobs/remote-talent-latam-disenador-grafico-con-motion-graphics-remote-latam-only-80010",
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
+      "category": "discovered",
+      "tier": null,
+      "size": null,
+      "priority": 3,
+      "lead_proof": null,
+      "remote_notes": "",
+      "added": "2026-09-02",
+      "last_reviewed": "2026-09-02"
+    }
+  ]
 }
