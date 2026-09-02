@@ -7,7 +7,7 @@ cd /d "%~dp0.."
 echo ==== %date% %time% nightly
 git -c rebase.autoStash=true pull --rebase --quiet origin main
 python -m scraper poll
-git add data/companies.json
+git add data/companies.json data/last-run.json
 git diff --cached --quiet || (git commit --quiet -m "companies: nightly discovery" && (git push --quiet origin HEAD:main || (git -c rebase.autoStash=true pull --rebase --quiet origin main && git push --quiet origin HEAD:main)))
 if exist "data\local\backup-dir.txt" (
   set /p BACKUP=<"data\local\backup-dir.txt"

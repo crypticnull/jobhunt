@@ -9,6 +9,7 @@ import hashlib
 import json
 from datetime import datetime, timedelta, timezone
 
+from .maintain import last_run
 from .store import TERMINAL, utcnow
 
 
@@ -84,7 +85,25 @@ def source_health(store, since):
     return problems
 
 
-def build(store, rules, companies=None, now=None, since=None):
+def _staleness(now, beat, days=2):
+    """A line when the scraper has not run lately. A digest that looks quiet
+    because nothing was found and one that looks quiet because the poll stopped
+    are the same page otherwise."""
+    if not beat or not beat.get("ran_at"):
+        return "The scraper has no record of ever running. Check the scheduled task."
+    try:
+        ran = datetime.fromisoformat(str(beat["ran_at"]).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if ran.tzinfo is None:
+        ran = ran.replace(tzinfo=timezone.utc)
+    late = (now - ran).days
+    if late >= days:
+        return f"The last poll was {late} days ago, on {str(beat['ran_at'])[:10]}. Nothing below is fresh; check the scheduled task."
+    return None
+
+
+def build(store, rules, companies=None, now=None, since=None, heartbeat=None):
     """Returns (markdown, surfaced_ids). `companies` is {slug: record}."""
     now = now or datetime.now(timezone.utc)
     since = since or (now - timedelta(days=7)).isoformat()
@@ -94,6 +113,9 @@ def build(store, rules, companies=None, now=None, since=None):
     stats = store.stats()
     collect_until = rules["tuning"].get("collect_only_until")
     out = [f"# Digest, week {_week(now)}", ""]
+    stale = _staleness(now, last_run(heartbeat) if heartbeat else None)
+    if stale:
+        out += [f"**{stale}**", ""]
     if collect_until and now.date().isoformat() < collect_until:
         out += [f"Collect-only until {collect_until}: nothing is applied to yet. Read the piles to check the gates aren't throwing away obvious fits.", ""]
         rare = [r for r in piles["apply"] + piles["overflow"] if (r["score"] or 0) >= rules["piles"].get("exceptional_min", 999)]
@@ -132,9 +154,9 @@ def build(store, rules, companies=None, now=None, since=None):
     return "\n".join(out), ids
 
 
-def write(store, rules, path_dir, companies=None, now=None):
+def write(store, rules, path_dir, companies=None, now=None, heartbeat=None):
     now = now or datetime.now(timezone.utc)
-    md, ids = build(store, rules, companies, now)
+    md, ids = build(store, rules, companies, now, heartbeat=heartbeat)
     path_dir.mkdir(parents=True, exist_ok=True)
     path = path_dir / f"{_week(now)}.md"
     path.write_text(md, encoding="utf-8")

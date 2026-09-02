@@ -86,7 +86,7 @@ if ($LASTEXITCODE -eq 0) { Ok "polled" } else { Bad "poll" "the poll did not fin
 
 Step "Pushing the company list"
 if ($identity) {
-  git add data/companies.json
+  git add data/companies.json data/last-run.json
   git diff --cached --quiet
   if ($LASTEXITCODE -eq 0) {
     Ok "nothing new to push"

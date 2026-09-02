@@ -29,6 +29,11 @@ list if it grew, then a backup to the directory in
 `data/local/backup-dir.txt`. A missed night costs nothing;
 postings are closed and reopened by what the next poll sees.
 
+Every poll writes `data/last-run.json` and the nightly job pushes it, so a
+job that quietly stopped is visible in the repo rather than only in its
+silence. The digest says so at the top when the last poll is two days old
+or more.
+
 ## Sunday, unattended
 
 `scripts/weekly.cmd` at 07:00: pull main, then `python -m scraper

@@ -126,6 +126,20 @@ class Digest(unittest.TestCase):
         self.assertNotIn("Collect-only", md)
         self.assertIn("# Digest, week 2026-W42", md)
 
+    def test_a_stopped_scraper_says_so_at_the_top(self):
+        """A digest that is quiet because nothing was found and one that is
+        quiet because the nightly job stopped look identical otherwise."""
+        with tempfile.TemporaryDirectory() as d:
+            beat = Path(d) / "last-run.json"
+            beat.write_text(json.dumps({"ran_at": "2026-08-20T04:00:00+00:00"}), encoding="utf-8")
+            md, _ = digest.build(self.s, self.r, COMPANIES, NOW, heartbeat=beat)
+            self.assertIn("The last poll was 15 days ago", md)
+            beat.write_text(json.dumps({"ran_at": "2026-09-05T04:00:00+00:00"}), encoding="utf-8")
+            md, _ = digest.build(self.s, self.r, COMPANIES, NOW, heartbeat=beat)
+            self.assertNotIn("last poll was", md)
+            md, _ = digest.build(self.s, self.r, COMPANIES, NOW, heartbeat=Path(d) / "missing.json")
+            self.assertIn("no record of ever running", md)
+
     def test_source_health_footer(self):
         self.s.log_poll("2026-09-05T02:30:00+00:00", "lever", "brand", False, error="503 down")
         self.s.log_poll("2026-09-04T02:30:00+00:00", "ashby", "quiet", True, 0, 0)
