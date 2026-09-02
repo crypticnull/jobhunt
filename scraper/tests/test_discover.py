@@ -14,13 +14,19 @@ REMOTIVE = {
     "jobs": [
         {"id": 1, "company_name": "Frame Co", "title": "Creative Technologist", "url": "https://r/1", "description": "ComfyUI pipeline work. Apply at https://jobs.lever.co/frameco/abc", "publication_date": "2026-09-01T10:00:00"},
         {"id": 2, "company_name": "Acme", "title": "Accountant", "url": "https://r/2", "description": "ledgers"},
+        {"id": 3, "company_name": "Sales Co", "title": "Account Executive", "url": "https://r/3", "description": "Sell our motion design platform to After Effects studios."},
+        {"id": 4, "company_name": "Backend Co", "title": "Senior Backend Engineer", "url": "https://r/4", "description": "REST API, automation, server-side rendering, Python, workflow orchestration, data modeling."},
     ]
 }
 WWR = """<rss><channel>
 <item><title>Frame Co: Technical Artist</title><link>https://w/1</link><description>Houdini and real-time</description></item>
 <item><title>Other Co: Copywriter</title><link>https://w/2</link><description>words</description></item>
 </channel></rss>"""
-HIMALAYAS = {"jobs": [{"title": "Motion Designer", "companyName": "Loose Co", "applicationLink": "https://h/1", "description": "<p>After Effects and Python scripting.</p>", "locationRestrictions": ["United States"], "pubDate": 1788249600}]}
+HIMALAYAS = {"jobs": [
+    {"title": "Motion Designer", "companyName": "Loose Co", "applicationLink": "https://h/1", "description": "<p>After Effects and Python scripting.</p>", "locationRestrictions": ["United States"], "pubDate": 1788249600},
+    {"title": "Motion Designer", "companyName": "Company", "applicationLink": "https://h/2", "description": "<p>After Effects work.</p>", "locationRestrictions": ["United States"]},
+    {"title": "Creative Technologist", "companyName": "Hop Co", "applicationLink": "https://h/3", "description": "<p>ComfyUI and Houdini.</p>", "locationRestrictions": ["United States"]},
+]}
 JOBICY = {"jobs": [{"id": 9, "jobTitle": "3D Generalist", "companyName": "Ashby Co", "url": "https://j/9", "jobDescription": "Houdini. <a href='https://jobs.ashbyhq.com/ashbyco/1'>apply</a>", "jobGeo": "USA", "pubDate": "2026-09-01 08:00:00"}]}
 ARBEITNOW = {"data": [{"slug": "x", "title": "Generative Artist", "company_name": "Onsite Co", "url": "https://a/1", "description": "ComfyUI", "remote": False}]}
 REMOTEOK = [
@@ -33,11 +39,14 @@ HN_THREAD = {
         {"id": 401, "author": "a", "created_at": "2026-09-01T15:00:00Z", "text": "Tiny Labs (YC S26) | Creative Technologist | REMOTE (US) | $150k-$180k<p>We build a generative video pipeline in ComfyUI and Python."},
         {"id": 402, "author": "b", "created_at": "2026-09-01T15:01:00Z", "text": "Desk Co | Motion Designer | ONSITE San Francisco | Houdini work"},
         {"id": 403, "author": "[deleted]", "text": ""},
+        {"id": 404, "author": "c", "created_at": "2026-09-01T15:02:00Z", "text": "We are hiring a creative technologist, remote, ComfyUI and Houdini, no pipes in this one"},
     ]
 }
 
 
 def get_json(url):
+    if "greenhouse" in url:
+        return {"jobs": [{"id": 1, "title": "Creative Technologist", "absolute_url": "https://x/1", "location": {"name": "Remote"}}]}
     if "remotive" in url:
         return REMOTIVE
     if "himalayas" in url:
@@ -55,8 +64,16 @@ def get_json(url):
     raise HttpError(url, 404, "no fixture")
 
 
+# The apply button on a job page is where the company's real board leaks out.
+HOP_PAGE = "<html><a href='https://boards.greenhouse.io/hopco/jobs/7'>Apply</a></html>"
+
+
 def get_text(url):
-    return WWR
+    if "weworkremotely" in url:
+        return WWR
+    if url == "https://h/3":
+        return HOP_PAGE
+    return "<html>nothing here</html>"
 
 
 def known(*records):
@@ -77,9 +94,34 @@ class Discover(unittest.TestCase):
         self.assertNotIn(("Onsite Co", "Generative Artist"), by, "arbeitnow's remote flag is respected")
         self.assertIn("comfyui", by[("Frame Co", "Creative Technologist")]["terms"])
 
+    def test_the_jobs_that_flooded_the_first_live_run_are_gone(self):
+        """The first real night added forty-eight companies, nearly all sales,
+        QA and backend roles, because the scoring legs match api, automation
+        and rendering. Discovery uses a tighter list now."""
+        found = discover.discover([], RULES, get_json, get_text)
+        titles = [i["title"] for i in found]
+        self.assertNotIn("Account Executive", titles, "a sales title is out even when the description says motion design")
+        self.assertNotIn("Senior Backend Engineer", titles, "api, automation and rendering are not a creative signal")
+        self.assertNotIn("Accountant", titles)
+        self.assertTrue(all(i["company"].lower() != "company" for i in found), "a generic company name is not a company")
+
+    def test_a_board_one_hop_in_is_found(self):
+        found = {i["company"]: i for i in discover.discover([], RULES, get_json, get_text)}
+        self.assertEqual(found["Hop Co"]["ats"], ("greenhouse", "hopco"), "the apply link on the job page gives the board away")
+
+    def test_page_fetches_are_capped(self):
+        rules = json.loads(json.dumps(RULES))
+        rules["discovery"]["max_page_fetches"] = 0
+        found = {i["company"]: i for i in discover.discover([], rules, get_json, get_text)}
+        self.assertIsNone(found["Hop Co"]["ats"], "no fetches left, so no board")
+        self.assertEqual(found["Green Co"]["ats"], ("greenhouse", "greenco"), "a board in the posting itself costs no fetch")
+
     def test_hn_thread_is_parsed_and_only_remote_kept(self):
         found = discover.discover([], RULES, get_json, get_text, sources=("hn",))
         self.assertEqual([(i["company"], i["title"], i["location"]) for i in found], [("Tiny Labs", "Creative Technologist", "REMOTE (US)")])
+        # the no-pipe comment is dropped rather than guessed at: the first real
+        # run turned one into a company called
+        # "beacon-ai-builds-intelligent-systems-that-make-aviation-safer"
         self.assertEqual(found[0]["url"], "https://news.ycombinator.com/item?id=401")
         self.assertEqual(found[0]["posted_at"], "2026-09-01T15:00:00+00:00")
 
@@ -122,7 +164,8 @@ class Grow(unittest.TestCase):
         self.assertEqual(by_slug["ashby-co"]["ats"]["kind"], "ashby")
         self.assertEqual(by_slug["loose-co"]["ats"], {"kind": "manual", "board": None})
         self.assertEqual(by_slug["tiny-labs"]["ats"]["kind"], "manual")
-        self.assertEqual(len(out["companies"]), 4)
+        self.assertEqual(by_slug["hop-co"]["ats"], {"kind": "greenhouse", "board": "hopco"}, "found one hop in, still pollable")
+        self.assertEqual(len(out["companies"]), 5)
         rows = {(r["company_slug"], r["source"]): r for r in self.s.open_postings()}
         self.assertIn(("loose-co", "himalayas"), rows)
         self.assertIn(("tiny-labs", "hn"), rows)

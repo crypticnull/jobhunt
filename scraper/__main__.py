@@ -164,15 +164,17 @@ def cmd_poll(args):
         results = poll(store, data["companies"])
     finally:
         store.close()
-    errors = 0
+    errors, skipped = 0, 0
     for r in results:
         if r["ok"] is None:
-            print(f"skip   {r['slug']:<28} {r['error']}")
+            skipped += 1
         elif r["ok"]:
             print(f"ok     {r['slug']:<28} seen {r['seen']:>3}  new {r['new']:>3}  closed {r['closed']:>3}")
         else:
             errors += 1
             print(f"ERROR  {r['slug']:<28} {r['error']}")
+    if skipped:
+        print(f"skip   {skipped} companies have no pollable board, they are checked by hand")
     print(f"{len(results)} companies, {errors} errors")
     return 0
 

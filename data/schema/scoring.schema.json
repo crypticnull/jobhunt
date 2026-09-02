@@ -50,6 +50,17 @@
         }
       }
     },
+    "discovery": {
+      "type": "object",
+      "properties": {
+        "note": { "type": "string" },
+        "require_any": { "type": "array", "items": { "type": "string" } },
+        "exclude_title_patterns": { "type": "array", "items": { "type": "string" } },
+        "generic_company_names": { "type": "array", "items": { "type": "string" } },
+        "max_page_fetches": { "type": "integer" },
+        "max_company_name_words": { "type": "integer" }
+      }
+    },
     "piles": { "type": "object", "required": ["apply_min", "review_min", "flagged_always_review", "apply_weekly_cap"] },
     "proof_lead_by_tier": { "type": "object" },
     "status_values": { "type": "array", "items": { "type": "string" } },

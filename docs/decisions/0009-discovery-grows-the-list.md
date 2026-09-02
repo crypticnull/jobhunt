@@ -23,6 +23,17 @@ salary fails them and a listed one competes on merit. Caps bound the
 growth per night. Job boards are still never scraped; only documented
 feeds and public APIs are read.
 
+## Amended 2026-09-02, after the first live run
+
+Discovery first reused the scoring intersection legs to decide relevance,
+and the first real night added 48 companies, nearly all sales, QA,
+marketing and backend roles. The legs are broad on purpose, which is
+right for a company already on the list and wrong for an open feed:
+`api`, `automation`, `rendering` and `modeling` match almost every
+software posting. Discovery now has its own `require_any` list of terms
+only a creative-technical role uses, excludes sales, QA, marketing and
+support titles outright, and drops a posting with no usable company name.
+
 ## Tradeoff accepted
 
 The list fills with companies Matt never chose, and the poll gets longer.

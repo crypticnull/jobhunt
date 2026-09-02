@@ -35,11 +35,20 @@ what happened to `setup.log`.
 The list grows on its own. Every night before the boards are polled, the
 poll reads six remote job feeds (Remotive, We Work Remotely, Himalayas,
 Jobicy, Arbeitnow, RemoteOK) and the month's Hacker News "Who is hiring"
-thread, and keeps every remote posting that hits the intersection terms.
+thread, and keeps every remote posting that names something only a
+creative-technical role names. That list is `discovery.require_any` in
+the ruleset, and it is deliberately tighter than the scoring legs: `api`,
+`automation` and `rendering` are fair signals on a company already on the
+list and match every backend and QA job in an open feed. Sales, QA,
+marketing and support titles are excluded outright, and a posting with no
+usable company name is dropped rather than guessed at.
 A posting whose links give away a Greenhouse, Lever, Ashby, Workable,
 SmartRecruiters or Recruitee board hands over the company's whole board,
-so the company is added to the list as pollable and everything it posts
-is watched from then on. A posting with no board behind it is stored as
+and where the links give nothing away the job page itself is fetched once,
+up to twelve a night, because the feeds link to themselves and the apply
+button is where the real board leaks out. A board found this way
+so the company is added to the list as pollable means everything that company
+posts is watched from then on. A posting with no board behind it is stored as
 a posting in its own right, under a hand-check company record, so nothing
 relevant is lost for lack of an ATS. Discovered companies carry the
 category `discovered` and no tier until Matt gives them one, which means

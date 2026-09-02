@@ -139,13 +139,26 @@ def remoteok(get_json):
     return out
 
 
+def detect_board(item, get_json=None, get_text=None):
+    """One hop: fetch the posting page and look for an ATS board in it. The
+    feeds link to themselves, and the apply button is what points at the
+    company's real board. Any failure is a None, never an exception."""
+    try:
+        hit = adapters.detect(item["url"], get_json, get_text)
+    except Exception:
+        return None
+    if hit and hit[0] in adapters.ADAPTERS and hit[0] != "rss":
+        return hit[0], hit[1]
+    return None
+
+
 def _hn_parse(text):
     """(company, title, location) from a Who is hiring comment's first line,
     which by convention reads `Company | Role | REMOTE | Salary | ...`."""
     first = text.strip().splitlines()[0] if text.strip() else ""
     parts = [p.strip() for p in first.split("|") if p.strip()]
-    if not parts:
-        return "?", "", ""
+    if len(parts) < 2:
+        return "?", "", ""  # no pipes, no convention, no reliable company name
     company = re.sub(r"\s*\(.*?\)\s*$", "", parts[0])[:80]
     title, location = "", ""
     for p in parts[1:]:
@@ -203,6 +216,28 @@ def board_of(item):
     return None
 
 
+def _generic(name, rules):
+    n = (name or "").strip().lower()
+    d = rules["discovery"]
+    if n in d["generic_company_names"] or not n:
+        return True
+    return len(n.split()) > d["max_company_name_words"]
+
+
+def relevant(item, rules):
+    """The terms a creative-technical posting names and a backend, QA or sales
+    posting does not. The scoring legs are deliberately broad, which is right
+    for a company already on the list and wrong for an open feed: `api`,
+    `automation` and `rendering` match every software job ever written.
+    Returns the terms that hit, empty when the posting is not for Matt."""
+    d = rules["discovery"]
+    title = (item["title"] or "").lower()
+    for pat in d["exclude_title_patterns"]:
+        if _pattern(pat).search(title):
+            return []
+    return _hits(item["title"] + "\n" + item["text"], d["require_any"])
+
+
 def _remote(item):
     text = (item["location"] + "\n" + item["text"]).lower()
     if item["source"] == "hn":
@@ -211,23 +246,29 @@ def _remote(item):
 
 
 def discover(known=(), rules=None, get_json=None, get_text=None, sources=SOURCES, errors=None):
-    """[{... terms, ats, known}] for every remote posting that hits the intersection
-    terms, unknown companies first. `known` is the company list's records."""
+    """[{... terms, ats, known}] for every remote posting that names something
+    only a creative-technical role names, unknown companies first. `known` is
+    the company list's records. A posting whose own links do not give away a
+    board gets its page fetched once, up to the ruleset's cap, because the
+    feeds mostly link to themselves and the board is one hop further in."""
     rules = rules or load_rules()
-    terms = [t for leg in rules["score"]["intersection"]["legs"].values() for t in leg]
     known_slugs = {c["slug"] for c in known}
     known_boards = {(c["ats"]["kind"], (c["ats"]["board"] or "").lower()) for c in known}
-    found, seen_urls = [], set()
+    found, seen_urls, fetches = [], set(), 0
+    cap = rules["discovery"]["max_page_fetches"]
     for item in collect(get_json, get_text, sources, errors):
         if not item["url"] or item["url"] in seen_urls:
             continue  # the same posting can sit in two categories or two feeds
         seen_urls.add(item["url"])
-        if not _remote(item):
+        if not _remote(item) or _generic(item["company"], rules):
             continue
-        hits = _hits(item["title"] + "\n" + item["text"], terms)
+        hits = relevant(item, rules)
         if not hits:
             continue
         ats = board_of(item)
+        if ats is None and fetches < cap:
+            fetches += 1
+            ats = detect_board(item, get_json, get_text)
         slug = companies.slugify(item["company"])
         item.update({
             "terms": hits,
