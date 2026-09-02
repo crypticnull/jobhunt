@@ -113,8 +113,8 @@ exists and every asset is a placeholder.
 | Nitro Create | `nitro-create-2026` | 2026 | POWER | record only | logo loop, identity |
 | Summit | `summit-2025` | 2025 | POWER | record only | logo loop, branding expansion. **Also flag anything showing dates and Asana task titles**, see below |
 | Power Awards Gala | `pag-2026` | 2026 | POWER | nothing | most recent, may still be in progress |
-| Banfield Pet Hospital | `banfield-<year>` | ? | Banfield | nothing | agency era. **Need the year and which studio, Quango or Think Joule** |
-| LiveRamp | `liveramp-<year>` | ? | LiveRamp | nothing | agency era, same question |
+| Banfield Pet Hospital | `banfield-2020` | 2020 | Banfield Pet Hospital | nothing | Quango era. Widens the client list past one employer |
+| LiveRamp | `liveramp-2021` | 2021 | LiveRamp | nothing | Quango era |
 
 ### Others already mentioned, worth scanning for while the drives are open
 
@@ -130,7 +130,7 @@ You asked what you were blanking on. These have come up and none has a record:
 | Ford, LinkedIn, Oportun explainers | `guidespark-<client>-2019` | 2019 | GuideSpark era |
 | Portland building brand suite | `<building>-<year>` | 2016–2019 | Think Joule. Still in use, which is worth saying |
 | School mascot | `<school>-mascot-<year>` | 2016–2019 | Think Joule. Also still in use |
-| Quango client work | various | 2020–2022 | the $350k of delivered value. Worth a sweep for the two or three best |
+| Quango client work | various | 2020–2022 | the $350k of delivered value, beyond Banfield and LiveRamp. Worth a sweep for the two or three best |
 
 ### Summit 2025, one extra thing
 
@@ -150,7 +150,9 @@ block per project is enough:
   render budget, a stakeholder who changed their mind at the styleframe stage.
 - **Dates.** Kickoff and delivery, so turnaround is computed rather than
   remembered. Only stated on the site where it is genuinely impressive.
-- **Role.** What you actually did, as distinct from what the team did.
+- **Role.** What you actually did, as distinct from what the team did. On the
+  Quango records, Banfield and LiveRamp, the role line names Quango, because a
+  client record with no studio in it reads as though the client was his own.
 - **Credits.** Who else worked on it and what they did. You said collaborators
   get named, case by case, so this is per project and your call each time.
 - **Tools.** The real list, including the ones that are unglamorous.
