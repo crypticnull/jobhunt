@@ -237,6 +237,7 @@
 
   "digest": {
     "day": "monday",
+    "dead_weight_min_postings": 15,
     "sections": ["new_by_source", "apply_pile", "review_pile_with_flags", "drops_by_reason"]
   },
 

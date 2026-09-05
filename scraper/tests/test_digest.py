@@ -223,3 +223,50 @@ class Headquarters(unittest.TestCase):
         md = self.md()
         self.assertIn("Senior Creative Technologist, Acme", md)
         self.assertNotIn(" ·  · ", md, "a missing location must not leave an empty separator")
+
+
+class DeadWeight(unittest.TestCase):
+    """A company polling hundreds of listings and clearing none of them is
+    spending budget for nothing. The digest says so and stops there: pruning
+    the list is Matt's call, not a scheduled job's."""
+
+    def setUp(self):
+        self.s = Store(":memory:")
+        self.r = rules()
+
+    def add(self, slug, n, on_target=0):
+        for i in range(n):
+            p = posting(source="greenhouse", source_id=f"{slug}-{i}", company_slug=slug,
+                        url=f"https://x/{slug}/{i}", remote="remote", location="Remote - US",
+                        title="Senior Creative Technologist" if i < on_target else "Regional Sales Manager",
+                        description="pipeline comfyui python" if i < on_target else "quota territory accounts",
+                        comp_min=140000, comp_max=165000)
+            pid, _ = self.s.upsert(p, SEEN)
+            self.s.set_score(pid, score(self.s.get(pid), self.r, NOW, {"slug": slug, "tier": 1}))
+
+    def test_a_company_with_no_hits_is_named(self):
+        self.add("webflow", 20)
+        out = digest.dead_weight(self.s, self.r, {"webflow": {"name": "Webflow", "hq": "San Francisco, CA"}})
+        joined = "\n".join(out)
+        self.assertIn("Webflow, San Francisco, CA: 20 postings, 0 on target", joined)
+        self.assertIn("python -m scraper drop webflow", joined)
+
+    def test_a_company_under_the_floor_is_left_alone(self):
+        self.add("tiny", 3)
+        self.assertEqual(digest.dead_weight(self.s, self.r, {}), [])
+
+    def test_a_company_that_ever_landed_is_not_dead_weight(self):
+        self.add("runway", 20, on_target=1)
+        joined = "\n".join(digest.dead_weight(self.s, self.r, {}))
+        self.assertNotIn("runway", joined)
+
+    def test_the_section_is_absent_when_everything_earns_its_poll(self):
+        self.add("runway", 20, on_target=2)
+        md, _ = digest.build(self.s, self.r, {}, NOW)
+        self.assertNotIn("Earning their poll", md)
+
+    def test_yield_is_sorted_worst_first(self):
+        self.add("a", 5)
+        self.add("b", 30)
+        rows = self.s.company_yield()
+        self.assertEqual(rows[0]["company_slug"], "b", "most postings for nothing comes first")

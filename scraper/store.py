@@ -222,6 +222,19 @@ class Store:
             seen.setdefault((r["company_slug"], r["source"]), []).append(r["postings_seen"])
         return [k for k, v in seen.items() if len(v) >= 2 and v[0] == 0 and v[1] == 0]
 
+    def company_yield(self):
+        """[{company_slug, postings, on_target}] over the whole store, worst
+        first. on_target counts postings that ever reached a pile other than
+        logged, so a company polling hundreds of listings and clearing none of
+        them is visible as what it is: polling budget spent for nothing."""
+        rows = self.db.execute(
+            "SELECT company_slug, COUNT(*) AS postings, "
+            "SUM(CASE WHEN pile IS NOT NULL AND pile != 'logged' THEN 1 ELSE 0 END) AS on_target "
+            "FROM postings GROUP BY company_slug"
+        ).fetchall()
+        out = [{"company_slug": r["company_slug"], "postings": r["postings"], "on_target": r["on_target"] or 0} for r in rows]
+        return sorted(out, key=lambda r: (r["on_target"], -r["postings"]))
+
     def stats(self, since=None):
         """Counts. With `since` (ISO date or datetime), the period fields count
         only what happened on or after it; the totals stay whole-store."""

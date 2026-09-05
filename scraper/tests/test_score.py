@@ -40,6 +40,7 @@ def row(**kw):
 
 
 TIER2 = {"tier": 2, "size": None}
+TIER1 = {"tier": 1, "size": None}
 
 
 def fired(result, rule):
@@ -344,3 +345,35 @@ class LocalOverlay(unittest.TestCase):
         for key in ("pass_min_annual", "flag_min_annual", "fail_below_annual", "hourly_floor"):
             self.assertIsNone(r["gates"]["comp"][key])
         self.assertEqual(r["score"]["comp"]["bands"], [])
+
+
+class RelevanceFloor(unittest.TestCase):
+    """Remote 22 plus comp 20 plus a tier 1 company plus freshness is 57, over
+    the review threshold, on a posting about nothing Matt does. With a review
+    cap of 40 a week that is how the pile fills with work he would never take."""
+
+    def test_no_title_fit_and_no_leg_is_logged_however_well_it_pays(self):
+        r = score(
+            row(title="Backend Engineer", description="Java and Spring, distributed systems.",
+                comp_min=180000, comp_max=220000),
+            rules(), NOW, TIER1,
+        )
+        self.assertEqual(r["pile"], "logged")
+        self.assertEqual(r["drop_reason"], "no title fit and no intersection")
+
+    def test_one_leg_is_enough_to_be_looked_at(self):
+        r = score(
+            row(title="Software Engineer", description="Build our ComfyUI generative video pipeline.",
+                comp_min=180000, comp_max=220000),
+            rules(), NOW, TIER1,
+        )
+        self.assertNotEqual(r["pile"], "logged")
+
+    def test_a_tiered_title_alone_is_enough(self):
+        r = score(row(title="Creative Technologist", description="", comp_min=180000, comp_max=220000), rules(), NOW, TIER1)
+        self.assertNotEqual(r["pile"], "logged")
+
+    def test_the_floor_never_rescues_a_gate_failure(self):
+        r = score(row(title="Creative Technologist", location="Remote - LATAM"), rules(), NOW, TIER1)
+        self.assertEqual(r["pile"], "logged")
+        self.assertIn("outside the US", r["drop_reason"])

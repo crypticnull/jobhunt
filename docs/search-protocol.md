@@ -180,6 +180,7 @@ Drop, with reason logged. Distinct from gates because they're about the work, no
 - **Apply**: score ≥ 70. Goes to the cover letter generator with the listing record, the tier and the proof-point lead for that tier (see `proof-points.json` when it exists, until then tier 1 leads with the ComfyUI pipeline, tier 2 with AE Llama, tier 3 with the tooling record, tier 4 with franchise ownership).
 - **Review**: 50–69, plus anything with a flag regardless of score. Matt skims on Mondays.
 - **Logged**: under 50, and every gate fail and disqualifier, with a reason string.
+- **Relevance floor**, added 2026-09-05. A posting with no title tier and no intersection leg is logged whatever it scores. Remote 22 plus comp 20 plus a tier 1 company plus freshness is 57, over the review threshold, on a posting about nothing Matt does, which is how a Backend Engineer at a good company was reaching the review pile. With a cap of 40 a week that is how the pile fills with work he would never take. Comp and company prestige can carry a posting, but only after it is about something.
 
 Cap the apply pile at 12 per week. If more than 12 clear 70, sort by tier then score and push the rest to review. Matt sends 5 to 8 a week, all custom, the cap keeps the generator from producing letters nobody reads.
 
@@ -217,7 +218,7 @@ Every listing that passes the gates is written with this shape. The generator re
 
 ## Weekly digest
 
-Every Monday morning, one file or message with: count of new listings by source, apply pile sorted by tier then score, review pile with flag reasons, counts of drops by reason. The drop-reason counts are what get the rules tuned. That digest folds into the Monday report Matt already gets.
+Every Monday morning, one file or message with: count of new listings by source, apply pile sorted by tier then score, review pile with flag reasons, counts of drops by reason, and, added 2026-09-05, an "Earning their poll" section naming any company that has been polled fifteen or more postings and cleared none of them. That section reports and never acts: a company that should be posting design roles and is not may be a title filter miss rather than a dead company, so it prints the names and the prune command and stops. Shortening the target list is Matt's call, not a scheduled job's. The drop-reason counts are what get the rules tuned. That digest folds into the Monday report Matt already gets.
 
 ## Tuning schedule
 
