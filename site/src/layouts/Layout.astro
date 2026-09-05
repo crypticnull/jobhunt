@@ -108,7 +108,48 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     --gutter: clamp(1rem, 4vw, 3rem);
     --grid-gap: 1.5rem;
     --measure: 66ch;
+
+    /* ---- Motion ----------------------------------------------------------
+       The work is the motion and the interface stays still. Every movement
+       the site makes is named here, and a component only ever writes a
+       token, never a number. Two columns: the value, and what it becomes
+       under reduced motion, which is a decision per movement rather than a
+       switch that zeroes everything.
+
+         token      default   reduced   used by
+         --t-quick  120ms     120ms     row hover tint. A colour change is not movement.
+         --t-fade   160ms     160ms     opacity fades, preview in, plate crossfade. Opacity is not movement,
+                                        and a hard cut between stills is worse for vestibular readers.
+         --t-slide  200ms     0ms       the chapter rail mark. Position change becomes a cut, same end state.
+         --t-blink  1000ms    0ms       the record dot while a clip plays. Becomes a steady dot, and a mono
+                                        PLAYING label sits beside it so the blink is never the only signal.
+         --ease-out            linear   anything entering or moving.
+         --ease-in             linear   anything leaving.
+         scroll     smooth    auto      anchor jumps. */
+    --t-quick: 120ms;
+    --t-fade: 160ms;
+    --t-slide: 200ms;
+    --t-blink: 1000ms;
+    --ease-out: cubic-bezier(0.2, 0, 0, 1);
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
     color-scheme: light dark;
+  }
+  /* The reduced column, applied the same three-state way as the theme: the
+     system preference unless the visitor said otherwise, and an explicit
+     data-motion="reduce" on the root for the specimen page and for tests. */
+  @media (prefers-reduced-motion: reduce) {
+    :root:not([data-motion="full"]) {
+      --t-slide: 0ms;
+      --t-blink: 0ms;
+      --ease-out: linear;
+      --ease-in: linear;
+    }
+  }
+  :root[data-motion="reduce"] {
+    --t-slide: 0ms;
+    --t-blink: 0ms;
+    --ease-out: linear;
+    --ease-in: linear;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -393,16 +434,16 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     column-gap: var(--grid-gap);
     padding: 1.1rem 0;
     text-decoration: none;
-    transition: background-color 120ms ease;
+    transition: background-color var(--t-quick) var(--ease-out);
   }
-  .card:hover {
+  a.card:hover {
     background: var(--field);
     color: inherit;
   }
   .card h3 {
     margin: 0 0 0.3em;
   }
-  .card:hover h3 {
+  a.card:hover h3 {
     color: var(--marker);
   }
   .card p {
@@ -572,17 +613,12 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     max-width: 70ch;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
+  /* Scroll is the one movement the tokens cannot carry, so it is the one
+     media query left. The wildcard 0.01ms override that used to live here
+     switched motion off rather than designing its absence; the tokens above
+     carry the reduced column now, per movement. */
   @media (prefers-reduced-motion: no-preference) {
-    html {
+    :root:not([data-motion="reduce"]) {
       scroll-behavior: smooth;
     }
   }

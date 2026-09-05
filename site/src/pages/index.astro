@@ -31,7 +31,7 @@ const builds = proof
   .filter((p) => p.data.linked_projects.length === 0)
   .map((p) => {
     const pipe = pipelineFor.get(p.data.id);
-    const source = p.data.repo ? "public repo" : "closed source";
+    const source = p.data.repo ? "public repo" : "not yet public";
     return {
       id: p.data.id,
       title: p.data.title,
