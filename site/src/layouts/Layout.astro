@@ -2,6 +2,7 @@
 import { Font } from "astro:assets";
 import { site } from "../site.config.mjs";
 import { build } from "../buildstamp.mjs";
+import Preferences from "../components/Preferences.astro";
 
 interface Props {
   title?: string;
@@ -18,6 +19,18 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
+    {/* The one script that runs before paint, and the only inline one on the
+        site: a stored theme or motion choice is stamped on the root here so
+        the first frame is already right. Twelve lines, try/catch wrapped, and
+        a blocked storage API leaves the system setting. ADR-0013. */}
+    <script is:inline>
+      try {
+        var t = localStorage.getItem("theme");
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+        var m = localStorage.getItem("motion");
+        if (m === "reduce") document.documentElement.setAttribute("data-motion", m);
+      } catch (e) {}
+    </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{pageTitle}</title>
     <meta name="description" content={description ?? site.sub} />
@@ -59,6 +72,7 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
         <span aria-hidden="true">·</span>
         <span>{site.location}</span>
       </p>
+      <Preferences />
       <p class="colophon">
         Set in Archivo, Source Serif 4 and IBM Plex Mono, self-hosted. Built static with Astro.
         {build.sha && <> Deployed from <a href={build.href}>{build.sha}</a> on {build.date}.</>}
@@ -170,6 +184,10 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     --field: #171a1d;
     --marker: #ff6157;
     --blueprint: #7aa7cc;
+    color-scheme: dark;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
   }
 
   /* ---- Base --------------------------------------------------------------- */
