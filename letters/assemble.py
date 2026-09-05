@@ -25,6 +25,29 @@ DEFAULT_LEAD = {
     "brand-inhouse": "event-franchises",
 }
 
+# The role decides the claim before the company does. Until 2026-09-05 the
+# claim came from the company's category alone, so Coinbase's product
+# designers got the event key-art letter and PlanetScale's brand designer got
+# the metadata one, and a design engineer at a tier 3 company was handed a
+# Keynote unzipper as proof. These mirror the title tiers in scoring.json.
+ROLE_FAMILIES = (
+    ("design-engineer", r"design engineer|design technologist|ux engineer|creative engineer|design systems? engineer|prototyper"),
+    ("product-designer", r"product designer|interaction designer|product motion|motion system|design systems? designer|motion design engineer"),
+    ("brand-visual", r"brand designer|visual designer|brand design|graphic designer"),
+    ("creative-technologist", r"creative technologist|technical artist|creative developer|motion technologist"),
+    ("motion", r"motion designer|motion graphics|animator|3d artist|3d generalist|art director"),
+)
+LEAD_BY_FAMILY = {"design-engineer": "game-project", "product-designer": "game-project"}
+
+
+def role_family(title):
+    """One of the family names above, or None for a title nobody standardized."""
+    t = re.sub(r"[^a-z0-9 ]+", " ", (title or "").lower())
+    for family, pattern in ROLE_FAMILIES:
+        if re.search(pattern, t):
+            return family
+    return None
+
 
 def _frontmatter(text):
     """The tiny YAML subset our records use: `key: value`, flow lists `[a, b]`."""
@@ -84,6 +107,9 @@ def hedges(posting):
 def choose_lead(company, lead=None, proof_root=PROOF, posting=None):
     if lead:
         return lead
+    family_lead = LEAD_BY_FAMILY.get(role_family((posting or {}).get("title")))
+    if family_lead and (Path(proof_root) / f"{family_lead}.md").exists():
+        return family_lead
     detail = json.loads((posting or {}).get("score_json") or "{}")
     if detail.get("proof_lead") and (Path(proof_root) / f"{detail['proof_lead']}.md").exists():
         return detail["proof_lead"]
@@ -112,7 +138,10 @@ def fill(text, **values):
 def select(posting, company, lead=None, blocks=None, proof_root=PROOF):
     blocks = blocks or load_blocks()
     cat = company.get("category")
-    claim = next(((m, b) for m, b in blocks["claim"] if m.get("for") == cat), None)
+    family = role_family(posting.get("title"))
+    claim = next(((m, b) for m, b in blocks["claim"] if family and family in (m.get("for_roles") or [])), None)
+    if claim is None:
+        claim = next(((m, b) for m, b in blocks["claim"] if m.get("for") == cat and not m.get("for_roles")), None)
     lead_id = choose_lead(company, lead, proof_root, posting)
     proof_meta, proof_body = load_proof(lead_id, proof_root)
     values = {"company": company.get("name", company.get("slug", "")), "role": posting.get("title", "")}
@@ -122,6 +151,7 @@ def select(posting, company, lead=None, blocks=None, proof_root=PROOF):
         "proof": (lead_id, proof_meta, proof_body),
         "remote": (blocks["remote"][0][0], fill(blocks["remote"][0][1], **values)) if blocks["remote"] else None,
         "remote_needed": hedges(posting),
+        "family": family,
         "closes": [(m, fill(b, **values)) for m, b in blocks["close"]],
     }
 

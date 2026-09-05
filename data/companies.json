@@ -211,25 +211,6 @@
       "last_reviewed": "2026-09-05"
     },
     {
-      "slug": "brand-new-school",
-      "name": "Brand New School",
-      "careers_url": "https://www.brand-new-school.com/careers",
-      "ats": {
-        "kind": "greenhouse",
-        "board": "brandnewschool"
-      },
-      "category": "studio-ai",
-      "tier": 2,
-      "size": null,
-      "priority": 2,
-      "lead_proof": null,
-      "remote_notes": "",
-      "added": "2026-09-01",
-      "last_reviewed": "2026-09-01",
-      "pay_model": "unknown",
-      "hq": null
-    },
-    {
       "slug": "brooks-running",
       "name": "Brooks Running",
       "careers_url": "https://www.brooksrunning.com/careers",
@@ -420,25 +401,6 @@
       "hq": null
     },
     {
-      "slug": "corridor-digital",
-      "name": "Corridor Digital",
-      "careers_url": "https://www.corridordigital.com/careers",
-      "ats": {
-        "kind": "ashby",
-        "board": "corridor"
-      },
-      "category": "studio-ai",
-      "tier": 2,
-      "size": null,
-      "priority": 2,
-      "lead_proof": null,
-      "remote_notes": "",
-      "added": "2026-09-01",
-      "last_reviewed": "2026-09-01",
-      "pay_model": "unknown",
-      "hq": null
-    },
-    {
       "slug": "cursor",
       "name": "Cursor",
       "careers_url": "https://anysphere.inc/careers",
@@ -570,25 +532,6 @@
       "remote_notes": "",
       "added": "2026-09-05",
       "last_reviewed": "2026-09-05"
-    },
-    {
-      "slug": "elastic",
-      "name": "Elastic",
-      "careers_url": "https://www.elastic.tv/careers",
-      "ats": {
-        "kind": "greenhouse",
-        "board": "elastic"
-      },
-      "category": "studio-ai",
-      "tier": 2,
-      "size": null,
-      "priority": 2,
-      "lead_proof": null,
-      "remote_notes": "",
-      "added": "2026-09-01",
-      "last_reviewed": "2026-09-01",
-      "pay_model": "unknown",
-      "hq": null
     },
     {
       "slug": "elevenlabs",
@@ -752,25 +695,6 @@
       },
       "category": "product-inhouse",
       "tier": 3,
-      "size": null,
-      "priority": 2,
-      "lead_proof": null,
-      "remote_notes": "",
-      "added": "2026-09-01",
-      "last_reviewed": "2026-09-01",
-      "pay_model": "unknown",
-      "hq": null
-    },
-    {
-      "slug": "framestore",
-      "name": "Framestore",
-      "careers_url": "https://www.framestore.com/careers",
-      "ats": {
-        "kind": "recruitee",
-        "board": "framestore"
-      },
-      "category": "studio-ai",
-      "tier": 2,
       "size": null,
       "priority": 2,
       "lead_proof": null,
@@ -1104,25 +1028,6 @@
       "last_reviewed": "2026-09-05"
     },
     {
-      "slug": "jellyfish-pictures",
-      "name": "Jellyfish Pictures",
-      "careers_url": "https://www.jellyfishpictures.co.uk/careers",
-      "ats": {
-        "kind": "ashby",
-        "board": "jellyfish"
-      },
-      "category": "studio-ai",
-      "tier": 2,
-      "size": null,
-      "priority": 2,
-      "lead_proof": null,
-      "remote_notes": "",
-      "added": "2026-09-01",
-      "last_reviewed": "2026-09-01",
-      "pay_model": "unknown",
-      "hq": null
-    },
-    {
       "slug": "kapwing",
       "name": "Kapwing",
       "careers_url": "https://www.kapwing.com/careers",
@@ -1294,25 +1199,6 @@
       "hq": null
     },
     {
-      "slug": "manvsmachine",
-      "name": "ManvsMachine",
-      "careers_url": "https://mvsm.com/careers",
-      "ats": {
-        "kind": "greenhouse",
-        "board": "manvsmachine"
-      },
-      "category": "studio-ai",
-      "tier": 2,
-      "size": null,
-      "priority": 2,
-      "lead_proof": null,
-      "remote_notes": "",
-      "added": "2026-09-01",
-      "last_reviewed": "2026-09-01",
-      "pay_model": "unknown",
-      "hq": null
-    },
-    {
       "slug": "masterclass",
       "name": "MasterClass",
       "careers_url": "https://www.masterclass.com/careers",
@@ -1322,25 +1208,6 @@
       },
       "category": "brand-inhouse",
       "tier": 4,
-      "size": null,
-      "priority": 2,
-      "lead_proof": null,
-      "remote_notes": "",
-      "added": "2026-09-01",
-      "last_reviewed": "2026-09-01",
-      "pay_model": "unknown",
-      "hq": null
-    },
-    {
-      "slug": "method-studios",
-      "name": "Method Studios",
-      "careers_url": "https://www.method-studios.com/careers",
-      "ats": {
-        "kind": "greenhouse",
-        "board": "method"
-      },
-      "category": "studio-ai",
-      "tier": 2,
       "size": null,
       "priority": 2,
       "lead_proof": null,
@@ -1379,25 +1246,6 @@
       },
       "category": "product-inhouse",
       "tier": 3,
-      "size": null,
-      "priority": 2,
-      "lead_proof": null,
-      "remote_notes": "",
-      "added": "2026-09-01",
-      "last_reviewed": "2026-09-01",
-      "pay_model": "unknown",
-      "hq": null
-    },
-    {
-      "slug": "monks",
-      "name": "Monks",
-      "careers_url": "https://www.monks.com/careers",
-      "ats": {
-        "kind": "greenhouse",
-        "board": "monks"
-      },
-      "category": "studio-ai",
-      "tier": 2,
       "size": null,
       "priority": 2,
       "lead_proof": null,
@@ -1617,25 +1465,6 @@
       "last_reviewed": "2026-09-05"
     },
     {
-      "slug": "parallel-teeth",
-      "name": "Parallel Teeth",
-      "careers_url": "https://www.parallelteeth.com/careers",
-      "ats": {
-        "kind": "greenhouse",
-        "board": "parallel"
-      },
-      "category": "studio-ai",
-      "tier": 2,
-      "size": null,
-      "priority": 2,
-      "lead_proof": null,
-      "remote_notes": "",
-      "added": "2026-09-01",
-      "last_reviewed": "2026-09-01",
-      "pay_model": "unknown",
-      "hq": null
-    },
-    {
       "slug": "path-robotics",
       "name": "Path Robotics",
       "careers_url": "https://www.path.tech/careers",
@@ -1721,25 +1550,6 @@
       },
       "category": "ai-video",
       "tier": 1,
-      "size": null,
-      "priority": 2,
-      "lead_proof": null,
-      "remote_notes": "",
-      "added": "2026-09-01",
-      "last_reviewed": "2026-09-01",
-      "pay_model": "unknown",
-      "hq": null
-    },
-    {
-      "slug": "pixomondo",
-      "name": "Pixomondo",
-      "careers_url": "https://www.pixomondo.com/careers",
-      "ats": {
-        "kind": "workable",
-        "board": "pxo"
-      },
-      "category": "studio-ai",
-      "tier": 2,
       "size": null,
       "priority": 2,
       "lead_proof": null,
@@ -2453,25 +2263,6 @@
       "last_reviewed": "2026-09-05"
     },
     {
-      "slug": "super-fiction",
-      "name": "Super Fiction",
-      "careers_url": "https://www.superfiction.co/careers",
-      "ats": {
-        "kind": "greenhouse",
-        "board": "super"
-      },
-      "category": "studio-ai",
-      "tier": 2,
-      "size": null,
-      "priority": 2,
-      "lead_proof": null,
-      "remote_notes": "",
-      "added": "2026-09-01",
-      "last_reviewed": "2026-09-01",
-      "pay_model": "unknown",
-      "hq": null
-    },
-    {
       "slug": "synthesia",
       "name": "Synthesia",
       "careers_url": "https://www.synthesia.io/careers",
@@ -2519,25 +2310,6 @@
       },
       "category": "ai-video",
       "tier": 1,
-      "size": null,
-      "priority": 2,
-      "lead_proof": null,
-      "remote_notes": "",
-      "added": "2026-09-01",
-      "last_reviewed": "2026-09-01",
-      "pay_model": "unknown",
-      "hq": null
-    },
-    {
-      "slug": "the-mill",
-      "name": "The Mill",
-      "careers_url": "https://www.theMill.com/careers",
-      "ats": {
-        "kind": "greenhouse",
-        "board": "mill"
-      },
-      "category": "studio-ai",
-      "tier": 2,
       "size": null,
       "priority": 2,
       "lead_proof": null,

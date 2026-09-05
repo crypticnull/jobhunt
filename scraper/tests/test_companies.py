@@ -102,3 +102,21 @@ class CheckAndStale(unittest.TestCase):
         companies.add(data, rec("old", reviewed="2026-06-01"))
         companies.add(data, rec("older", reviewed="2026-01-01"))
         self.assertEqual(companies.stale(data, 60, today="2026-09-01"), [("older", 243), ("old", 92)])
+
+
+class TheSecondPrinciple(unittest.TestCase):
+    """No longform animation, stated 2026-09-05. Twelve VFX and commercial
+    animation studios sat on the public list at tier 2 from the first poll,
+    four days before the principle was stated, and two of their guessed board
+    slugs had landed on other companies entirely. They were removed the day
+    the review found them, and this keeps them off."""
+
+    def test_the_public_list_carries_no_studio_records(self):
+        import json
+        from pathlib import Path
+        data = json.loads((Path(__file__).resolve().parents[2] / "data" / "companies.json").read_text(encoding="utf-8"))
+        studios = [c["slug"] for c in data["companies"] if c.get("category") == "studio-ai"]
+        self.assertEqual(studios, [], "studio-ai records are the work the second principle rejects")
+        banned = {"framestore", "the-mill", "method-studios", "pixomondo", "monks", "jellyfish-pictures", "manvsmachine",
+                  "brand-new-school", "corridor-digital", "parallel-teeth", "super-fiction"}
+        self.assertEqual(banned & {c["slug"] for c in data["companies"]}, set())

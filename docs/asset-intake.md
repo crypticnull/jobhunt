@@ -150,7 +150,7 @@ You asked what you were blanking on. These have come up and none has a record:
 | --- | --- | --- | --- |
 | Power Camp | `power-camp-<year>` | ? | POWER event |
 | HQ Soiree | `hq-soiree-2025` | 2025 | POWER event |
-| HVHZ door presentation assets | `hvhz-doors-<year>` | ? | full 3D set modelled, lit, rendered and delivered inside one day. That turnaround is the story |
+| HVHZ door presentation assets | `hvhz-doors-<year>` | ? | full 3D presentation set. The turnaround is not the story, Matt struck that callout on 2026-09-04 |
 | Bill of Rights | `bill-of-rights-2024` | 2024 | appears as an example in `docs/naming.md`, so confirm whether it is real work or a placeholder |
 | Voidfall Survivors | `game-2026` | 2026 | personal. Has a proof record, no project record. Needs title screen, sprite sheets, the eight-angle sets |
 | Ford, LinkedIn, Oportun explainers | `guidespark-<client>-2019` | 2019 | GuideSpark era |

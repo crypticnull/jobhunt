@@ -2,9 +2,9 @@
 
 ![ci](https://github.com/crypticnull/jobhunt/actions/workflows/ci.yml/badge.svg)
 
-A senior motion designer who ships software is going to market as exactly
-that, and this repo is both the toolkit for the search and a public record
-of how he works. Three things share one data spine: a portfolio site, a
+A designer who builds the motion inside products and the software that
+ships it is going to market as exactly that, and this repo is both the
+toolkit for the search and a public record of how he works. Three things share one data spine: a portfolio site, a
 poller against public ATS endpoints, and a cover letter generator with a
 voice lint that refuses anything that reads as machine-written. Everything
 runs locally on standard-library Python plus one pinned Astro site, and the

@@ -73,3 +73,44 @@ class Brief(unittest.TestCase):
         p, c = posting(), company()
         md = assemble.render_brief(p, c, assemble.select(p, c), load_rules())
         self.assertIn("skip it, the posting is clearly remote", md)
+
+
+class TheRoleChoosesTheClaim(unittest.TestCase):
+    """Until 2026-09-05 the claim came from the company category alone, so a
+    Staff Product Designer at a brand-inhouse company got the event key-art
+    letter and a Brand Designer at a product company got the metadata one."""
+
+    def test_a_product_designer_at_a_brand_company_gets_the_product_motion_claim(self):
+        chosen = assemble.select(posting(title="Staff Product Designer"), company(category="brand-inhouse"))
+        self.assertEqual(chosen["claim"][0]["id"], "claim-product-motion")
+        self.assertEqual(chosen["family"], "product-designer")
+        self.assertEqual(chosen["proof"][0], "game-project", "the game is the design engineer proof, not the Keynote unzipper")
+
+    def test_a_design_engineer_at_a_product_company_too(self):
+        chosen = assemble.select(posting(title="Senior Design Engineer"), company(category="product-inhouse"))
+        self.assertEqual(chosen["claim"][0]["id"], "claim-product-motion")
+        self.assertEqual(chosen["proof"][0], "game-project")
+
+    def test_a_brand_designer_gets_the_product_motion_claim_wherever_the_company_sits(self):
+        chosen = assemble.select(posting(title="Brand Designer"), company(category="product-inhouse"))
+        self.assertEqual(chosen["claim"][0]["id"], "claim-product-motion")
+
+    def test_an_unfamiliar_title_still_falls_back_to_the_category(self):
+        chosen = assemble.select(posting(title="Head of Product Creative"), company(category="brand-inhouse"))
+        self.assertEqual(chosen["claim"][0]["for"], "brand-inhouse")
+        self.assertIsNone(chosen["family"])
+
+    def test_no_block_or_story_carries_the_struck_bullets(self):
+        import re
+        from pathlib import Path
+        root = Path(__file__).resolve().parents[2]
+        texts = [p.read_text(encoding="utf-8") for p in list((root / "letters" / "blocks").rglob("*.md")) + list((root / "data" / "proof").glob("*.md"))]
+        for t in texts:
+            self.assertIsNone(re.search(r"58 tasks|sixteen weeks|inside a single day|inside one day|RTX 5090 machine", t), t[:80])
+
+    def test_no_claim_or_opening_files_him_as_a_motion_designer_first(self):
+        import re
+        b = assemble.load_blocks()
+        for meta, body in b["claim"] + b["opening"]:
+            first = body.strip().split(".")[0].lower()
+            self.assertIsNone(re.search(r"\bi'?m an? [a-z ]*motion designer", first), meta["id"])
