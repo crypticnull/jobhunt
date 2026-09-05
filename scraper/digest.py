@@ -7,6 +7,7 @@ banner, so the gates can be checked against what they throw away."""
 
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
@@ -155,10 +156,14 @@ def source_health(store, since, status_log=None, now=None):
     for r in store.poll_errors_since(since):
         key = (r["source"], r["company_slug"], r["error"])
         counted.setdefault(key, []).append(r["ran_at"][:10])
+    dead = store.never_answered(since)
     problems = []
     for (source, slug, error), days in counted.items():
         when = f"{len(days)} polls, last {days[0]}" if len(days) > 1 else days[0]
-        problems.append(f"{source}/{slug}: {error} ({when})")
+        line = f"{source}/{slug}: {error} ({when})"
+        if len(days) > 1 and (source, slug) in dead:
+            line += ". It has not answered once this week, so it is on the list without being polled. Check the slug or drop it."
+        problems.append(line)
     problems += [f"{source}/{slug}: zero postings on the last two polls" for slug, source in store.zero_twice_running()]
     problems += _status_lines(status_log or STATUS_LOG, now or datetime.now(timezone.utc))
     return problems
@@ -182,6 +187,23 @@ def _staleness(now, beat, days=2):
     return None
 
 
+def code_stamp(root=None):
+    """The commit this digest was built from. A digest printed from a checkout
+    that never pulled reads exactly like a current one, and once the text is
+    pasted somewhere there is nothing left to tell them apart. So the page
+    carries the tree it came from, the way the site masthead does. Degrades to
+    None rather than printing something untrue."""
+    root = str(root or Path(__file__).resolve().parent.parent)
+    try:
+        out = subprocess.run(
+            ["git", "log", "-1", "--format=%h, committed %cs"],
+            cwd=root, capture_output=True, text=True, timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return out.stdout.strip() if out.returncode == 0 and out.stdout.strip() else None
+
+
 def build(store, rules, companies=None, now=None, since=None, heartbeat=None):
     """Returns (markdown, surfaced_ids). `companies` is {slug: record}."""
     now = now or datetime.now(timezone.utc)
@@ -191,6 +213,7 @@ def build(store, rules, companies=None, now=None, since=None, heartbeat=None):
     drops = store.drop_counts(since)
     stats = store.stats()
     collect_until = rules["tuning"].get("collect_only_until")
+    stamp = code_stamp()
     out = [f"# Digest, week {_week(now)}", ""]
     stale = _staleness(now, last_run(heartbeat) if heartbeat else None)
     if stale:
@@ -205,7 +228,8 @@ def build(store, rules, companies=None, now=None, since=None, heartbeat=None):
     out += [
         f"{stats['open']} open postings. This week: {sum(by_source.values())} new, {len(piles['apply'])} to apply"
         + (f" (+{len(piles['overflow'])} over the weekly cap of {rules['piles']['apply_weekly_cap']}, pushed to review)" if piles["overflow"] else "")
-        + f", {len(piles['review']) + len(piles['overflow'])} to review, {sum(drops.values())} logged. Ruleset {rules['version']}.",
+        + f", {len(piles['review']) + len(piles['overflow'])} to review, {sum(drops.values())} logged. Ruleset {rules['version']}."
+        + (f" Built from {stamp}." if stamp else ""),
         "",
         "## New listings by source",
         "",

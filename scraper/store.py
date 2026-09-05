@@ -221,6 +221,17 @@ class Store:
         ).fetchall()
         return [dict(r) for r in rows]
 
+    def never_answered(self, since):
+        """{(source, company_slug)} that only ever errored in the window. A
+        board that fails some polls is drifting, but one that fails every poll
+        is a company sitting on the list without being polled at all, which
+        looks the same as a company with nothing open."""
+        rows = self.db.execute(
+            "SELECT source, company_slug, SUM(ok) AS ok, COUNT(*) AS n "
+            "FROM poll_log WHERE ran_at >= ? GROUP BY source, company_slug", (since,)
+        ).fetchall()
+        return {(r["source"], r["company_slug"]) for r in rows if (r["ok"] or 0) == 0}
+
     def zero_twice_running(self):
         """(company_slug, source) pairs whose last two successful polls saw nothing."""
         rows = self.db.execute("SELECT company_slug, source, postings_seen FROM poll_log WHERE ok = 1 ORDER BY id DESC").fetchall()

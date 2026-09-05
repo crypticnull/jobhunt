@@ -154,6 +154,20 @@ class Digest(unittest.TestCase):
             md, _ = digest.build(self.s, self.r, COMPANIES, NOW, heartbeat=Path(d) / "missing.json")
             self.assertIn("no record of ever running", md)
 
+    def test_the_digest_says_which_commit_built_it(self):
+        """A digest run from a checkout that never pulled reads exactly like a
+        current one. The stamp is the only thing that tells them apart after
+        the text is pasted somewhere."""
+        md, _ = digest.build(self.s, self.r, COMPANIES, NOW)
+        stamp = digest.code_stamp()
+        self.assertIsNotNone(stamp, "the repo is a git checkout, so the stamp should resolve")
+        self.assertIn(f"Built from {stamp}.", md)
+        self.assertIn(", committed 20", stamp)
+
+    def test_the_stamp_degrades_rather_than_printing_something_untrue(self):
+        with tempfile.TemporaryDirectory() as d:
+            self.assertIsNone(digest.code_stamp(d))
+
     def test_source_health_footer(self):
         self.s.log_poll("2026-09-05T02:30:00+00:00", "lever", "brand", False, error="503 down")
         self.s.log_poll("2026-09-04T02:30:00+00:00", "ashby", "quiet", True, 0, 0)
@@ -163,6 +177,25 @@ class Digest(unittest.TestCase):
         self.assertIn("lever/brand: 503 down", md)
         self.assertIn("ashby/quiet: zero postings on the last two polls", md)
         self.assertNotIn("greenhouse/acme", md.split("## Source health")[1])
+
+    def test_a_board_that_never_answers_is_called_what_it_is(self):
+        """Workable has returned 429 for four companies on every poll for a
+        week. Grouped into one line that is easy to read past, which is how a
+        company stays on the list for a month without ever being polled."""
+        for day in ("03", "04", "05"):
+            self.s.log_poll(f"2026-09-{day}T02:30:00+00:00", "workable", "d-id", False, error="429 too many requests")
+        problems = digest.source_health(self.s, SEEN, status_log="/nonexistent")
+        line = next(p for p in problems if p.startswith("workable/d-id"))
+        self.assertIn("3 polls", line)
+        self.assertIn("on the list without being polled", line)
+
+    def test_a_board_that_answers_sometimes_is_only_drifting(self):
+        for day in ("03", "04"):
+            self.s.log_poll(f"2026-09-{day}T02:30:00+00:00", "workable", "redox", False, error="503 down")
+        self.s.log_poll("2026-09-05T02:30:00+00:00", "workable", "redox", True, 12, 2)
+        problems = digest.source_health(self.s, SEEN, status_log="/nonexistent")
+        line = next(p for p in problems if p.startswith("workable/redox"))
+        self.assertNotIn("without being polled", line)
 
     def test_all_sources_answered(self):
         md, _ = digest.build(self.s, self.r, now=NOW)

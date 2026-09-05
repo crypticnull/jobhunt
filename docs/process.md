@@ -46,6 +46,33 @@ job that quietly stopped is visible in the repo rather than only in its
 silence. The digest says so at the top when the last poll is two days old
 or more.
 
+## Any hand run
+
+`run.cmd` is the launcher at the repo root, so a command works from a
+fresh shell with no `cd` and no PYTHONPATH. It reads the same
+`data/local/python.txt` the scheduled tasks read, so a hand run and a
+nightly run can never disagree about which interpreter owns the database.
+
+Only the nightly pulls on a schedule. A digest run by hand at noon
+therefore reads whatever code was here at 04:00, and if the rules moved
+since then the piles are stale and the digest says nothing about it. So
+pull first:
+
+```
+X:\_CLAUDE\26_09_01_Job_Hunt\jobhunt\run.cmd pull
+```
+
+`pull` is the one thing the launcher does on its own rather than handing
+to the scraper. It rebases on main, and if the pull touched
+`data/scoring.json` or anything under `scraper/` it rescores before
+handing the shell back, so the next digest reads the piles the new rules
+produce. It refuses if the checkout is on some other branch.
+
+Every digest carries the commit it was built from in its opening line,
+next to the ruleset version. That is what makes a digest pasted into a
+chat traceable to a tree, and it is the fastest way to catch a checkout
+that has been sitting still.
+
 ## Sunday, unattended
 
 `scripts/weekly.cmd` at 07:00: pull main, then `python -m scraper
