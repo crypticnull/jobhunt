@@ -74,7 +74,9 @@ def _entry(row, companies):
     tier = company.get("tier")
     lines = [
         f"### {row['title']}, {name}" + (f" (tier {tier})" if tier else ""),
-        f"{row['remote_class']} · {_comp(row)} · first seen {row['first_seen'][:10]} · score {round(row['score'])}"
+        f"{row['remote_class']} · {_comp(row)}"
+        + (f" · {company['hq']}" if company.get("hq") else "")
+        + f" · first seen {row['first_seen'][:10]} · score {round(row['score'])}"
         + (f" · legs {', '.join(detail.get('legs_hit') or [])}" if detail.get("legs_hit") else ""),
         "Score: " + ", ".join(parts),
     ]

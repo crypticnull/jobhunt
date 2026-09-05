@@ -299,13 +299,17 @@ def discover(known=(), rules=None, get_json=None, get_text=None, sources=SOURCES
     return found
 
 
-def grow(store, data, rules=None, get_json=None, get_text=None, today=None, now=None, board_cap=15, posting_cap=30, errors=None):
+def grow(store, data, rules=None, get_json=None, get_text=None, today=None, now=None, board_cap=None, posting_cap=None, errors=None):
     """Add what discovery found to the list and the store. A posting that gives
     away a board adds the company as pollable; the poll picks up its whole
     board the same night. A posting with no board adds a hand-check company
     and the posting itself, scored like any other. Caps keep one wild night
     from doubling the list. Returns {companies: [records], postings: [ids]}."""
     rules = rules or load_rules()
+    # The caps live in the ruleset so they can be tuned without a code change.
+    # An explicit argument still wins, which is what the tests use.
+    board_cap = board_cap if board_cap is not None else rules["discovery"].get("board_cap", 15)
+    posting_cap = posting_cap if posting_cap is not None else rules["discovery"].get("posting_cap", 30)
     now = now or datetime.now(timezone.utc)
     today = today or now.date().isoformat()
     seen = []

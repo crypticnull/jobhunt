@@ -1,0 +1,97 @@
+# Western US, weighted to companies nobody would put on a top-100 list.
+#
+# Two reasons this list exists. Matt moves to Washington or Oregon in June
+# 2027, so a company already in the west is worth knowing about early. And the
+# top 100 is a lagging indicator: every company on it was small once, and the
+# roles worth having are often the ones posted before a company is famous.
+#
+# The remote gate has not moved. Everything here still has to post a genuinely
+# remote US role to reach the apply pile, and a good number of these studios
+# will not. They are seeded anyway because they cost nothing to poll, because
+# some of them do hire remote, and because if the gate is ever opened for
+# Washington and Oregon they are already on the list.
+#
+# category | careers url | name | City, ST
+
+# --- Pacific Northwest studios. The closest thing in the country to Matt's own
+# --- discipline, and all within a day's drive of where he is moving.
+studio-ai | https://www.laika.com/careers | Laika | Hillsboro, OR
+studio-ai | https://housespecial.com/careers | House Special | Portland, OR
+studio-ai | https://hingedigital.com/careers | Hinge Digital | Portland, OR
+studio-ai | https://bentimagelab.com/careers | Bent Image Lab | Portland, OR
+studio-ai | https://www.instrument.com/careers | Instrument | Portland, OR
+studio-ai | https://www.wk.com/careers | Wieden Kennedy | Portland, OR
+studio-ai | https://thesisagency.com/careers | Thesis | Portland, OR
+studio-ai | https://www.sockeye.com/careers | Sockeye | Portland, OR
+
+# --- Los Angeles motion and title design. Not the west Matt is moving to, but
+# --- this is where the discipline concentrates and several hire remote.
+studio-ai | https://buck.co/careers | Buck | Los Angeles, CA
+studio-ai | https://www.gentlemanscholar.com/careers | Gentleman Scholar | Los Angeles, CA
+studio-ai | https://www.imaginaryforces.com/careers | Imaginary Forces | Los Angeles, CA
+studio-ai | https://prologue.com/careers | Prologue | Venice, CA
+studio-ai | https://territorystudio.com/careers | Territory Studio | Los Angeles, CA
+studio-ai | https://www.digitaldomain.com/careers | Digital Domain | Playa Vista, CA
+
+# --- Experiential and immersive, where creative technologist is the actual
+# --- job title rather than a market-facing one.
+studio-ai | https://meowwolf.com/careers | Meow Wolf | Santa Fe, NM
+
+# --- Pacific Northwest games and consumer tech
+product-inhouse | https://www.bungie.net/careers | Bungie | Bellevue, WA
+product-inhouse | https://arena.net/en/careers | ArenaNet | Bellevue, WA
+product-inhouse | https://company.wizards.com/careers | Wizards of the Coast | Renton, WA
+product-inhouse | https://glowforge.com/careers | Glowforge | Seattle, WA
+product-inhouse | https://amperity.com/careers | Amperity | Seattle, WA
+product-inhouse | https://www.highspot.com/careers | Highspot | Seattle, WA
+product-inhouse | https://www.outreach.io/careers | Outreach | Seattle, WA
+product-inhouse | https://www.remitly.com/careers | Remitly | Seattle, WA
+product-inhouse | https://www.rover.com/careers | Rover | Seattle, WA
+product-inhouse | https://www.statsig.com/careers | Statsig | Seattle, WA
+product-inhouse | https://www.read.ai/careers | Read AI | Seattle, WA
+product-inhouse | https://www.truveta.com/careers | Truveta | Seattle, WA
+
+# --- Mountain west. Smaller cities, lower cost of living, and several of these
+# --- pay the same wherever you sit.
+product-inhouse | https://lucid.co/careers | Lucid Software | South Jordan, UT
+product-inhouse | https://www.domo.com/careers | Domo | American Fork, UT
+product-inhouse | https://www.podium.com/careers | Podium | Lehi, UT
+product-inhouse | https://www.getweave.com/careers | Weave | Lehi, UT
+product-inhouse | https://www.recursion.com/careers | Recursion | Salt Lake City, UT
+product-inhouse | https://clearwateranalytics.com/careers | Clearwater Analytics | Boise, ID
+product-inhouse | https://www.submittable.com/careers | Submittable | Missoula, MT
+product-inhouse | https://www.onxmaps.com/careers | onX Maps | Missoula, MT
+product-inhouse | https://www.guildeducation.com/careers | Guild | Denver, CO
+product-inhouse | https://ibotta.com/careers | Ibotta | Denver, CO
+product-inhouse | https://boomsupersonic.com/careers | Boom Supersonic | Denver, CO
+product-inhouse | https://sphero.com/careers | Sphero | Boulder, CO
+product-inhouse | https://www.axon.com/careers | Axon | Scottsdale, AZ
+product-inhouse | https://trainual.com/careers | Trainual | Scottsdale, AZ
+
+# --- California outside the San Francisco bubble
+product-inhouse | https://www.sonos.com/careers | Sonos | Santa Barbara, CA
+product-inhouse | https://www.procore.com/careers | Procore | Carpinteria, CA
+product-inhouse | https://www.appfolio.com/careers | AppFolio | Santa Barbara, CA
+product-inhouse | https://www.servicetitan.com/careers | ServiceTitan | Glendale, CA
+product-inhouse | https://www.scopely.com/careers | Scopely | Culver City, CA
+product-inhouse | https://www.braincorp.com/careers | Brain Corp | San Diego, CA
+product-inhouse | https://tealium.com/careers | Tealium | San Diego, CA
+
+# --- Western brands that run real in-house creative teams. Event and brand
+# --- work is what Matt has been doing, so these are the closest analogue to
+# --- his current job at a company he would rather work for.
+brand-inhouse | https://jobs.nike.com | Nike | Beaverton, OR
+brand-inhouse | https://www.columbia.com/careers | Columbia Sportswear | Portland, OR
+brand-inhouse | https://www.keenfootwear.com/careers | Keen | Portland, OR
+brand-inhouse | https://www.dutchbros.com/careers | Dutch Bros | Grants Pass, OR
+brand-inhouse | https://www.rei.com/jobs | REI | Seattle, WA
+brand-inhouse | https://www.brooksrunning.com/careers | Brooks Running | Seattle, WA
+brand-inhouse | https://www.filson.com/careers | Filson | Seattle, WA
+brand-inhouse | https://www.ruffwear.com/careers | Ruffwear | Bend, OR
+brand-inhouse | https://www.hydroflask.com/careers | Hydro Flask | Bend, OR
+brand-inhouse | https://www.cotopaxi.com/careers | Cotopaxi | Salt Lake City, UT
+brand-inhouse | https://www.traeger.com/careers | Traeger | Salt Lake City, UT
+brand-inhouse | https://blackdiamondequipment.com/careers | Black Diamond | Salt Lake City, UT
+brand-inhouse | https://www.crocs.com/careers | Crocs | Broomfield, CO
+brand-inhouse | https://www.otterbox.com/careers | Otter Products | Fort Collins, CO
+brand-inhouse | https://www.bigagnes.com/careers | Big Agnes | Steamboat Springs, CO

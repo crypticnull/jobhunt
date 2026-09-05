@@ -59,9 +59,11 @@ def parse_import_lines(text):
         if not line or line.startswith("#"):
             continue
         parts = [x.strip() for x in line.split("|")]
-        if len(parts) != 3 or parts[0] not in companies.CATEGORIES or not parts[1].startswith("http"):
-            raise ValueError(f"line {n}: expected `category | careers url | name` with a category from {', '.join(companies.CATEGORIES)}, got {raw!r}")
-        out.append(tuple(parts))
+        if len(parts) not in (3, 4) or parts[0] not in companies.CATEGORIES or not parts[1].startswith("http"):
+            raise ValueError(f"line {n}: expected `category | careers url | name` with an optional ` | City, ST`, and a category from {', '.join(companies.CATEGORIES)}, got {raw!r}")
+        category, url, name = parts[:3]
+        hq = parts[3] if len(parts) == 4 and parts[3] else None
+        out.append((category, url, name, hq))
     return out
 
 
@@ -88,7 +90,7 @@ def cmd_import(args):
     data = companies.load(args.companies)
     known = {c["slug"] for c in data["companies"]}
     added, skipped, guessed, missed = 0, 0, 0, []
-    for category, url, name in rows:
+    for category, url, name, hq in rows:
         slug = companies.slugify(name)
         if slug in known:
             skipped += 1
@@ -104,7 +106,7 @@ def cmd_import(args):
             print(f"unknown   {name}: no board found behind {url}, and the name is not a board slug either")
             continue
         kind, board, count = hit or ("manual", None, None)
-        rec = companies.record(slug, name, kind, board, category, args.priority, url)
+        rec = companies.record(slug, name, kind, board, category, args.priority, url, hq=hq)
         companies.add(data, rec)
         known.add(slug)
         added += 1

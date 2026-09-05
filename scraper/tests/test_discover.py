@@ -202,3 +202,20 @@ class Grow(unittest.TestCase):
         self.assertEqual(kinds.count("manual"), 1)
         self.assertEqual(len([k for k in kinds if k != "manual"]), 1)
         self.assertEqual(len(out["postings"]), 1)
+
+
+class Caps(unittest.TestCase):
+    """The caps were function defaults written when the list was ten long. They
+    are config now, because the point of discovery is finding companies before
+    they are famous and that needs room."""
+
+    def test_the_ruleset_supplies_the_caps(self):
+        r = load_rules(RULES_PATH, local="/nonexistent")
+        self.assertEqual(r["discovery"]["board_cap"], 40)
+        self.assertEqual(r["discovery"]["posting_cap"], 80)
+
+    def test_an_explicit_argument_still_wins(self):
+        import inspect
+        sig = inspect.signature(discover.grow)
+        self.assertIsNone(sig.parameters["board_cap"].default)
+        self.assertIsNone(sig.parameters["posting_cap"].default)

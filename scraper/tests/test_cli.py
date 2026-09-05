@@ -120,4 +120,37 @@ class SeedFiles(unittest.TestCase):
         root = Path(__file__).resolve().parents[2]
         rows = main_mod.parse_import_lines((root / "data" / "seeds" / "2026-09-05-narrowing.txt").read_text(encoding="utf-8"))
         self.assertGreater(len(rows), 10)
-        self.assertTrue(all(u.startswith("http") for _, u, _ in rows))
+        self.assertTrue(all(u.startswith("http") for _, u, _, _ in rows))
+
+
+class SeedHeadquarters(unittest.TestCase):
+    """A seed line may carry a fourth field, `City, ST`. Matt moves to
+    Washington or Oregon in June 2027, so where a company sits is worth
+    recording even while the search is remote-only."""
+
+    def test_three_fields_still_parse_with_no_headquarters(self):
+        rows = main_mod.parse_import_lines("ai-video | https://x.com/careers | X")
+        self.assertEqual(rows, [("ai-video", "https://x.com/careers", "X", None)])
+
+    def test_a_fourth_field_is_the_headquarters(self):
+        rows = main_mod.parse_import_lines("studio-ai | https://laika.com/careers | Laika | Hillsboro, OR")
+        self.assertEqual(rows[0][3], "Hillsboro, OR")
+
+    def test_an_empty_fourth_field_reads_as_unknown(self):
+        rows = main_mod.parse_import_lines("ai-video | https://x.com/careers | X |")
+        self.assertIsNone(rows[0][3])
+
+    def test_five_fields_are_refused(self):
+        with self.assertRaises(ValueError):
+            main_mod.parse_import_lines("ai-video | https://x.com/careers | X | Bend, OR | extra")
+
+    def test_the_western_seed_file_parses_and_every_row_states_a_location(self):
+        root = Path(__file__).resolve().parents[2]
+        rows = main_mod.parse_import_lines((root / "data" / "seeds" / "2026-09-05-western.txt").read_text(encoding="utf-8"))
+        self.assertGreater(len(rows), 50)
+        self.assertTrue(all(hq and ", " in hq for *_, hq in rows), "every western seed states City, ST")
+
+    def test_a_record_carries_the_headquarters_through(self):
+        r = companies.record("laika", "Laika", "greenhouse", "laika", "studio-ai", hq="Hillsboro, OR")
+        self.assertEqual(r["hq"], "Hillsboro, OR")
+        self.assertIsNone(companies.record("x", "X", "greenhouse", "x", "ai-video")["hq"])

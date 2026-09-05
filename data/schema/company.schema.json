@@ -158,6 +158,14 @@
           ],
           "default": "unknown",
           "description": "Whether pay is the same wherever you live. Location-adjusted pay is what decides whether the Pacific Northwest move costs money, so it belongs on the record rather than in a memo, and the digest prints it so it gets asked on the first call instead of discovered at offer stage."
+        },
+        "hq": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "description": "Headquarters as 'City, ST'. Null where it is not known. Matt is moving to Washington or Oregon in June 2027, so a company already in the west is worth knowing about even while the search is remote-only, and the digest prints it."
         }
       }
     }

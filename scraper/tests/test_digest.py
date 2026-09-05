@@ -199,3 +199,27 @@ class PayModel(unittest.TestCase):
         md = self.md("same-everywhere")
         self.assertNotIn("Pay model unknown", md)
         self.assertNotIn("location-adjusted", md)
+
+
+class Headquarters(unittest.TestCase):
+    def setUp(self):
+        self.s = Store(":memory:")
+        self.r = rules()
+        p = posting(source="greenhouse", source_id="1", company_slug="acme", url="https://x/1",
+                    remote="remote", location="Remote - US", title="Senior Creative Technologist",
+                    description="pipeline comfyui python", comp_min=140000, comp_max=165000)
+        self.pid, _ = self.s.upsert(p, SEEN)
+
+    def md(self, **extra):
+        c = {"slug": "acme", "name": "Acme", "tier": 1, **extra}
+        self.s.set_score(self.pid, score(self.s.get(self.pid), self.r, NOW, c))
+        md, _ = digest.build(self.s, self.r, {"acme": c}, NOW)
+        return md
+
+    def test_a_known_location_is_printed(self):
+        self.assertIn("Hillsboro, OR", self.md(hq="Hillsboro, OR"))
+
+    def test_an_unknown_location_adds_nothing(self):
+        md = self.md()
+        self.assertIn("Senior Creative Technologist, Acme", md)
+        self.assertNotIn(" ·  · ", md, "a missing location must not leave an empty separator")
