@@ -25,6 +25,7 @@ site:
 
 drift:
 	node tools/check_drift.mjs
+	node tools/check_tokens.mjs
 
 lighthouse: site
 	cd site && npm run lighthouse
