@@ -79,10 +79,19 @@ def cmd_curriculum(args):
     """The study list. Built from postings that cleared into a pile, because
     what a dropped posting wants is not a reason to learn anything."""
     rules = load_rules()
-    with Store(args.db) as store:
-        rows = [r for r in store.open_postings() if r.get("pile") in ("apply", "review")]
+    store = Store(args.db)
+    rows = [r for r in store.open_postings() if r.get("pile") in ("apply", "review")]
+    store.close()
     lines = curriculum.report(rows, rules)
-    print("\n".join(lines) if lines else f"Nothing clears the floor yet, from {len(rows)} postings in a pile.")
+    text = "\n".join(lines) if lines else f"Nothing clears the floor yet, from {len(rows)} postings in a pile."
+    if args.write:
+        out = Path(args.write)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        header = ["# Curriculum", "", "Written by the nightly job. What the postings in a pile ask for and", "data/skills.json does not claim, most-asked first. The same vocabulary", "steers the search, so learning down this list moves the piles.", ""]
+        out.write_text("\n".join(header + lines[1:] if lines else header + [text]) + "\n", encoding="utf-8")
+        print(f"curriculum: {out}")
+    else:
+        print(text)
     return 0
 
 
@@ -365,6 +374,7 @@ def main(argv=None):
 
     cu = sub.add_parser("curriculum", help="what the postings you are looking at ask for and skills.json does not claim")
     cu.add_argument("--db", default=str(DEFAULT_DB))
+    cu.add_argument("--write", default=None, help="write the report to this path instead of printing it")
     cu.set_defaults(fn=cmd_curriculum)
 
     sc = sub.add_parser("score", help="rescore every open posting")

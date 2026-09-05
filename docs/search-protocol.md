@@ -25,7 +25,7 @@ So `scoring.json` carries a `curriculum` block with a vocabulary and a set of `t
 
 Those 5 points came from company tier, halved from 10 to 5, on his own argument that the top 100 is a lagging indicator. Where a company sits on a list he would not have written matters less than whether the job is the one he is training for. The pile thresholds came down 5 with it, apply to 65 and review to 45, so the rebalance changes which postings win rather than how many clear.
 
-Backwards, the same vocabulary counted against `data/skills.json` gives the study list, printed in the digest and available as `python -m scraper curriculum`. A term is a gap when the target postings ask for it and the skills file cannot claim it, and gaps rank by how often the market asks. Learning down that list moves the piles, because it is the same vocabulary on both ends.
+Backwards, the same vocabulary counted against `data/skills.json` gives the study list. The nightly job writes it to `data/curriculum.md` and commits it, so it is versioned and the diff shows what the market started asking for, and it is in the digest and available as `python -m scraper curriculum`. A term is a gap when the target postings ask for it and the skills file cannot claim it, and gaps rank by how often the market asks. Learning down that list moves the piles, because it is the same vocabulary on both ends.
 
 `skills.json` requires evidence on every entry, a project slug, a proof record or the resume. A skill claimed without evidence removes itself from the study list and never gets learned.
 
@@ -201,7 +201,7 @@ Drop, with reason logged. Distinct from gates because they're about the work, no
 - **Logged**: under 50, and every gate fail and disqualifier, with a reason string.
 - **Relevance floor**, added 2026-09-05. A posting with no title tier and no intersection leg is logged whatever it scores. Remote 22 plus comp 20 plus a tier 1 company plus freshness is 57, over the review threshold, on a posting about nothing Matt does, which is how a Backend Engineer at a good company was reaching the review pile. With a cap of 40 a week that is how the pile fills with work he would never take. Comp and company prestige can carry a posting, but only after it is about something.
 
-Cap the apply pile at 12 per week. If more than 12 clear 65, sort by tier then score and push the rest to review. The review cap went from 40 to 100 on 2026-09-05: a genuinely good match should not be held back by an arbitrary number when the digest is where the fine-toothed comb runs. Matt sends 5 to 8 a week, all custom, the cap keeps the generator from producing letters nobody reads.
+Both caps are 100 per week as of 2026-09-05, up from 12 on apply and 40 on review. A genuinely good match should not be held back by an arbitrary number when the digest is where the fine-toothed comb runs. The apply cap still sorts by tier then score, so the order is meaningful even when the number is not binding, and the generator is still only ever run on the letters Matt chooses to send. Matt sends 5 to 8 a week, all custom, the cap keeps the generator from producing letters nobody reads.
 
 ## Output record
 
