@@ -1,7 +1,7 @@
 # Search protocol
 
 ```
-version: 1.1
+version: 2.0
 date: 2026-09-05
 status: final
 owner: Cowork agent
@@ -11,7 +11,7 @@ machine twin: scoring.json (same rules as data, must stay in sync)
 
 ## Purpose
 
-Rules for which job listings are worth Matt's time. The scraper collects, normalizes, gates, scores and sorts. Matt only ever sees the apply pile and the review pile. Everything else is logged with a reason so the rules can be tuned at the Nov 16 checkpoint.
+Rules for which job listings are worth Matt's time. The scraper collects, normalizes, gates, scores and sorts. Matt only ever sees the apply pile and the review pile. Everything else is logged with a reason so the rules can be tuned at the Oct 5 checkpoint.
 
 Two hard gates run first. A listing that fails either gate is dropped regardless of score. Then a 100-point score, deductions for underpaid tells, and a threshold sort into piles.
 
@@ -27,6 +27,10 @@ Those 5 points came from company tier, halved from 10 to 5, on his own argument 
 
 Backwards, the same vocabulary counted against `data/skills.json` gives the study list. The nightly job writes it to `data/curriculum.md` and commits it, so it is versioned and the diff shows what the market started asking for, and it is in the digest and available as `python -m scraper curriculum`. A term is a gap when the target postings ask for it and the skills file cannot claim it, and gaps rank by how often the market asks. Learning down that list moves the piles, because it is the same vocabulary on both ends.
 
+The vocabulary matcher counts plurals as of 2026-09-05, so "design systems" and "micro-interactions", which is how product postings write them, score. A regex-form term such as the one for llm is claimed by its readable form, and a claimed skill retires any term it matches, so "stable diffusion" retires "diffusion". Bare "canvas" and bare "spline" left the vocabulary because they scored a blank canvas and spline interpolation, and unreal, unity and vfx left the study list because the second principle rejects that work.
+
+Discovery learned the same vocabulary the same day. Its title patterns and require-any terms carried no product-motion or design-engineer vocabulary, so a Design Engineer or Senior Product Designer in an open feed was dropped before it could add a company, and the mechanism ADR-0009 relies on to find companies early was blind to the direction. Design engineer, design systems, interaction design, product design and design technologist are titles now, figma, design system, design tokens, component library, prototyping, lottie, rive, framer motion and gsap are terms, and every engineering-discipline design engineer is excluded by title so a mechanical one with "prototyping" in the body does not ride in.
+
 `skills.json` requires evidence on every entry, a project slug, a proof record or the resume. A skill claimed without evidence removes itself from the study list and never gets learned.
 
 ## The two guiding principles
@@ -41,12 +45,12 @@ Matt Rodenbeck. Market-facing title Creative Technologist. Currently a senior mo
 
 ## Sources, in priority order
 
-1. Careers pages of companies in `targets.csv`, through their ATS. These are the highest-value listings and the ones where unlisted salary is tolerable. Greenhouse, Lever and Ashby all expose public JSON, so poll those directly rather than scraping HTML.
+1. Careers pages of companies in `data/companies.json`, through their ATS. These are the highest-value listings and the ones where unlisted salary is tolerable. Greenhouse, Lever and Ashby all expose public JSON, so poll those directly rather than scraping HTML.
    - Greenhouse: `https://boards-api.greenhouse.io/v1/boards/{board_token}/jobs?content=true`
    - Lever: `https://api.lever.co/v0/postings/{company}?mode=json`
    - Ashby: `https://api.ashbyhq.com/posting-api/job-board/{org}` (public postings, includes compensation when the company enables it)
    - Workday, SmartRecruiters, Rippling and custom boards need per-company handling. Log them as `source_type: manual` until a fetcher exists.
-2. Aggregators with a remote filter: Wellfound, Otta / Welcome to the Jungle, We Work Remotely, Working Nomads, Remotive, Remote OK. LinkedIn only via the public job search pages and only within its terms, never with an authenticated session.
+2. Remote job feeds with a documented API or RSS: Remotive, We Work Remotely, Himalayas, Jobicy, Arbeitnow, RemoteOK, and the month's Hacker News "Who is hiring" thread. These are discovery sources: a posting that names a creative-technical role and links to a board adds that company to the list. LinkedIn, Indeed and any board whose terms forbid it are never read.
 3. Community boards, manual or semi-manual: Motionographer jobs, the ComfyUI Discord jobs channel, the aescripts community, Motion Design Slack groups, Creative Technologist listings on The Dots. These are low volume and high signal, a weekly manual sweep is fine for v1.
 
 Seed lists live in `data/seeds/*.txt` as `category | careers url | name`, with an optional fourth field for the headquarters as `City, ST`. The nightly job runs `scraper import data/seeds` before polling and skips any company already on the list, so a list dropped in that directory is taken in on its own. Added 2026-09-05, when a count of the corpus put the yield at 0.8% and showed the binding constraint was seed coverage rather than filter quality: the scraper can only find what it is pointed at, and it was pointed at 88 companies.
@@ -55,7 +59,7 @@ A second list went in on 2026-09-05, across the western states, weighted to ones
 
 Two more lists went in with it. A remote-first list of companies that are all-remote by construction or known to pay the same wherever you sit, which is the one that serves the first principle directly, and a Midwest list, because he can work from anywhere and the point is coverage rather than a bet on a city.
 
-Discovery's caps went up the same day, from 15 boards and 30 postings a night to 40 and 80, and moved out of the function signature into `scoring.json` so they can be tuned without a code change. The old numbers were written when the list was ten companies long.
+Discovery's caps went up the same day, from 15 boards and 30 postings a night to 40 and 100, and moved out of the function signature into `scoring.json` so they can be tuned without a code change. The old numbers were written when the list was ten companies long.
 
 Company boards first, aggregators second. Aggregators are where most fake-remote and underpaid listings come from, so they get the same gates but a lower prior.
 
@@ -66,10 +70,10 @@ Every listing becomes one record with these fields before any rule runs. Missing
 | field | type | notes |
 |---|---|---|
 | `id` | string | stable hash of `source + external_id` or `source + url` |
-| `source` | string | `greenhouse`, `lever`, `ashby`, `wellfound`, `linkedin`, `manual`, etc |
+| `source` | string | `greenhouse`, `lever`, `ashby`, `workable`, `smartrecruiters`, `recruitee`, `rss`, `manual`, or a discovery feed |
 | `url` | string | canonical listing URL |
-| `company` | string | as posted, then matched against `targets.csv` by normalized name and domain |
-| `company_tier` | 1–4 or `null` | from `targets.csv`; `null` if unknown |
+| `company` | string | as posted, then matched against `data/companies.json` by slug |
+| `company_tier` | 1–4 or `null` | from `data/companies.json`; `null` if unknown |
 | `company_size` | int or `null` | headcount if the source or targets file has it |
 | `title` | string | as posted |
 | `title_norm` | string | lowercased, punctuation stripped, seniority words kept |
@@ -131,10 +135,10 @@ Where an ATS publishes one range per office, which is how location-adjusted pay 
 **Fail**
 - `salary_max` < 110,000.
 - Hourly under $85 for contract or freelance, annualized. The floor is firm, so a contract posting that lists an annual figure is held to the same number.
-- Salary not posted, company not in `targets.csv`, and size unknown or under 200. Most states with remote-hiring companies require posted ranges now, so a remote-US listing with no range is itself a signal.
+- Salary not posted, company not on `data/companies.json` with a tier, and size unknown or under 200. Most states with remote-hiring companies require posted ranges now, so a remote-US listing with no range is itself a signal.
 - Any unpaid test project, take-home or "design exercise" described as longer than two hours, or any spec work.
 
-Log every gate-2 fail with its reason. The Nov 16 checkpoint reviews the `unlisted_salary_unknown_company` bucket specifically, because that's the rule most likely to be throwing away good listings.
+Log every gate-2 fail with its reason. The Oct 5 checkpoint reviews the `unlisted_salary_unknown_company` bucket specifically, because that's the rule most likely to be throwing away good listings.
 
 ## Underpaid tells
 
@@ -143,7 +147,7 @@ Each match subtracts 3 from the final score. Cap the total deduction at 15. The 
 - "content creator", "social media videos", "short-form content", "10+ videos a week", or any per-week output quota: volume shop.
 - "wear many hats", "fast-paced environment", "scrappy", "startup mentality" without a posted band: underpaid by design.
 - "rockstar", "ninja", "guru", "wizard": tells you who wrote the listing.
-- "junior", "mid-level", "associate", "coordinator" in the title: wrong level.
+- "junior", "jr", "mid-level", "associate", "coordinator", "intern" at the start of the title: wrong level. Revised 2026-09-05 so that Associate Creative Director, Associate Design Director, International Brand Designer and Internal Tools Designer stop being dropped by their first letters.
 - "unlimited PTO" or "competitive salary" standing in where a number should be.
 - Agency vocabulary: "account", "client deliverables", "billable", "utilization".
 - "AI video editor", "AI content", "generate content at scale": churn framing, the opposite of the intersection.
@@ -165,10 +169,11 @@ Drop, with reason logged. Distinct from gates because they're about the work, no
 - Travel over 10%.
 - Contract-to-hire with a conversion salary below the floor, or no conversion salary stated.
 - Postings older than 30 days with no repost. `posted_at` older than 30 days and `last_seen` more than 7 days ago.
-- Roles whose primary requirement is a discipline he doesn't have and can't credibly bridge: pure UX/UI product design, pure brand strategy, pure ML research, pure sound design.
+- Roles whose primary requirement is a discipline he doesn't have and can't credibly bridge: pure UX/UI product design, pure brand strategy, pure ML research, pure sound design. Research scientist, ML researcher and machine learning engineer are title patterns as of 2026-09-05, not body phrases, because every Design Engineer posting at an AI company says it works alongside one.
+- Film-pipeline titles, added 2026-09-05: fx, vfx, cfx, lighting, rigging, creature, groom, previs, look dev, environment and texture artists, TDs, supervisors and leads, CG supervisor, stop motion. Senior Animator and Creature FX Technical Director at a commercials shop were reaching apply.
 
 **Flag, don't drop**
-- Unreal or Unity as the primary tool. Technical Artist listings often want a game engine. The eye and the pipeline thinking transfer, the engine doesn't, but it's worth Matt's call.
+- Unreal or Unity as the primary tool. Technical Artist listings often want a game engine. The eye and the pipeline thinking transfer, the engine doesn't, but it's worth Matt's call. Revised 2026-09-05: the phrases are unreal, ue4, ue5, unity engine, in unity, hlsl. "shader" and "glsl" left the list because they are curriculum web-motion vocabulary and were holding a Design Engineer in review for the words the search rewards, and bare "unity" matched "team unity". The flag still holds a tier B title, tier A overrides as before.
 - A flag holds a posting in review so Matt decides, **except where the title is tier A**. Added 2026-09-05, after Creative Technologist at Luma, the stated bullseye, scored 70 and sat in review because the body mentions Unity. A tier A title is the thing being searched for, so the flag prints on the row and the posting still reaches the pile the letter generator reads.
 - Web frontend terms, react, typescript, frontend, front-end, **only where the title has not already earned tier A or B**. Revised 2026-09-05. Every design engineering posting names React and TypeScript, so flagging them sent the tier being promoted straight to review, which defeated the promotion. Where the title is untiered and the body is mostly frontend, the flag still stands and Matt decides.
 
@@ -192,23 +197,23 @@ The leg term lists were cut back hard on 2026-09-05, after the first real digest
 **Intersection legs** (5 each, max 20)
 - `3d`: cinema 4d, c4d, redshift, octane, houdini, blender, maya, 3d modeling, 3d modelling, 3d animation, 3d artist, 3d generalist, hard surface, retopology, uv mapping, look dev, lookdev, texturing, lighting and rendering, render farm
 - `motion`: after effects, motion design, motion designer, motion graphics, animation, compositing, premiere, brand motion, kinetic type, logo animation
-- `generative`: diffusion model, latent diffusion, diffusion transformer, comfyui, stable diffusion, flux.1, flux (model|lora|checkpoint|dev|schnell|kontext), text-to-video, text to video, image-to-video, image to video, img2vid, ai video, ai image, generative video, generative image, generative art, lora, controlnet, upscal, inpaint, kling, veo, sora, hailuo, minimax (video|ai|model), ltx
-- `software`: python, javascript, typescript, extendscript, cep, plugin, panel, scripting, automation, api, rest, node, tooling, agentic, llm, local models, llama.cpp, ollama
+- `generative`: diffusion model, latent diffusion, diffusion transformer, comfyui, stable diffusion, flux.1, flux model, text-to-video, text to video, image-to-video, image to video, img2vid, ai video, ai image, generative video, generative image, generative art, lora, controlnet, upscal, inpaint, kling, veo, sora, hailuo, minimax video, ltx
+- `software`: python, javascript, typescript, extendscript, cep, plugin, panel, scripting, automation, api, rest api, restful, node, tooling, agentic, llm, local models, llama.cpp, ollama, cuda, pytorch
 - `pipeline`: pipeline, asset management, mam, dam, metadata, taxonomy, naming convention, iconik, frame.io, workflow, render farm, versioning, asana, shotgrid, ftrack
 
   The `generative` terms were bounded again on 2026-09-05, after the Economist posting at OpenAI kept its generative leg through the first cut. Bare `diffusion` matched the diffusion of innovation, bare `flux` matched a market in flux, and bare `minimax` matched minimax regret. Each is now written in its product sense, `diffusion model` and `latent diffusion` and `diffusion transformer`, `flux.1` and Flux checkpoints and LoRAs, `hailuo` and MiniMax video. Three words that name both an economics idea and a model family, which is exactly the shape of false positive the first cut was for.
-- `product`: prototyping, prototype, figma, design system, design systems, component library, interaction design, design tokens. Added 2026-09-05. These are the terms the remote target set actually runs on, prototyping in 64.5% of it, Figma 42.6%, design systems 41.4%, and design systems carries the highest median comp of any term measured. It scores as intersection, and deliberately does not satisfy the tier B leg gate.
+- `product`: figma prototyp, figma, design system, design systems, component library, interaction design, design tokens, motion system, motion systems, product animation, ui animation, interface animation, animation system, motion guidelines, micro-interaction, microinteraction, plus every term in the curriculum's product-motion vocabulary as of 2026-09-05, storybook, prototyping, protopie, origami, framer, spline.design, rive, lottie, bodymovin, smart animate, variable fonts, motion principles, motion language, animation principles, motion tokens, prototype, design handoff. Half of that vocabulary sat in no leg before, so a Product Designer whose body named only Lottie and Rive could not satisfy tier B's leg gate, and the funnel selected generic Figma roles over product-motion roles and then reported that selection back as the study list. It scores as intersection, and deliberately does not satisfy the tier B leg gate on its own for a title that is not a design title.
 
 **Title tiers**
-- Tier A (15): creative technologist, technical artist, design technologist (zero occurrences in 6,425 postings as of 2026-09-05, kept here because it costs nothing and would be a bullseye, removed from the discovery term lists where it only spent match budget), creative engineer, motion design engineer, creative developer, generative ai designer, generative ai artist, ai creative lead, ai creative director, creative ai engineer, pipeline td, motion technologist, technical director (motion or design context)
-- Tier B (10): motion designer, senior motion designer, lead motion designer, 3d motion designer, 3d artist, 3d generalist, art director, design engineer, **product designer, brand designer, visual designer**, when the body also hits the `generative` or `software` or `pipeline` leg
+- Tier A (15): creative technologist, technical artist, design technologist (zero occurrences in 6,425 postings as of 2026-09-05, kept here because it costs nothing and would be a bullseye, removed from the discovery term lists where it only spent match budget), creative engineer, motion design engineer, creative developer, generative ai designer, generative ai artist, generative artist, ai creative lead, ai creative director, creative ai engineer, creative ai designer, creative ai artist, creative ai lead, creative ai director, pipeline td, pipeline technical director, motion technologist, technical director, motion systems, motion system designer, product motion, design systems engineer. Revised 2026-09-05: technical director and pipeline td need a generative, software, pipeline or product leg, because Creature FX Technical Director at a VFX house tiered A and overrode every flag, and bare "creative ai" put Creative AI Product Manager in apply at 80.
+- Tier B (10): motion designer, motion graphics designer, 3d motion designer, 3d artist, 3d generalist, art director, design engineer, motion lead, head of motion, animation director, **product designer, brand designer, visual designer**, and as of 2026-09-05 interaction designer, ux engineer, prototyper, design systems designer, motion design lead, motion director, product motion designer, when the body also hits the `generative`, `software`, `pipeline` or `product` leg. The product-motion titles were untiered before, so Interaction Designer with a Figma and design-systems body scored 70 and could never reach apply.
 
   Product and brand titles added 2026-09-05. Product Designer is 130 of the corpus against Motion Designer's 25, it is where the remote volume and the pay are, and roughly 29 of the 59 remote target roles are at AI video and image companies where those titles are how the work is advertised. Luma posted Creative Technologist twice and also Visual Designer Product. The leg gate is what reconciles that with the thesis: `product` alone never earns a tier, so a Product Designer role tiers at an AI video company that wants generative or pipeline work and does not tier at a bank. Pure UX is still dropped outright.
-- Tier C (5): motion designer, senior motion designer, 3d artist, animator, when the body hits none of `generative`, `software`, `pipeline`
+- Tier C (5): motion designer, motion graphics designer, motion graphics artist, 3d artist, animator, 3d generalist, when the body hits none of the tier B legs. Tier C never reaches apply as of 2026-09-05, review at most: it is the work being left, and with posted comp at a tier 2 company a Senior Animator at a commercials shop was reaching apply at 66.
 
 ## Piles
 
-- **Apply**: score ≥ 65 **and a title tier**. Added 2026-09-05: the apply pile is what the letter generator reads, and a posting whose title does not fit is not one Matt can write a credible letter for, whatever the body scores. It is how an Economist and a PCB Layout Engineer reached apply on generic body language. They still reach review. Goes to the cover letter generator with the listing record, the tier and the proof-point lead for that tier (see `proof-points.json` when it exists, until then tier 1 leads with the ComfyUI pipeline, tier 2 with AE Llama, tier 3 with the tooling record, tier 4 with franchise ownership).
+- **Apply**: score ≥ 65 **and a tier A or B title**. Added 2026-09-05: the apply pile is what the letter generator reads, and a posting whose title does not fit is not one Matt can write a credible letter for, whatever the body scores. It is how an Economist and a PCB Layout Engineer reached apply on generic body language. They still reach review. Goes to the cover letter generator with the listing record, the tier and the proof-point lead for that tier (see `proof-points.json` when it exists, until then tier 1 leads with the ComfyUI pipeline, tier 2 with AE Llama, tier 3 with the tooling record, tier 4 with franchise ownership).
 - **Review**: 45–64, plus anything with a flag regardless of score, unless the title is tier A. Matt skims on Mondays.
 - **Logged**: under 50, and every gate fail and disqualifier, with a reason string.
 - **Relevance floor**, added 2026-09-05 and tightened the same day. A posting is relevant when the title tiers, or the body hits a **craft** leg: `3d`, `motion`, `generative` or `product`. `software` and `pipeline` are deliberately excluded, because they support a creative role rather than define one and every backend job in the corpus hits them. The first version accepted any leg, and the first real run put 894 postings in a pile led by LLM, CI/CD and GraphQL, which is a software job board rather than a shortlist. A posting with neither a tiered title nor a craft leg is logged whatever it scores. Remote 22 plus comp 20 plus a tier 1 company plus freshness is 57, over the review threshold, on a posting about nothing Matt does, which is how a Backend Engineer at a good company was reaching the review pile. With a cap of 40 a week that is how the pile fills with work he would never take. Comp and company prestige can carry a posting, but only after it is about something.
@@ -253,7 +258,7 @@ Every Monday morning, one file or message with: count of new listings by source,
 
 ## Tuning schedule
 
-- Sep 2 to Sep 6: collect only, compressed from a month on 2026-09-02 because Matt does not expect to still be in his current job in two. Use the first digests to check the gates aren't throwing away obvious fits. A posting scoring 85 or better is named in the digest anyway; it will not wait.
+- Sep 2 to Sep 6: collect only, compressed from a month on 2026-09-02 because Matt does not expect to still be in his current job in two. Use the first digests to check the gates aren't throwing away obvious fits. A posting scoring 80 or better is named in the digest anyway; it will not wait.
 - Sep 6: first apply pile, the very first digest.
 - Oct 5 checkpoint: if tier 1 and 2 response rate is under 10% after 20 applications, the problem is the materials, not the rules. If the apply pile is thin, loosen `unlisted_salary_unknown_company` first, then title tier B, in that order. Never loosen gate 1.
 

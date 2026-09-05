@@ -196,15 +196,18 @@ def cmd_poll(args):
     try:
         if not args.no_discover:
             feed_errors = []
-            grown = discover.grow(store, data, errors=feed_errors)
-            companies.save(args.companies, data)
-            boards = [c for c in grown["companies"] if c["ats"]["kind"] != "manual"]
-            pct = (100.0 * grown["found"] / grown["scanned"]) if grown["scanned"] else 0.0
-            print(f"discover  {grown['scanned']} postings read, {grown['found']} relevant ({pct:.1f}%), {len(boards)} new boards to poll, {len(grown['postings'])} stored")
-            if pct > 15:
-                print("          that share looks high. If the names below are not creative-technical roles, say so and the filter gets tightened.")
-            for c in boards:
-                print(f"  + {c['name']}: {c['ats']['kind']}/{c['ats']['board']}")
+            try:
+                grown = discover.grow(store, data, errors=feed_errors)
+                companies.save(args.companies, data)
+                boards = [c for c in grown["companies"] if c["ats"]["kind"] != "manual"]
+                pct = (100.0 * grown["found"] / grown["scanned"]) if grown["scanned"] else 0.0
+                print(f"discover  {grown['scanned']} postings read, {grown['found']} relevant ({pct:.1f}%), {len(boards)} new boards to poll, {len(grown['postings'])} stored")
+                if pct > 15:
+                    print("          that share looks high. If the names below are not creative-technical roles, say so and the filter gets tightened.")
+                for c in boards:
+                    print(f"  + {c['name']}: {c['ats']['kind']}/{c['ats']['board']}")
+            except Exception as e:  # discovery is the optional half; the poll and the heartbeat still have to happen
+                print(f"discover  failed, {type(e).__name__}: {e}. Polling the list as it stands.")
             for e in feed_errors:
                 print(f"  feed error: {e}")
         results = poll(store, data["companies"])
@@ -307,7 +310,37 @@ def cmd_discover(args):
     return 0
 
 
+def cmd_drop(args):
+    """Remove companies from the list by slug. Their open postings close on the
+    next poll, because close_unlisted runs before any board is read. The digest
+    has told Matt to run this since the dead-weight section shipped, and until
+    2026-09-05 it did not exist."""
+    data = companies.load(args.companies)
+    before = {c["slug"] for c in data["companies"]}
+    unknown = [s for s in args.slugs if s not in before]
+    data["companies"] = [c for c in data["companies"] if c["slug"] not in set(args.slugs)]
+    companies.save(args.companies, data)
+    dropped = sorted(before - {c["slug"] for c in data["companies"]})
+    for slug in dropped:
+        print(f"dropped   {slug}")
+    for slug in unknown:
+        print(f"unknown   {slug}: not on the list")
+    print(f"{len(dropped)} dropped, {len(data['companies'])} remain")
+    return 0 if not unknown else 1
+
+
 def cmd_backup(args):
+    dest = Path(args.to) if args.to else None
+    if dest is None or str(dest).strip() in ("", "."):
+        print("backup needs a target outside the repo, and got an empty one. Check data/local/backup-dir.txt.", file=sys.stderr)
+        return 2
+    try:
+        inside = dest.resolve().is_relative_to(ROOT.resolve())
+    except (OSError, ValueError):
+        inside = False
+    if inside and not dest.resolve().is_relative_to((ROOT / "data" / "local").resolve()):
+        print(f"backup target {dest} is inside the repo. A backup on the same disk as the database is not a backup.", file=sys.stderr)
+        return 2
     target = maintain.backup(args.db, args.to, keep=args.keep)
     print(f"backed up to {target}")
     return 0
@@ -360,6 +393,10 @@ def main(argv=None):
 
     c = sub.add_parser("check", help="probe every company's endpoint")
     c.set_defaults(fn=cmd_check)
+
+    dr = sub.add_parser("drop", help="remove companies from the list by slug")
+    dr.add_argument("slugs", nargs="+")
+    dr.set_defaults(fn=cmd_drop)
 
     s = sub.add_parser("stale", help="companies not reviewed recently")
     s.add_argument("--days", type=int, default=60)

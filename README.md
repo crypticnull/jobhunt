@@ -43,7 +43,7 @@ under a minute, no credentials. What the README claims, that runs.
 make hooks && make test && make validate && make lint
 ```
 
-133 tests, all offline against fixtures, the JSON records validated
+Three offline suites, over three hundred tests against fixtures, the JSON records validated
 against their schemas, and every doc and the site source checked by the
 voice lint. CI runs the same plus the site build with Lighthouse budgets:
 CLS 0, performance 90 and accessibility 95 or better, three runs, median.

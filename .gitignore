@@ -11,3 +11,8 @@ __pycache__/
 # poster, board and styleframe the site renders is meant to live.
 /assets/
 setup.log
+
+# Database files never belong in git, and a backup that lands in the repo
+# root by mistake must not be one commit away from public.
+*.db
+postings-*.db

@@ -144,7 +144,7 @@ class Gates(unittest.TestCase):
 class Disqualifiers(unittest.TestCase):
     def test_title_patterns(self):
         self.assertEqual(score(row(title="Video Editor"), rules(), NOW, TIER2)["drop_reason"], "title: ^video editor$")
-        self.assertEqual(score(row(title="Junior Motion Designer"), rules(), NOW, TIER2)["drop_reason"], "title: ^junior")
+        self.assertEqual(score(row(title="Junior Motion Designer"), rules(), NOW, TIER2)["drop_reason"], "title: ^(junior|jr)\\b")
         self.assertIsNone(score(row(title="Senior Video Editor and Motion Designer"), rules(), NOW, TIER2)["drop_reason"])
 
     def test_phrases_and_staleness(self):
@@ -573,7 +573,7 @@ class ThirdDigestFixes(unittest.TestCase):
         """Creative Technologist at Luma scored 70 and sat in review because the
         body mentions Unity. The flag still prints, so Matt still decides."""
         r = self.junk("Creative Technologist",
-                      "Build with our video models, ComfyUI, text-to-video, some Unity work.")
+                      "Build with our video models, ComfyUI, text-to-video, some Unity engine work.")
         self.assertEqual(r["title_tier"], "A")
         self.assertTrue(r["flags"])
         self.assertEqual(r["pile"], "apply")
@@ -705,3 +705,65 @@ class PayFollowsTheWorker(unittest.TestCase):
         found = extract("We offer a $1,000 to $2,000 home office stipend. The base salary range is $150,000 to $180,000.")
         self.assertEqual(found[:2], (150000, 180000))
         self.assertIsNone(extract("A $500 stipend and a $2,000 learning budget."))
+
+
+class TitlesAfterTheReview(unittest.TestCase):
+    """The 2026-09-05 review: product-motion titles had no tier, seniority
+    prefixes dropped senior roles, the engine flag fired on curriculum words,
+    and studio roles reached apply through tier C and a bare tier A title."""
+
+    def product(self, title, body="Figma, prototyping, design systems, TypeScript, product motion.", **kw):
+        return score(row(title=title, description=body, comp_min=200000, comp_max=260000, comp_found=1, **kw), rules(), NOW, TIER1)
+
+    def test_product_motion_titles_tier(self):
+        for title in ("Interaction Designer", "UX Engineer", "Prototyper", "Design Systems Designer", "Motion Design Lead"):
+            r = self.product(title)
+            self.assertEqual(r["title_tier"], "B", title)
+            self.assertEqual(r["pile"], "apply", title)
+
+    def test_seniority_prefixes_only_drop_juniors(self):
+        self.assertIsNone(self.product("Associate Creative Director").get("drop_reason"))
+        self.assertIsNone(self.product("International Brand Designer").get("drop_reason"))
+        self.assertIsNone(self.product("Internal Tools Designer").get("drop_reason"))
+        self.assertEqual(self.product("Junior Product Designer")["pile"], "logged")
+        self.assertEqual(self.product("Associate Product Designer")["pile"], "logged")
+        self.assertEqual(self.product("Intern, Design")["pile"], "logged")
+
+    def test_the_engine_flag_spares_tiered_titles_and_team_unity(self):
+        r = self.product("Design Engineer", "WebGL shaders and GLSL for product motion, Figma, design systems.")
+        self.assertFalse(any("game engine" in f for f in r["flags"]), r["flags"])
+        self.assertEqual(r["pile"], "apply")
+        r = self.product("Senior Product Designer", "We value team unity. Figma, prototyping.")
+        self.assertFalse(any("game engine" in f for f in r["flags"]))
+        r = score(row(title="Creative Producer", description="Unity engine work, Unreal Engine 5, motion design in After Effects."), rules(), NOW, TIER1)
+        self.assertTrue(any("game engine" in f for f in r["flags"]))
+
+    def test_naming_the_ml_team_is_not_a_disqualifier(self):
+        for body in ("Design Engineer working alongside a research scientist. Figma, design systems.",
+                     "You will pair with a machine learning engineer. Figma, prototyping."):
+            r = self.product("Design Engineer", body)
+            self.assertIsNone(r.get("drop_reason"), body)
+        self.assertEqual(self.product("Senior Research Scientist")["pile"], "logged")
+        self.assertEqual(self.product("Machine Learning Engineer, Video")["pile"], "logged")
+
+    def test_bare_creative_ai_is_no_longer_tier_a(self):
+        self.assertIsNone(self.product("Creative AI Product Manager", "Generative video, ComfyUI.")["title_tier"])
+        self.assertEqual(self.product("Creative AI Engineer", "Generative video, ComfyUI.")["title_tier"], "A")
+
+    def test_studio_roles_stay_out_of_apply(self):
+        studio = "Commercials, brand films and music videos. Cinema 4D, After Effects."
+        for title in ("Senior Animator", "Stop Motion Animator", "Senior 3D Artist"):
+            r = score(row(title=title, description=studio, comp_min=150000, comp_max=180000, comp_found=1), rules(), NOW, TIER2)
+            self.assertNotEqual(r["pile"], "apply", title)
+        for title in ("Creature FX Technical Director", "Lighting Artist", "FX TD", "CG Supervisor"):
+            r = score(row(title=title, description=studio, comp_min=150000, comp_max=180000, comp_found=1), rules(), NOW, TIER2)
+            self.assertEqual(r["pile"], "logged", title)
+        td = score(row(title="Technical Director, Animation", description=studio, comp_min=150000, comp_max=180000, comp_found=1), rules(), NOW, TIER2)
+        self.assertIsNone(td["title_tier"], "a film TD with no software or pipeline leg does not tier A")
+        pipe = score(row(title="Pipeline TD", description="Python tooling, ComfyUI, asset management.", comp_min=150000, comp_max=180000, comp_found=1), rules(), NOW, TIER2)
+        self.assertEqual(pipe["title_tier"], "A")
+
+    def test_lottie_and_rive_unlock_tier_b(self):
+        r = self.product("Product Designer", "Lottie and Rive animation for the app.")
+        self.assertEqual(r["title_tier"], "B")
+        self.assertIn("product", r["legs_hit"])

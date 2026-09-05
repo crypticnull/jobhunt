@@ -7,6 +7,7 @@ banner, so the gates can be checked against what they throw away."""
 
 import hashlib
 import json
+from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
 from .maintain import last_run
@@ -117,9 +118,37 @@ def dead_weight(store, rules, companies=None):
     return out
 
 
-def source_health(store, since):
-    problems = [f"{r['source']}/{r['company_slug']}: {r['error']} ({r['ran_at'][:10]})" for r in store.poll_errors_since(since)]
+STATUS_LOG = Path(__file__).resolve().parent.parent / "data" / "local" / "nightly-status.log"
+
+
+def _status_lines(path, now, days=7):
+    """The last few lines the scheduled scripts wrote about their own failures,
+    when the file is recent. The heartbeat only proves the poll ran; this is
+    how a failed push or backup reaches the Sunday page."""
+    try:
+        p = Path(path)
+        if not p.exists():
+            return []
+        age = now.timestamp() - p.stat().st_mtime
+        if age > days * 86400:
+            return []
+        lines = [ln.strip() for ln in p.read_text(encoding="utf-8", errors="replace").splitlines() if ln.strip()]
+        return [f"scheduled task: {ln}" for ln in lines[-4:]]
+    except OSError:
+        return []
+
+
+def source_health(store, since, status_log=None, now=None):
+    counted = {}
+    for r in store.poll_errors_since(since):
+        key = (r["source"], r["company_slug"], r["error"])
+        counted.setdefault(key, []).append(r["ran_at"][:10])
+    problems = []
+    for (source, slug, error), days in counted.items():
+        when = f"{len(days)} polls, last {days[0]}" if len(days) > 1 else days[0]
+        problems.append(f"{source}/{slug}: {error} ({when})")
     problems += [f"{source}/{slug}: zero postings on the last two polls" for slug, source in store.zero_twice_running()]
+    problems += _status_lines(status_log or STATUS_LOG, now or datetime.now(timezone.utc))
     return problems
 
 

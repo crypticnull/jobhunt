@@ -32,13 +32,30 @@ def readable(term):
     that llm does not match llms-of-the-valley, and nobody should have to read
     the escaping."""
     import re as _re
+    term = _re.sub(r"\((?!\?)([^)|]+)\|[^)]*\)", r"\1", term)  # an alternation reads as its first option
     return _re.sub(r"\\b|\(\?![^)]*\)|\\", "", term).strip()
 
 
 def _pattern(term):
+    """Plain terms match their plural too, so 'design systems' and
+    'micro-interactions', which is how product postings actually write them,
+    count. Before 2026-09-05 they scored nothing and the study list undercounted
+    design systems by half."""
     if re.search(r"[\\^$.|?*+()\[\]{}]", term):
         return re.compile(term, re.IGNORECASE)
-    return re.compile(r"(?<![a-z0-9])" + re.escape(term.lower()) + r"(?![a-z0-9])", re.IGNORECASE)
+    return re.compile(r"(?<![a-z0-9])" + re.escape(term.lower()) + r"(?:e?s)?(?![a-z0-9])", re.IGNORECASE)
+
+
+def claimed_by(term, claimed):
+    """A vocabulary term is claimed when its readable form is in skills.json,
+    or when a claimed skill matches it, so 'stable diffusion' retires
+    'diffusion' and 'llm' retires the regex-form term, which nobody should have
+    to write escaped into a skills file."""
+    r = readable(term).lower()
+    if term.lower() in claimed or r in claimed:
+        return True
+    pat = _pattern(term)
+    return any(pat.search(c) for c in claimed)
 
 
 def load_skills(path=None):
@@ -87,7 +104,7 @@ def gaps(rows, rules, skills=None):
     out = []
     for area, terms in vocab.items():
         for term in terms:
-            if term.lower() in claimed:
+            if claimed_by(term, claimed):
                 continue
             pat = _pattern(term)
             hits = [i for i, t in enumerate(texts) if pat.search(t)]
