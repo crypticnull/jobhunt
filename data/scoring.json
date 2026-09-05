@@ -33,7 +33,13 @@
       ],
       "ok_timezone_phrases": ["us time zones", "any us time zone", "pacific", "pt hours", "pst", "pdt", "west coast"],
       "pacific_phrases": ["pacific", "pt hours", "pst", "pdt", "west coast", "pnw", "pacific northwest"],
-      "nationwide_tokens": ["us", "usa", "u\\.s\\.", "united states", "anywhere in the us", "all us states", "nationwide", "us-remote", "remote-us"]
+      "nationwide_tokens": ["us", "usa", "u\\.s\\.", "united states", "anywhere in the us", "all us states", "nationwide", "us-remote", "remote-us"],
+      "fail_location_patterns": [
+        "latam", "latin america", "\\bemea\\b", "\\bapac\\b", "\\beu\\b", "\\bemea/apac\\b",
+        "united kingdom", "\\buk\\b", "\\bcanada\\b", "\\bindia\\b", "philippines", "\\bestonia\\b",
+        "poland", "germany", "\\bspain\\b", "portugal", "\\bbrazil\\b", "argentina", "\\bmexico\\b",
+        "colombia", "\\bukraine\\b", "romania", "netherlands", "\\bireland\\b", "australia", "singapore"
+      ]
     },
     "comp": {
       "annualize_hourly_multiplier": 2080,
@@ -55,7 +61,13 @@
 
   "disqualifiers": {
     "drop": {
-      "title_patterns": ["^video editor$", "^editor$", "^junior", "^associate", "^coordinator", "^intern"],
+      "title_patterns": [
+        "^video editor$", "^editor$", "^junior", "^associate", "^coordinator", "^intern",
+        "(electrical|mechanical|civil|structural|precast|controls|hvac|plumbing|piping|thermal|process|manufacturing|packaging|hardware|firmware|asic|pcb|\\brf\\b) design engineer",
+        "design engineer[^a-z]{0,3}\\((electrical|mechanical|civil|structural|hardware|controls)",
+        "\\bp\\.?e\\.?\\b.{0,20}design engineer",
+        "user experience designer", "\\bux\\b.{0,3}(/|and)?.{0,3}\\bui\\b designer", "product designer \\(ux"
+      ],
       "phrases": [
         "relocation required", "relocation assistance",
         "travel (up to )?(1[1-9]|[2-9]\\d)%", "travel (up to )?\\d{2}%\\+",
@@ -67,8 +79,15 @@
       "stale_unseen_days": 7
     },
     "flag": {
-      "phrases": ["unreal", "unity", "ue5", "shader", "hlsl", "glsl", "react", "typescript", "frontend", "front-end"],
-      "reason": "engine or frontend primary, Matt decides"
+      "engine": {
+        "phrases": ["unreal", "unity", "ue5", "shader", "hlsl", "glsl"],
+        "reason": "game engine primary, Matt decides"
+      },
+      "frontend": {
+        "phrases": ["react", "typescript", "frontend", "front-end"],
+        "reason": "web frontend primary, Matt decides",
+        "skip_if_title_tier_in": ["A", "B"]
+      }
     }
   },
 
@@ -106,7 +125,8 @@
         "motion": ["after effects", "motion design", "motion designer", "motion graphics", "animation", "compositing", "premiere", "brand motion", "kinetic type", "logo animation"],
         "generative": ["generative", "diffusion", "comfyui", "stable diffusion", "flux", "wan", "text-to-video", "text to video", "image-to-video", "image to video", "img2vid", "ai video", "ai image", "gen ai", "genai", "gen-ai", "lora", "controlnet", "upscal", "inpaint", "runway", "kling", "veo", "sora", "minimax", "ltx"],
         "software": ["python", "javascript", "typescript", "extendscript", "cep", "plugin", "panel", "scripting", "automation", "api", "rest api", "restful", "node", "tooling", "agentic", "llm", "local models", "llama\\.cpp", "ollama", "cuda", "pytorch"],
-        "pipeline": ["pipeline", "asset management", "mam", "dam", "metadata", "taxonomy", "naming convention", "iconik", "frame\\.io", "workflow", "render farm", "versioning", "asana", "shotgrid", "ftrack"]
+        "pipeline": ["pipeline", "asset management", "mam", "dam", "metadata", "taxonomy", "naming convention", "iconik", "frame\\.io", "workflow", "render farm", "versioning", "asana", "shotgrid", "ftrack"],
+        "product": ["prototyping", "prototype", "figma", "design system", "design systems", "component library", "interaction design", "design tokens"]
       }
     },
     "title": {
@@ -124,7 +144,9 @@
         "points": 10,
         "patterns": [
           "motion designer", "motion graphics designer", "3d motion designer", "3d artist", "3d generalist",
-          "art director", "design engineer", "motion lead", "head of motion", "animation director"
+          "art director", "design engineer", "motion lead", "head of motion", "animation director",
+          "product designer", "senior product designer", "staff product designer", "principal product designer",
+          "brand designer", "visual designer"
         ],
         "requires_any_leg": ["generative", "software", "pipeline"]
       },
@@ -145,7 +167,7 @@
       "designer", "design lead", "head of design", "design director",
       "art director", "art direction", "creative director", "creative lead", "head of creative",
       "artist", "animator", "animation", "motion", "3d", "\\bvfx\\b", "compositor",
-      "technical director", "technical artist", "creative technologist", "design technologist",
+      "technical director", "technical artist", "creative technologist",
       "creative engineer", "creative developer", "creative coder", "generative",
       "video editor", "illustrator", "previs", "look dev", "lookdev", "graphics", "visual design",
       "storyboard", "concept art", "pipeline td", "brand studio"
@@ -156,7 +178,7 @@
       "storyboard", "styleframe", "previs", "matte painting", "look dev", "lookdev",
       "octane", "redshift render", "touchdesigner", "davinci resolve", "\\bnuke\\b",
       "motion design", "motion designer", "motion graphics", "3d artist", "3d generalist",
-      "technical artist", "creative technologist", "design technologist",
+      "technical artist", "creative technologist",
       "character animation", "animation pipeline", "\\bvfx\\b", "visual effects",
       "text-to-video", "text to video", "image-to-video", "image to video"
     ],
@@ -167,7 +189,7 @@
       "comfyui", "stable diffusion", "midjourney", "diffusion model", "generative ai", "\\bgen ai\\b", "genai",
       "text-to-video", "text to video", "image-to-video", "image to video", "\\blora\\b", "controlnet", "ai video", "ai-generated video",
       "3d artist", "3d generalist", "3d motion", "3d animation", "character animation", "animation director", "animation pipeline",
-      "technical artist", "creative technologist", "design technologist", "creative engineer", "creative developer", "creative coder",
+      "technical artist", "creative technologist", "creative engineer", "creative developer", "creative coder",
       "pipeline td", "pipeline technical director", "technical director", "look dev", "lookdev", "shader artist",
       "environment artist", "concept art", "storyboard", "styleframe", "previs", "matte painting",
       "\\bvfx\\b", "visual effects", "compositing", "motion capture", "art direction", "art director",

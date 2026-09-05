@@ -1,0 +1,34 @@
+# Seed expansion from the narrowing directive, 5 September 2026.
+#
+# The directive's finding: 6,425 postings collected, 59 remote and on target,
+# a 0.8% yield, and the binding constraint is seed coverage rather than filter
+# quality. Roughly 29 of those 59 are at AI video and image companies, and Luma
+# posted Creative Technologist twice, remote. That is the bullseye, so this
+# seeds more of that category and the design-forward dev tools whose postings
+# already show up in the remote set.
+#
+# Most of the directive's AI video list was already on companies.json. These
+# are the ones that were not. `python -m scraper import data/seeds` reads every
+# file here and skips any company already on the list, so it is safe to re-run
+# and the nightly job does exactly that.
+#
+# category | careers url | name
+
+# AI video and image, the category actually producing remote roles at level
+ai-video | https://jobs.ashbyhq.com/moonvalley | Moonvalley
+ai-video | https://www.photoroom.com/careers | Photoroom
+ai-video | https://leonardo.ai/careers | Leonardo AI
+ai-video | https://www.freepik.com/company/careers | Freepik
+ai-video | https://fal.ai/careers | Fal
+
+# Design-forward dev tools. Linear, Vercel, Ramp and Notion already appear in
+# the remote target set, so this is their peer group.
+product-inhouse | https://www.raycast.com/careers | Raycast
+product-inhouse | https://thebrowser.company/careers | The Browser Company
+product-inhouse | https://anysphere.inc/careers | Cursor
+product-inhouse | https://replit.com/careers | Replit
+product-inhouse | https://retool.com/careers | Retool
+product-inhouse | https://www.framer.com/careers | Framer
+product-inhouse | https://supabase.com/careers | Supabase
+product-inhouse | https://planetscale.com/careers | PlanetScale
+product-inhouse | https://www.val.town/careers | Val Town

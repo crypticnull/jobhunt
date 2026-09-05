@@ -126,6 +126,12 @@ def gate_remote(p, rules):
     fails = _hits(r["fail_phrases"], body + "\n" + loc)
     if fails:
         return "fail", [f"fake-remote phrase: {', '.join(fails[:3])}"], False
+    # A posting whose location names another country and no US marker is not a
+    # US remote role, whatever its remote claim says. Checked against the
+    # location only, never the body, because a US role can mention EMEA teams.
+    abroad = _hits(r.get("fail_location_patterns", []), loc)
+    if abroad and not _hits(r["nationwide_tokens"], loc) and not parse_states(loc, rules):
+        return "fail", [f"location is outside the US: {', '.join(abroad[:2])}"], False
     states = parse_states((p.get("location") or "") + "\n" + (p.get("description") or ""), rules)
     if states and states != ["US"]:
         if any(s not in states for s in r["fail_if_state_list_excludes"]):
@@ -248,15 +254,21 @@ def evaluate(p, rules, company=None, now=None):
     if comp_result == "flag":
         out["flags"] += [f"comp: {r}" for r in comp_reasons]
     body = (p.get("description") or "").lower()
-    engine = _hits(rules["disqualifiers"]["flag"]["phrases"], body)
+    flag_rules = rules["disqualifiers"]["flag"]
+    engine = _hits(flag_rules["engine"]["phrases"], body)
     if engine:
-        out["flags"].append(f"{rules['disqualifiers']['flag']['reason']}: {', '.join(engine[:3])}")
+        out["flags"].append(f"{flag_rules['engine']['reason']}: {', '.join(engine[:3])}")
 
     s = rules["score"]
     legs = legs_hit(p, rules)
     out["legs_hit"] = legs
     tt, title_points = title_tier(p, legs, rules)
     out["title_tier"] = tt
+    fe = flag_rules.get("frontend")
+    if fe and tt not in fe.get("skip_if_title_tier_in", []):
+        hits = _hits(fe["phrases"], body)
+        if hits:
+            out["flags"].append(f"{fe['reason']}: {', '.join(hits[:3])}")
     comp_points = 0
     if comp_result == "flag" and mid is not None:
         comp_points = s["comp"]["flagged"]

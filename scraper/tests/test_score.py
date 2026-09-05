@@ -154,10 +154,89 @@ class Disqualifiers(unittest.TestCase):
         still_up = score(row(posted_at="2026-07-01T00:00:00+00:00"), rules(), NOW, TIER2)
         self.assertIsNone(still_up["drop_reason"], "old but still listed is not stale")
 
-    def test_engine_and_frontend_are_flags_not_drops(self):
+    def test_a_game_engine_is_always_a_flag(self):
         r = score(row(description="Unreal Engine and custom shader work."), rules(), NOW, TIER2)
         self.assertEqual(r["pile"], "review")
-        self.assertTrue(any("engine or frontend primary" in f for f in r["flags"]))
+        self.assertTrue(any("game engine primary" in f for f in r["flags"]), r["flags"])
+
+    def test_frontend_terms_do_not_flag_a_title_that_already_tiered(self):
+        """Every design engineering posting names React and TypeScript. Flagging
+        them sent the tier being promoted straight to review, which defeated the
+        promotion."""
+        body = "Build our design system in React and TypeScript, with Python tooling for the pipeline."
+        de = score(row(title="Design Engineer", description=body), rules(), NOW, TIER2)
+        self.assertEqual(de["title_tier"], "B")
+        self.assertFalse(any("web frontend" in f for f in de["flags"]), de["flags"])
+
+    def test_frontend_terms_still_flag_an_untiered_title(self):
+        r = score(row(title="Growth Marketer", description="Mostly React and front-end work."), rules(), NOW, TIER2)
+        self.assertIsNone(r["title_tier"])
+        self.assertTrue(any("web frontend primary" in f for f in r["flags"]), r["flags"])
+
+    def test_engineering_design_engineers_are_dropped(self):
+        """The title match was catching civil and electrical engineering, which
+        polluted the highest-value tier."""
+        for title in (
+            "Controls Design Engineer (Electrical)",
+            "Electrical Design Engineer",
+            "Precast Design Engineer",
+            "Mechanical Design Engineer",
+        ):
+            r = score(row(title=title, description="python automation pipeline"), rules(), NOW, TIER2)
+            self.assertEqual(r["pile"], "logged", title)
+            self.assertIn("design engineer", r["drop_reason"], title)
+
+    def test_a_real_design_engineer_survives(self):
+        r = score(row(title="Design Engineer", description="Prototyping in Figma, Python tooling, generative video."), rules(), NOW, TIER2)
+        self.assertIsNone(r.get("drop_reason"))
+        self.assertEqual(r["title_tier"], "B")
+
+    def test_a_posting_located_abroad_fails_the_remote_gate(self):
+        for loc in ("Remote - LATAM", "Estonia", "Remote (United Kingdom)", "Remote - India"):
+            r = score(row(location=loc), rules(), NOW, TIER2)
+            self.assertEqual(r["pile"], "logged", loc)
+            self.assertIn("outside the US", r["drop_reason"], loc)
+
+    def test_a_us_marker_beside_another_country_still_passes(self):
+        """Remote - US, Canada is a US role that also hires in Canada."""
+        r = score(row(location="Remote - US, Canada"), rules(), NOW, TIER2)
+        self.assertIsNone(r.get("drop_reason"), r.get("drop_reason"))
+
+    def test_a_us_state_list_is_not_read_as_abroad(self):
+        r = score(row(location="Remote - PA, WA, OR"), rules(), NOW, TIER2)
+        self.assertIsNone(r.get("drop_reason"), r.get("drop_reason"))
+
+
+class ProductTitles(unittest.TestCase):
+    """Product Designer is 130 of the corpus and where the remote volume and the
+    pay are, but Matt is not a product designer and the protocol drops pure UX.
+    The leg gate is what reconciles those: the title tiers only where the body
+    also wants generative, software or pipeline work."""
+
+    def test_product_designer_at_an_ai_company_tiers(self):
+        r = score(
+            row(title="Senior Product Designer", description="Prototyping in Figma for our text-to-video diffusion product, with Python tooling."),
+            rules(), NOW, TIER2,
+        )
+        self.assertEqual(r["title_tier"], "B")
+
+    def test_product_designer_without_the_intersection_does_not_tier(self):
+        r = score(
+            row(title="Senior Product Designer", description="Prototyping in Figma, design systems, component library work."),
+            rules(), NOW, TIER2,
+        )
+        self.assertIsNone(r["title_tier"], "product terms alone must not earn a tier")
+
+    def test_the_product_leg_still_scores_where_it_appears(self):
+        r = score(
+            row(title="Senior Product Designer", description="Prototyping in Figma, design systems, component library work."),
+            rules(), NOW, TIER2,
+        )
+        self.assertIn("product", r["legs_hit"])
+
+    def test_pure_ux_is_still_dropped(self):
+        r = score(row(title="User Experience Designer", description="prototyping figma"), rules(), NOW, TIER2)
+        self.assertEqual(r["pile"], "logged")
 
 
 class Points(unittest.TestCase):

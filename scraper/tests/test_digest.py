@@ -167,3 +167,35 @@ class Digest(unittest.TestCase):
     def test_all_sources_answered(self):
         md, _ = digest.build(self.s, self.r, now=NOW)
         self.assertIn("All sources answered.", md)
+
+
+class PayModel(unittest.TestCase):
+    """Location-adjusted pay is what decides whether the move north costs money,
+    so the digest asks the question rather than leaving it to offer stage."""
+
+    def setUp(self):
+        self.s = Store(":memory:")
+        self.r = rules()
+        p = posting(source="greenhouse", source_id="1", company_slug="acme", url="https://x/1",
+                    remote="remote", location="Remote - US", title="Senior Creative Technologist",
+                    description="pipeline comfyui python", comp_min=140000, comp_max=165000)
+        pid, _ = self.s.upsert(p, SEEN)
+        self.pid = pid
+
+    def md(self, pay_model):
+        cs = {"acme": {"slug": "acme", "name": "Acme", "tier": 1, "pay_model": pay_model}}
+        row = self.s.get(self.pid)
+        self.s.set_score(self.pid, score(row, self.r, NOW, cs["acme"]))
+        md, _ = digest.build(self.s, self.r, cs, NOW)
+        return md
+
+    def test_location_adjusted_is_called_out(self):
+        self.assertIn("location-adjusted, so the move north cuts it", self.md("location-adjusted"))
+
+    def test_unknown_asks_the_question(self):
+        self.assertIn("Ask whether pay is the same wherever you live", self.md("unknown"))
+
+    def test_same_everywhere_says_nothing(self):
+        md = self.md("same-everywhere")
+        self.assertNotIn("Pay model unknown", md)
+        self.assertNotIn("location-adjusted", md)

@@ -65,9 +65,23 @@ def parse_import_lines(text):
     return out
 
 
+def seed_files(path):
+    """A file, or every .txt in a directory, sorted. The directory form is what
+    the nightly job runs, so a seed list dropped into data/seeds is picked up
+    on its own rather than waiting for someone to remember a command."""
+    p = Path(path)
+    return sorted(p.glob("*.txt")) if p.is_dir() else [p]
+
+
 def cmd_import(args):
+    files = seed_files(args.file)
+    if not files:
+        print(f"no seed files in {args.file}")
+        return 0
+    rows = []
     try:
-        rows = parse_import_lines(Path(args.file).read_text(encoding="utf-8"))
+        for f in files:
+            rows += parse_import_lines(f.read_text(encoding="utf-8"))
     except (OSError, ValueError) as e:
         print(str(e), file=sys.stderr)
         return 2
@@ -304,7 +318,7 @@ def main(argv=None):
     a.add_argument("--board", help="board slug when --kind is given")
     a.set_defaults(fn=cmd_add)
 
-    im = sub.add_parser("import", help="many companies from a text file, one per line: category | careers url | name")
+    im = sub.add_parser("import", help="many companies from a text file, or every .txt in a directory: category | careers url | name")
     im.add_argument("file")
     im.add_argument("--priority", type=int, default=2, choices=(1, 2, 3))
     im.add_argument("--manual", action="store_true", help="keep companies with no detectable ATS on the list as manual")

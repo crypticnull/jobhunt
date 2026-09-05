@@ -15,7 +15,7 @@ def rec(slug, kind="greenhouse", board="acme", reviewed="2026-09-01", priority=2
 class Records(unittest.TestCase):
     def test_record_shape_matches_example(self):
         r = rec("acme")
-        self.assertEqual(set(r), {"slug", "name", "careers_url", "ats", "category", "tier", "size", "priority", "lead_proof", "remote_notes", "contacts", "notes", "added", "last_reviewed"})
+        self.assertEqual(set(r), {"slug", "name", "careers_url", "ats", "category", "tier", "size", "priority", "lead_proof", "pay_model", "remote_notes", "contacts", "notes", "added", "last_reviewed"})
 
     def test_rejects_bad_category_and_kind(self):
         with self.assertRaises(ValueError):

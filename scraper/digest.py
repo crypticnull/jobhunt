@@ -82,6 +82,11 @@ def _entry(row, companies):
         lines.append("Flags: " + "; ".join(detail["flags"]))
     if detail.get("proof_lead"):
         lines.append(f"Lead with: {detail['proof_lead']}")
+    pay = company.get("pay_model", "unknown")
+    if pay == "location-adjusted":
+        lines.append("Pay: location-adjusted, so the move north cuts it. Ask on the first call.")
+    elif pay == "unknown":
+        lines.append("Pay model unknown. Ask whether pay is the same wherever you live.")
     lines.append(f"{row['url']}  (id {row['id']}, `python -m scraper mark {row['id']} reviewed`)")
     return "\n".join(lines) + "\n"
 

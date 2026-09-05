@@ -5,7 +5,10 @@
       "slug": "example-ai",
       "name": "Example AI",
       "careers_url": "https://jobs.ashbyhq.com/example-ai",
-      "ats": { "kind": "ashby", "board": "example-ai" },
+      "ats": {
+        "kind": "ashby",
+        "board": "example-ai"
+      },
       "category": "ai-video",
       "tier": 1,
       "size": null,
@@ -15,13 +18,17 @@
       "contacts": [],
       "notes": "",
       "added": "2026-09-01",
-      "last_reviewed": "2026-09-01"
+      "last_reviewed": "2026-09-01",
+      "pay_model": "unknown"
     },
     {
       "slug": "example-studio",
       "name": "Example Studio",
       "careers_url": "https://boards.greenhouse.io/examplestudio",
-      "ats": { "kind": "greenhouse", "board": "examplestudio" },
+      "ats": {
+        "kind": "greenhouse",
+        "board": "examplestudio"
+      },
       "category": "studio-ai",
       "tier": 2,
       "size": null,
@@ -31,13 +38,17 @@
       "contacts": [],
       "notes": "",
       "added": "2026-09-01",
-      "last_reviewed": "2026-09-01"
+      "last_reviewed": "2026-09-01",
+      "pay_model": "unknown"
     },
     {
       "slug": "example-brand",
       "name": "Example Brand",
       "careers_url": "https://jobs.lever.co/examplebrand",
-      "ats": { "kind": "lever", "board": "examplebrand" },
+      "ats": {
+        "kind": "lever",
+        "board": "examplebrand"
+      },
       "category": "brand-inhouse",
       "tier": 4,
       "size": null,
@@ -47,13 +58,17 @@
       "contacts": [],
       "notes": "",
       "added": "2026-09-01",
-      "last_reviewed": "2026-09-01"
+      "last_reviewed": "2026-09-01",
+      "pay_model": "unknown"
     },
     {
       "slug": "example-manual",
       "name": "Example Manual",
       "careers_url": "https://example.com/careers",
-      "ats": { "kind": "manual", "board": null },
+      "ats": {
+        "kind": "manual",
+        "board": null
+      },
       "category": "product-inhouse",
       "tier": 3,
       "size": null,
@@ -63,7 +78,8 @@
       "contacts": [],
       "notes": "",
       "added": "2026-09-01",
-      "last_reviewed": "2026-09-01"
+      "last_reviewed": "2026-09-01",
+      "pay_model": "unknown"
     }
   ]
 }

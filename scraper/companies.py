@@ -92,6 +92,9 @@ def record(slug, name, kind, board, category, priority=2, careers_url=None, lead
         "size": int(size) if size else None,
         "priority": int(priority),
         "lead_proof": lead_proof,
+        # Asked on the first call. Location-adjusted pay is what decides whether
+        # the move north costs money, so it is a field rather than a note.
+        "pay_model": "unknown",
         "remote_notes": "",
         "contacts": [],
         "notes": "",
