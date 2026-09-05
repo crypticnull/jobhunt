@@ -17,6 +17,18 @@ Two hard gates run first. A listing that fails either gate is dropped regardless
 
 The scraper never decides to apply. It decides what Matt looks at.
 
+## The curriculum, pointed forwards
+
+Added 2026-09-05 at Matt's request, and the direction matters. The first version of this derived a study list from the postings, jobs to curriculum. He asked for the opposite: the curriculum should influence which jobs surface, because the point is to align what he is learning with the jobs the learning leads to, one funnel with a procedure to follow.
+
+So `scoring.json` carries a `curriculum` block with a vocabulary and a set of `targets`, currently product-motion and web-motion, which is the product animation and motion systems direction. A posting asking for those scores up to 5 points **whether or not Matt can claim the skill yet**. That is the whole idea: the job asking for what he is studying is the job the studying is for, and a scale that only rewards what he already has can only ever find him his current job again.
+
+Those 5 points came from company tier, halved from 10 to 5, on his own argument that the top 100 is a lagging indicator. Where a company sits on a list he would not have written matters less than whether the job is the one he is training for. The pile thresholds came down 5 with it, apply to 65 and review to 45, so the rebalance changes which postings win rather than how many clear.
+
+Backwards, the same vocabulary counted against `data/skills.json` gives the study list, printed in the digest and available as `python -m scraper curriculum`. A term is a gap when the target postings ask for it and the skills file cannot claim it, and gaps rank by how often the market asks. Learning down that list moves the piles, because it is the same vocabulary on both ends.
+
+`skills.json` requires evidence on every entry, a project slug, a proof record or the resume. A skill claimed without evidence removes itself from the study list and never gets learned.
+
 ## The two guiding principles
 
 Stated by Matt on 2026-09-05 and they outrank everything below. **Remote**, so he can live where he likes without a commute, which means location-agnostic pay matters as much as a remote job title, because a location-adjusted employer turns a move to a cheaper place into a pay cut. And **no longform animation**, which is why the target is product animation and motion systems, motion embedded in a product rather than delivered as a film.
@@ -162,7 +174,8 @@ Drop, with reason logged. Distinct from gates because they're about the work, no
 | Compensation | 20 | Midpoint ≥ 150k: 20. 130k–150k: 15. Unlisted at tier 1–3: 10. Unlisted, size > 200, no tier: 8. Flagged 110k–130k: 5. |
 | Intersection asks | 20 | 5 points per leg mentioned in the body, max 4 legs. Legs and their keyword lists are in `scoring.json`. A leg counts once no matter how many keywords hit. |
 | Title fit | 15 | Tier A title: 15. Tier B: 10. Tier C: 5. Lists below and in `scoring.json`. |
-| Company tier | 10 | Tier 1: 10, 2: 8, 3: 6, 4: 4, unknown: 2. |
+| Company tier | 5 | Tier 1: 5, 2: 4, 3: 3, 4: 2, unknown: 1. Halved 2026-09-05; the other 5 went to the curriculum. |
+| Curriculum | 5 | Two or more `curriculum.targets` areas in the body: 5. One: 3. Scored whether or not Matt can claim the skill. |
 | Freshness | 5 | Posted within 7 days: 5. Within 14: 3. Otherwise 0. |
 | Human findable | 5 | `contact_hint` present: 5. |
 
@@ -183,12 +196,12 @@ Drop, with reason logged. Distinct from gates because they're about the work, no
 
 ## Piles
 
-- **Apply**: score ≥ 70. Goes to the cover letter generator with the listing record, the tier and the proof-point lead for that tier (see `proof-points.json` when it exists, until then tier 1 leads with the ComfyUI pipeline, tier 2 with AE Llama, tier 3 with the tooling record, tier 4 with franchise ownership).
-- **Review**: 50–69, plus anything with a flag regardless of score. Matt skims on Mondays.
+- **Apply**: score ≥ 65. Goes to the cover letter generator with the listing record, the tier and the proof-point lead for that tier (see `proof-points.json` when it exists, until then tier 1 leads with the ComfyUI pipeline, tier 2 with AE Llama, tier 3 with the tooling record, tier 4 with franchise ownership).
+- **Review**: 45–64, plus anything with a flag regardless of score. Matt skims on Mondays.
 - **Logged**: under 50, and every gate fail and disqualifier, with a reason string.
 - **Relevance floor**, added 2026-09-05. A posting with no title tier and no intersection leg is logged whatever it scores. Remote 22 plus comp 20 plus a tier 1 company plus freshness is 57, over the review threshold, on a posting about nothing Matt does, which is how a Backend Engineer at a good company was reaching the review pile. With a cap of 40 a week that is how the pile fills with work he would never take. Comp and company prestige can carry a posting, but only after it is about something.
 
-Cap the apply pile at 12 per week. If more than 12 clear 70, sort by tier then score and push the rest to review. Matt sends 5 to 8 a week, all custom, the cap keeps the generator from producing letters nobody reads.
+Cap the apply pile at 12 per week. If more than 12 clear 65, sort by tier then score and push the rest to review. The review cap went from 40 to 100 on 2026-09-05: a genuinely good match should not be held back by an arbitrary number when the digest is where the fine-toothed comb runs. Matt sends 5 to 8 a week, all custom, the cap keeps the generator from producing letters nobody reads.
 
 ## Output record
 

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skills.schema.json",
+  "title": "Claimed skills",
+  "description": "What Matt can claim today, from the resume and the proof records rather than from ambition. The curriculum counts the vocabulary in scoring.json against the target postings and subtracts this; what is left is the study list. A term claimed without evidence removes itself from that list and never gets learned, which is why evidence is required.",
+  "type": "object",
+  "required": ["version", "skills"],
+  "additionalProperties": true,
+  "properties": {
+    "version": { "type": "integer", "enum": [1] },
+    "note": { "type": "string" },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["term", "area", "evidence"],
+        "additionalProperties": false,
+        "properties": {
+          "term": { "type": "string" },
+          "area": { "type": "string", "enum": ["3d", "motion", "generative", "software", "pipeline", "product"] },
+          "evidence": { "type": "string", "description": "A project slug, a proof record id, or 'resume'" }
+        }
+      }
+    }
+  }
+}

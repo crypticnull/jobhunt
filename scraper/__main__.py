@@ -20,7 +20,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from . import adapters, companies, digest, discover, maintain, manual
+from . import adapters, companies, curriculum, digest, discover, maintain, manual
 from .poll import enrich, poll
 from .score import load_rules, score
 from .store import STATES, Store
@@ -73,6 +73,17 @@ def seed_files(path):
     on its own rather than waiting for someone to remember a command."""
     p = Path(path)
     return sorted(p.glob("*.txt")) if p.is_dir() else [p]
+
+
+def cmd_curriculum(args):
+    """The study list. Built from postings that cleared into a pile, because
+    what a dropped posting wants is not a reason to learn anything."""
+    rules = load_rules()
+    with Store(args.db) as store:
+        rows = [r for r in store.open_postings() if r.get("pile") in ("apply", "review")]
+    lines = curriculum.report(rows, rules)
+    print("\n".join(lines) if lines else f"Nothing clears the floor yet, from {len(rows)} postings in a pile.")
+    return 0
 
 
 def cmd_import(args):
@@ -351,6 +362,10 @@ def main(argv=None):
     d.add_argument("--stdout", action="store_true", help="print instead of writing, and do not mark postings as surfaced")
     d.add_argument("--out", default=str(ROOT / "data" / "digests"), help="directory for the digest files (default data/digests)")
     d.set_defaults(fn=cmd_digest)
+
+    cu = sub.add_parser("curriculum", help="what the postings you are looking at ask for and skills.json does not claim")
+    cu.add_argument("--db", default=str(DEFAULT_DB))
+    cu.set_defaults(fn=cmd_curriculum)
 
     sc = sub.add_parser("score", help="rescore every open posting")
     sc.set_defaults(fn=cmd_score)

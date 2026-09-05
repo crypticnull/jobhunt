@@ -26,6 +26,7 @@ TARGETS = [
     (ROOT / "data" / "companies.example.json", SCHEMA / "company.schema.json"),
     (ROOT / "data" / "companies.json", SCHEMA / "company.schema.json"),
     (ROOT / "data" / "scoring.json", SCHEMA / "scoring.schema.json"),
+    (ROOT / "data" / "skills.json", SCHEMA / "skills.schema.json"),
     (ROOT / "data" / "local" / "scoring.local.json", SCHEMA / "scoring.schema.json"),
 ]
 
