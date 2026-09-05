@@ -319,16 +319,27 @@ class Points(unittest.TestCase):
         self.assertEqual((r["pile"], r["drop_reason"]), ("logged", "under review threshold"))
         self.assertEqual(r["score"], 36)
 
-    def test_flags_always_push_to_review(self):
+    def test_flags_push_to_review_unless_the_title_is_tier_a(self):
+        """A flag means Matt decides, so it holds the posting in review. A tier A
+        title is the thing being searched for, so it goes through with the flag
+        printed on the row. Revised 2026-09-05."""
         r = score(
+            row(title="3D Motion Designer", description="ComfyUI pipeline in Python and Houdini, Unreal for previs.", comp_min=140000, comp_max=165000, comp_found=1),
+            rules(),
+            NOW,
+            {"tier": 1},
+        )
+        self.assertGreaterEqual(r["score"], 65)
+        self.assertEqual(r["pile"], "review")
+        self.assertEqual(lane(r, rules()), "review")
+        a = score(
             row(title="Creative Technologist", description="ComfyUI pipeline in Python and Houdini, Unreal for previs.", comp_min=140000, comp_max=165000, comp_found=1),
             rules(),
             NOW,
             {"tier": 1},
         )
-        self.assertGreaterEqual(r["score"], 70)
-        self.assertEqual(r["pile"], "review")
-        self.assertEqual(lane(r, rules()), "review")
+        self.assertTrue(a["flags"])
+        self.assertEqual(a["pile"], "apply")
 
     def test_proof_lead_follows_the_tier(self):
         self.assertEqual(score(row(), rules(), NOW, {"tier": 4})["proof_lead"], "event-franchises")
@@ -549,3 +560,54 @@ class LegBreadth(unittest.TestCase):
             r = score(row(title="Creative Technologist", location=loc), rules(), NOW, TIER1)
             self.assertEqual(r["pile"], "logged", loc)
             self.assertIn("outside the US", r["drop_reason"], loc)
+
+
+class ThirdDigestFixes(unittest.TestCase):
+    """Three things the 2026-09-05 digest still had wrong, one of them the
+    stated bullseye."""
+
+    def junk(self, title, description):
+        return score(row(title=title, description=description, comp_min=145000, comp_max=205000), rules(), NOW, TIER1)
+
+    def test_a_tier_a_title_is_not_held_out_of_apply_by_a_flag(self):
+        """Creative Technologist at Luma scored 70 and sat in review because the
+        body mentions Unity. The flag still prints, so Matt still decides."""
+        r = self.junk("Creative Technologist",
+                      "Build with our video models, ComfyUI, text-to-video, some Unity work.")
+        self.assertEqual(r["title_tier"], "A")
+        self.assertTrue(r["flags"])
+        self.assertEqual(r["pile"], "apply")
+
+    def test_an_untiered_title_is_still_held_by_a_flag(self):
+        r = score(row(title="Senior Frontend Engineer, Ads Creative",
+                      description="React, TypeScript, frontend work on motion in ads, Figma, design systems, prototyping.",
+                      comp_min=190800, comp_max=267100), rules(), NOW, TIER1)
+        self.assertTrue(r["flags"])
+        self.assertNotEqual(r["pile"], "apply")
+
+    def test_economics_words_are_not_the_generative_leg(self):
+        """diffusion of innovation, a market in flux, minimax regret. All three
+        were scoring a generative leg on the Economist posting at OpenAI."""
+        r = self.junk("Economist",
+                      "Study the diffusion of innovation in a market in flux, minimax regret under uncertainty.")
+        self.assertNotIn("generative", r["legs_hit"])
+
+    def test_the_product_senses_of_those_words_still_score(self):
+        for body in ("Latent diffusion and diffusion transformers.",
+                     "We fine-tune FLUX.1 and ship Flux LoRAs.",
+                     "Hailuo and MiniMax video models."):
+            r = self.junk("Research Engineer", body)
+            self.assertIn("generative", r["legs_hit"], body)
+
+    def test_the_discipline_can_come_after_design_engineer(self):
+        """Data Center Design Engineer, Electrical was reaching review at 60.
+        Every pattern required the discipline before the title."""
+        for title in ("Data Center Design Engineer, Electrical - Industrial Compute",
+                      "Design Engineer, Mechanical", "Design Engineer - Power and Cooling"):
+            r = self.junk(title, "Python tooling and verification.")
+            self.assertEqual(r["pile"], "logged", title)
+
+    def test_a_plain_design_engineer_still_tiers(self):
+        r = self.junk("Senior Design Engineer",
+                      "Figma, prototyping, design systems, TypeScript, motion in the product.")
+        self.assertEqual(r["title_tier"], "B")

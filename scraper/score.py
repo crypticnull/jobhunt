@@ -329,7 +329,14 @@ def evaluate(p, rules, company=None, now=None):
     # body scores, and it is how an Economist and a PCB Layout Engineer reached
     # apply on generic body language. They still reach review.
     titled = out["title_tier"] is not None or not piles.get("apply_requires_title_tier")
-    if titled and score["total"] >= piles["apply_min"] and not (out["flags"] and piles["flagged_always_review"]):
+    # A flag holds a posting in review so Matt decides, except where the title is
+    # tier A. Creative Technologist at Luma is the stated bullseye and it scored
+    # 70 and sat in review because the body mentions Unity. The flag still prints
+    # on the row, so he still decides, but a tier A title reaches the pile the
+    # letter generator reads.
+    override = out["title_tier"] in (piles.get("flag_override_title_tiers") or [])
+    held = bool(out["flags"]) and piles["flagged_always_review"] and not override
+    if titled and score["total"] >= piles["apply_min"] and not held:
         out["pile"] = "apply"
     elif score["total"] >= piles["review_min"] or out["flags"]:
         out["pile"] = "review"
