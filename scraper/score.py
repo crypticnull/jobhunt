@@ -11,6 +11,7 @@ Matt looks at."""
 
 import json
 import re
+from . import curriculum as curriculum_mod
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -264,6 +265,12 @@ def evaluate(p, rules, company=None, now=None):
     out["legs_hit"] = legs
     tt, title_points = title_tier(p, legs, rules)
     out["title_tier"] = tt
+    # The curriculum points forward. A posting asking for what Matt is
+    # learning scores for it whether or not he can claim the skill yet,
+    # because that is the job the learning is for.
+    aligned = curriculum_mod.alignment(f"{p.get('title') or ''}\n{p.get('description') or ''}", rules)
+    out["curriculum"] = aligned
+    curriculum_points = curriculum_mod.points(aligned, rules)
     fe = flag_rules.get("frontend")
     if fe and tt not in fe.get("skip_if_title_tier_in", []):
         hits = _hits(fe["phrases"], body)
@@ -297,6 +304,7 @@ def evaluate(p, rules, company=None, now=None):
         "intersection": min(len(legs), s["intersection"]["max_legs"]) * s["intersection"]["per_leg"],
         "title": title_points,
         "company": s["company_tier"].get(str(tier), s["company_tier"]["unknown"]),
+        "curriculum": curriculum_points,
         "freshness": fresh,
         "human": s["human"]["points_if_contact_hint"] if p.get("contact_hint") else 0,
         "deductions": -deductions,
@@ -337,6 +345,7 @@ def score(p, rules, now=None, company=None):
         ("intersection", ", ".join(ev["legs_hit"]) or "no legs"),
         ("title", f"tier {ev['title_tier']}" if ev["title_tier"] else "no title tier"),
         ("company", f"tier {(company or {}).get('tier') or 'unknown'}"),
+        ("curriculum", ", ".join(ev.get("curriculum") or []) or "no curriculum area"),
         ("freshness", "posted recently" if ev["score"].get("freshness") else "older"),
         ("human", "contact named" if p.get("contact_hint") else "no contact"),
         ("deductions", ", ".join(ev["deduction_hits"][:4]) or "none"),
@@ -353,6 +362,7 @@ def score(p, rules, now=None, company=None):
         "drop_reason": ev["drop_reason"],
         "proof_lead": ev["proof_lead"],
         "legs_hit": ev["legs_hit"],
+        "curriculum": ev.get("curriculum") or [],
         "title_tier": ev["title_tier"],
         "remote": ev["remote"],
         "comp": ev["comp"],

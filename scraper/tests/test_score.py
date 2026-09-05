@@ -255,7 +255,11 @@ class Points(unittest.TestCase):
             NOW,
             {"tier": 1},
         )
-        self.assertEqual((r["pile"], r["score"]), ("apply", 100))
+        # 95 rather than 100: company tier is worth half what it was, and this
+        # posting is a perfect fit for what Matt already has without asking for
+        # anything the curriculum is taking him toward. Full marks now need
+        # both, which is the point of the rebalance.
+        self.assertEqual((r["pile"], r["score"]), ("apply", 95))
         self.assertEqual(sorted(r["legs_hit"]), ["3d", "generative", "pipeline", "software"])
         self.assertEqual(r["title_tier"], "A")
         self.assertEqual(r["proof_lead"], "local-pipeline")
@@ -267,7 +271,7 @@ class Points(unittest.TestCase):
         and no named human is exactly the posting a human should glance at."""
         r = score(row(), rules(), NOW, TIER2)
         self.assertEqual(r["pile"], "review")
-        self.assertEqual(r["score"], 55)
+        self.assertEqual(r["score"], 51)
         self.assertEqual(r["title_tier"], "C")
 
     def test_title_tier_b_needs_a_technical_leg(self):
@@ -285,9 +289,9 @@ class Points(unittest.TestCase):
 
     def test_freshness_and_company_tier(self):
         fresh = score(row(), rules(), NOW, {"tier": 1})
-        self.assertEqual((fired(fresh, "freshness")["value"], fired(fresh, "company")["value"]), (5, 10))
+        self.assertEqual((fired(fresh, "freshness")["value"], fired(fresh, "company")["value"]), (5, 5))
         older = score(row(posted_at="2026-08-20T00:00:00+00:00"), rules(), NOW, {"tier": 4, "size": 300})
-        self.assertEqual((fired(older, "freshness")["value"], fired(older, "company")["value"]), (3, 4))
+        self.assertEqual((fired(older, "freshness")["value"], fired(older, "company")["value"]), (3, 2))
         old = score(row(posted_at="2026-08-01T00:00:00+00:00"), rules(), NOW, {"tier": 3, "size": 50})
         self.assertIsNone(fired(old, "freshness"))
 
@@ -300,7 +304,7 @@ class Points(unittest.TestCase):
     def test_under_threshold_is_logged_with_a_reason(self):
         r = score(row(title="Animator", posted_at="2026-08-01T00:00:00+00:00"), rules(), NOW, {"size": 300})
         self.assertEqual((r["pile"], r["drop_reason"]), ("logged", "under review threshold"))
-        self.assertEqual(r["score"], 37)
+        self.assertEqual(r["score"], 36)
 
     def test_flags_always_push_to_review(self):
         r = score(
@@ -412,3 +416,31 @@ class GuidingPrinciples(unittest.TestCase):
     def test_ui_animation_scores_the_product_leg(self):
         r = score(row(title="Senior Product Designer", description="UI animation and interface animation for the app, plus Python tooling."), rules(), NOW, TIER2)
         self.assertIn("product", r["legs_hit"])
+
+
+class Rebalance(unittest.TestCase):
+    """Company tier went from 10 points to 5 and the curriculum took the other
+    5. Matt's own argument for it: the top 100 is a lagging indicator, so where
+    a company sits on a list he would not have written matters less than
+    whether the job is the one he is training for. Thresholds came down 5 with
+    it, so this changes which postings win rather than how many clear."""
+
+    def test_a_hundred_now_needs_the_curriculum_too(self):
+        best = score(
+            row(title="Senior Creative Technologist",
+                description="Own the motion system and product animation, shipped with Lottie and GSAP, "
+                            "on a generative ComfyUI pipeline in Houdini with Python tooling and asset management. Pacific hours.",
+                comp_min=160000, comp_max=200000, contact_hint="Jane Doe"),
+            rules(), NOW, TIER1,
+        )
+        self.assertEqual(best["score"], 100)
+        self.assertEqual(best["pile"], "apply")
+
+    def test_prestige_alone_moves_a_posting_less_than_it_did(self):
+        # Both carry a posted band, so company tier is the only thing differing.
+        # Unlisted salary at an unknown company fails the comp gate outright,
+        # which would otherwise swamp the comparison.
+        paid = dict(title="Motion Designer", comp_min=140000, comp_max=160000, comp_found=1)
+        tier1 = score(row(**paid), rules(), NOW, TIER1)
+        unknown = score(row(**paid), rules(), NOW, {})
+        self.assertEqual(tier1["score"] - unknown["score"], 4, "tier 1 over unknown is 4 points, was 8")

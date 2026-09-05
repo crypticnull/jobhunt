@@ -212,7 +212,7 @@ class Caps(unittest.TestCase):
     def test_the_ruleset_supplies_the_caps(self):
         r = load_rules(RULES_PATH, local="/nonexistent")
         self.assertEqual(r["discovery"]["board_cap"], 40)
-        self.assertEqual(r["discovery"]["posting_cap"], 80)
+        self.assertEqual(r["discovery"]["posting_cap"], 100)
 
     def test_an_explicit_argument_still_wins(self):
         import inspect

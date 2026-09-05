@@ -11,6 +11,7 @@ from datetime import datetime, timedelta, timezone
 
 from .maintain import last_run
 from .store import TERMINAL, utcnow
+from . import curriculum as curriculum_mod
 
 
 def digest_hash(row):
@@ -82,6 +83,8 @@ def _entry(row, companies):
     ]
     if detail.get("flags"):
         lines.append("Flags: " + "; ".join(detail["flags"]))
+    if detail.get("curriculum"):
+        lines.append("Curriculum: " + ", ".join(detail["curriculum"]))
     if detail.get("proof_lead"):
         lines.append(f"Lead with: {detail['proof_lead']}")
     pay = company.get("pay_model", "unknown")
@@ -182,6 +185,7 @@ def build(store, rules, companies=None, now=None, since=None, heartbeat=None):
         out += [f"{len(piles['hidden'])} more scored below {lowest} and are held back rather than marked as seen. They return next week if nothing better arrives.", ""]
     out += ["## Logged, by reason", ""]
     out += [f"- {n:>3}  {reason}" for reason, n in sorted(drops.items(), key=lambda kv: -kv[1])] or ["- none"]
+    out += curriculum_mod.report([dict(r) for r in piles["apply"] + review], rules)
     out += dead_weight(store, rules, companies)
     out += ["", "## Source health", ""]
     problems = source_health(store, since)
