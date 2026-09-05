@@ -179,6 +179,8 @@ Drop, with reason logged. Distinct from gates because they're about the work, no
 | Freshness | 5 | Posted within 7 days: 5. Within 14: 3. Otherwise 0. |
 | Human findable | 5 | `contact_hint` present: 5. |
 
+The leg term lists were cut back hard on 2026-09-05, after the first real digest put an Economist, a PCB Layout Engineer and a Software Engineer for Trainium in the apply pile. The discovery config had already written the reason down weeks earlier, in its own note: the scoring legs are far too broad, rendering matches every backend job, and generative ai is boilerplate. That lesson had only ever been applied to discovery. Bare `3d`, `modeling`, `modelling` and `rendering` are gone, because economic modeling, threat modeling and server-side rendering were all scoring the 3d leg. Bare `generative` and the phrase `generative ai` are gone for the same reason. And `runway` is gone because it is a company name, so every Runway posting was scoring a generative leg for its own letterhead.
+
 **Intersection legs** (5 each, max 20)
 - `3d`: cinema 4d, c4d, redshift, octane, 3d, modeling, modelling, lighting, texturing, rendering, houdini, blender
 - `motion`: after effects, motion design, motion graphics, animation, compositing, premiere, brand motion
@@ -196,7 +198,7 @@ Drop, with reason logged. Distinct from gates because they're about the work, no
 
 ## Piles
 
-- **Apply**: score ≥ 65. Goes to the cover letter generator with the listing record, the tier and the proof-point lead for that tier (see `proof-points.json` when it exists, until then tier 1 leads with the ComfyUI pipeline, tier 2 with AE Llama, tier 3 with the tooling record, tier 4 with franchise ownership).
+- **Apply**: score ≥ 65 **and a title tier**. Added 2026-09-05: the apply pile is what the letter generator reads, and a posting whose title does not fit is not one Matt can write a credible letter for, whatever the body scores. It is how an Economist and a PCB Layout Engineer reached apply on generic body language. They still reach review. Goes to the cover letter generator with the listing record, the tier and the proof-point lead for that tier (see `proof-points.json` when it exists, until then tier 1 leads with the ComfyUI pipeline, tier 2 with AE Llama, tier 3 with the tooling record, tier 4 with franchise ownership).
 - **Review**: 45–64, plus anything with a flag regardless of score. Matt skims on Mondays.
 - **Logged**: under 50, and every gate fail and disqualifier, with a reason string.
 - **Relevance floor**, added 2026-09-05 and tightened the same day. A posting is relevant when the title tiers, or the body hits a **craft** leg: `3d`, `motion`, `generative` or `product`. `software` and `pipeline` are deliberately excluded, because they support a creative role rather than define one and every backend job in the corpus hits them. The first version accepted any leg, and the first real run put 894 postings in a pile led by LLM, CI/CD and GraphQL, which is a software job board rather than a shortlist. A posting with neither a tiered title nor a craft leg is logged whatever it scores. Remote 22 plus comp 20 plus a tier 1 company plus freshness is 57, over the review threshold, on a posting about nothing Matt does, which is how a Backend Engineer at a good company was reaching the review pile. With a cap of 40 a week that is how the pile fills with work he would never take. Comp and company prestige can carry a posting, but only after it is about something.

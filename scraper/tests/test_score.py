@@ -221,12 +221,25 @@ class ProductTitles(unittest.TestCase):
         )
         self.assertEqual(r["title_tier"], "B")
 
-    def test_product_designer_without_the_intersection_does_not_tier(self):
+    def test_product_terms_now_tier_because_the_leg_means_the_work(self):
+        """Reversed 2026-09-05. The product leg used to be generic enough that
+        a bank's product role would tier on it, so it was kept out of the gate.
+        It is now figma prototyping, design system, motion system, ui animation,
+        which is the target work rather than the discipline, and keeping it out
+        meant a Design Engineer doing design systems could not tier and so could
+        never reach apply. Pure UX is still dropped by title."""
         r = score(
             row(title="Senior Product Designer", description="Prototyping in Figma, design systems, component library work."),
             rules(), NOW, TIER2,
         )
-        self.assertIsNone(r["title_tier"], "product terms alone must not earn a tier")
+        self.assertEqual(r["title_tier"], "B")
+        self.assertIn("product", r["legs_hit"])
+
+    def test_a_motion_title_with_no_technical_leg_is_still_tier_c(self):
+        """The distinction tier C exists to draw. Adding motion and 3d to the
+        gate collapsed it, so only product joined."""
+        r = score(row(title="Motion Designer", description="After Effects and Cinema 4D."), rules(), NOW, TIER2)
+        self.assertEqual(r["title_tier"], "C")
 
     def test_the_product_leg_still_scores_where_it_appears(self):
         r = score(
@@ -478,3 +491,61 @@ class CraftFloor(unittest.TestCase):
     def test_a_tiered_title_still_clears_without_any_leg(self):
         r = score(row(title="Creative Technologist", description="Nothing else to say."), rules(), NOW, TIER2)
         self.assertNotEqual(r["pile"], "logged")
+
+
+class LegBreadth(unittest.TestCase):
+    """The first digest put an Economist, a PCB Layout Engineer and a Software
+    Engineer for Trainium in the apply pile. The discovery config already said
+    why, in a note written weeks earlier: the scoring legs are far too broad,
+    rendering matches every backend job, generative ai is boilerplate. That
+    lesson had only ever been applied to discovery."""
+
+    def junk(self, title, description):
+        return score(row(title=title, description=description, comp_min=250000, comp_max=380000), rules(), NOW, TIER1)
+
+    def test_economic_modeling_is_not_the_3d_leg(self):
+        r = self.junk("Economist", "Economic modeling and forecasting. Data pipelines in Python.")
+        self.assertNotIn("3d", r["legs_hit"])
+        self.assertEqual(r["pile"], "logged")
+
+    def test_server_side_rendering_is_not_the_3d_leg(self):
+        r = self.junk("Full Stack Engineer", "Server-side rendering, React, Node.")
+        self.assertNotIn("3d", r["legs_hit"])
+
+    def test_threat_modeling_is_not_the_3d_leg(self):
+        r = self.junk("Threat Intelligence Platform Engineer", "Threat modeling and detection, Python pipelines.")
+        self.assertNotIn("3d", r["legs_hit"])
+        self.assertEqual(r["pile"], "logged")
+
+    def test_generative_ai_boilerplate_is_not_the_generative_leg(self):
+        """Every posting at every AI company says it. The specific terms stay."""
+        r = self.junk("Software Engineer, Trainium", "Compiler work for generative AI training.")
+        self.assertNotIn("generative", r["legs_hit"])
+        real = self.junk("Research Engineer", "Diffusion models, ComfyUI and text-to-video.")
+        self.assertIn("generative", real["legs_hit"])
+
+    def test_the_company_name_runway_is_not_a_skill(self):
+        """Every Runway posting was scoring a generative leg for its own
+        letterhead."""
+        r = self.junk("Backend Engineer", "Join Runway to build our API.")
+        self.assertNotIn("generative", r["legs_hit"])
+
+    def test_chip_and_hardware_design_engineers_are_dropped(self):
+        for title in ("RTL Design Engineer - Interconnect", "Actuator Design Engineer",
+                      "PCB Layout Engineer, Robotics", "Silicon Design Engineer"):
+            r = self.junk(title, "Python tooling and verification.")
+            self.assertEqual(r["pile"], "logged", title)
+
+    def test_apply_needs_a_title_that_fits(self):
+        """The apply pile feeds the letter generator. A posting he cannot write
+        a credible letter for does not belong in it, whatever the body scores."""
+        r = self.junk("Staff IT Technical Program Manager",
+                      "Figma, design systems and motion system work across teams, Python automation.")
+        self.assertIsNone(r["title_tier"])
+        self.assertNotEqual(r["pile"], "apply")
+
+    def test_japan_and_the_rest_of_the_world_fail_the_gate(self):
+        for loc in ("Remote - Japan", "Remote (France)", "Remote - Singapore", "Tel Aviv, Israel"):
+            r = score(row(title="Creative Technologist", location=loc), rules(), NOW, TIER1)
+            self.assertEqual(r["pile"], "logged", loc)
+            self.assertIn("outside the US", r["drop_reason"], loc)
