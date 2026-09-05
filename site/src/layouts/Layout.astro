@@ -141,6 +141,15 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     outline: 2px solid var(--marker);
     outline-offset: 3px;
   }
+  /* On a plate the light marker measures 3.2 to 1 and fails, so the ring
+     switches to the plate's own marker with a paper halo inside it. The ring
+     never animates: a focus ring that fades in arrives late for the one
+     person who can least afford the wait. */
+  .frame :focus-visible,
+  .plate :focus-visible {
+    outline-color: var(--plate-marker);
+    box-shadow: 0 0 0 2px var(--paper);
+  }
   h1,
   h2,
   h3 {

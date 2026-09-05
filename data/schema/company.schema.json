@@ -21,6 +21,13 @@
       "items": {
         "$ref": "#/$defs/company"
       }
+    },
+    "dropped": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "ISO date the company was dropped by `scraper drop`. A dropped record stays on the list so nothing re-adds it, and the poll, the check and the digest skip it."
     }
   },
   "$defs": {

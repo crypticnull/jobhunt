@@ -7,9 +7,9 @@
 # Three groups. The motion-tooling makers, whose whole product is the thing
 # Matt is studying. The design-engineering-first startups, where the Design
 # Engineer title was invented. And the large remote design orgs on pollable
-# boards. Careers URLs, not board URLs: the import detects the board behind
-# the page and tries the name as a slug, and a name that resolves to nothing
-# becomes a hand-check record once rather than being re-probed every night.
+# boards. Careers URLs: the nightly reads each page for a board link and never
+# guesses slugs, so a name whose page gives nothing away waits for the one-off
+# `run.cmd import data/seeds`, which does guess, run by hand once.
 #
 # category | careers url | name
 

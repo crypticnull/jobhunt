@@ -204,10 +204,11 @@ class Store:
         return [dict(r) for r in rows]
 
     def study_rows(self):
-        """Open postings in a pile whose status is not terminal. The study
-        list counts what the market asks of postings Matt could still act on;
-        a posting he skipped or was rejected from has nothing left to teach."""
-        return [r for r in self.open_postings() if r.get("pile") in ("apply", "review") and self.state_of(r["id"]) not in TERMINAL]
+        """Open postings in a pile that Matt has not skipped or been rejected
+        from. Applied and interviewing postings stay in, because they are the
+        best evidence of what the target asks for; a skipped one has nothing
+        left to teach."""
+        return [r for r in self.open_postings() if r.get("pile") in ("apply", "review") and self.state_of(r["id"]) not in ("skipped", "rejected")]
 
     def mark_digested(self, ids, at, hasher):
         for pid in ids:
