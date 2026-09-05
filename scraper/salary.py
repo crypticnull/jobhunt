@@ -21,27 +21,34 @@ def _num(raw, k):
     return int(n)
 
 
+def _annualize(lo, hi, text, end):
+    tail = text[end : end + 20]
+    if _HOURLY.search(tail) or (hi < 500 and _HOURLY.search(text)):
+        return lo * 2080, hi * 2080, "hourly"
+    return lo, hi, None
+
+
 def extract(text):
-    """(min, max, currency, note) or None. note is 'hourly' when annualized."""
+    """(min, max, currency, note) or None. note is 'hourly' when annualized.
+    Every range in the text is tried in order and the first that reads as a
+    salary wins, so a home office stipend before the base pay no longer hides
+    it. A range under 20,000 after annualizing is a bonus, a stipend or a price."""
     if not text:
         return None
-    m = _RANGE.search(text)
-    if m:
+    for m in _RANGE.finditer(text):
         lo, hi = _num(m.group(1), m.group(2)), _num(m.group(3), m.group(4))
-        span = m.group(0)
-        tail = text[m.end() : m.end() + 20]
-    else:
-        m = _SINGLE.search(text)
-        if not m:
-            return None
+        lo, hi = min(lo, hi), max(lo, hi)
+        lo, hi, note = _annualize(lo, hi, text, m.end())
+        if hi >= 20000:
+            return _with_currency(text, m, lo, hi, note)
+    for m in _SINGLE.finditer(text):
         lo = hi = _num(m.group(1), m.group(2))
-        span = m.group(0)
-        tail = text[m.end() : m.end() + 20]
-    lo, hi = min(lo, hi), max(lo, hi)
-    note = None
-    if _HOURLY.search(tail) or (hi < 500 and _HOURLY.search(text)):
-        lo, hi, note = lo * 2080, hi * 2080, "hourly"
-    if hi < 20000:
-        return None  # a bonus, a stipend, a price, not a salary
+        lo, hi, note = _annualize(lo, hi, text, m.end())
+        if hi >= 20000:
+            return _with_currency(text, m, lo, hi, note)
+    return None
+
+
+def _with_currency(text, m, lo, hi, note):
     cur = _CURRENCY.search(text[max(0, m.start() - 30) : m.end() + 30])
     return lo, hi, (cur.group(1) if cur else "USD"), note

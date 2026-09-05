@@ -27,12 +27,20 @@ def _summary_range(text):
 
 
 def _comp(c):
+    """The lowest salary tier, because Ashby lists the headquarters tier first
+    and a remote hire is paid the other one."""
     if not c:
         return None, None, None
+    best = None
     for tier in c.get("compensationTiers") or []:
         for comp in tier.get("components") or []:
-            if (comp.get("compensationType") or "").lower() == "salary":
-                return comp.get("minValue"), comp.get("maxValue"), comp.get("currencyCode")
+            if (comp.get("compensationType") or "").lower() != "salary":
+                continue
+            hi = comp.get("maxValue")
+            if best is None or (hi is not None and (best[1] is None or hi < best[1])):
+                best = (comp.get("minValue"), hi, comp.get("currencyCode"))
+    if best:
+        return best
     lo, hi = _summary_range(c.get("scrapeableCompensationSalarySummary") or c.get("compensationTierSummary"))
     return lo, hi, ("USD" if lo is not None else None)
 
