@@ -203,6 +203,12 @@ class Store:
         rows = self.db.execute("SELECT * FROM postings WHERE closed_at IS NULL ORDER BY score DESC, first_seen").fetchall()
         return [dict(r) for r in rows]
 
+    def study_rows(self):
+        """Open postings in a pile whose status is not terminal. The study
+        list counts what the market asks of postings Matt could still act on;
+        a posting he skipped or was rejected from has nothing left to teach."""
+        return [r for r in self.open_postings() if r.get("pile") in ("apply", "review") and self.state_of(r["id"]) not in TERMINAL]
+
     def mark_digested(self, ids, at, hasher):
         for pid in ids:
             self.db.execute("UPDATE postings SET digested_at = ?, digest_hash = ? WHERE id = ?", (at, hasher(self.get(pid)), pid))

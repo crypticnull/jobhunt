@@ -1,0 +1,47 @@
+# The classes of company that post product motion, design engineer and motion
+# systems roles, added 2026-09-06 after the review found none of them on any
+# seed. The geography seeds were largest-employer-per-city lists, legal-tech,
+# health-tech, logistics and robotics, and the classes that actually hire for
+# the target were absent.
+#
+# Three groups. The motion-tooling makers, whose whole product is the thing
+# Matt is studying. The design-engineering-first startups, where the Design
+# Engineer title was invented. And the large remote design orgs on pollable
+# boards. Careers URLs, not board URLs: the import detects the board behind
+# the page and tries the name as a slug, and a name that resolves to nothing
+# becomes a hand-check record once rather than being re-probed every night.
+#
+# category | careers url | name
+
+# --- motion tooling
+product-inhouse | https://rive.app/careers | Rive
+product-inhouse | https://lottiefiles.com/careers | LottieFiles
+product-inhouse | https://spline.design/careers | Spline
+product-inhouse | https://jitter.video/careers | Jitter
+product-inhouse | https://www.protopie.io/careers | ProtoPie
+product-inhouse | https://www.framer.com/careers | Framer
+
+# --- design-engineering-first
+product-inhouse | https://www.raycast.com/careers | Raycast
+product-inhouse | https://thebrowser.company/careers | The Browser Company
+product-inhouse | https://tldraw.com/careers | tldraw
+product-inhouse | https://expo.dev/careers | Expo
+product-inhouse | https://zed.dev/jobs | Zed
+product-inhouse | https://www.perplexity.ai/careers | Perplexity
+product-inhouse | https://www.loom.com/careers | Loom
+product-inhouse | https://pitch.com/careers | Pitch
+product-inhouse | https://mercury.com/careers | Mercury
+product-inhouse | https://www.brex.com/careers | Brex
+product-inhouse | https://www.superhuman.com/careers | Superhuman
+product-inhouse | https://liveblocks.io/careers | Liveblocks
+product-inhouse | https://cal.com/jobs | Cal.com
+
+# --- large remote design orgs on pollable boards
+product-inhouse | https://www.cloudflare.com/careers | Cloudflare
+product-inhouse | https://www.grammarly.com/jobs | Grammarly
+product-inhouse | https://www.intercom.com/careers | Intercom
+product-inhouse | https://careers.datadoghq.com | Datadog
+product-inhouse | https://block.xyz/careers | Block
+product-inhouse | https://www.shopify.com/careers | Shopify
+product-inhouse | https://www.canva.com/careers | Canva
+product-inhouse | https://automattic.com/work-with-us | Automattic

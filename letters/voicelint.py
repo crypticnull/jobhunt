@@ -66,6 +66,10 @@ def _word(term):
 def r_em_dash(line):
     out = [(m.start() + 1, "em dash") for m in re.finditer("—", line)]
     out += [(m.start() + 2, "spaced en dash used as an em dash") for m in re.finditer(r"\s–\s", line)]
+    # Between letters or after sentence punctuation only, so a CLI flag like
+    # --profile in a doc and a year range like 2016–2019 are left alone.
+    out += [(m.start() + 1, "double hyphen used as an em dash") for m in re.finditer(r"(?<=[A-Za-z.,!?)])--(?=[A-Za-z\s])", line)]
+    out += [(m.start() + 1, "unspaced en dash used as an em dash") for m in re.finditer(r"(?<=[a-zA-Z])–(?=[a-zA-Z])", line)]
     return out
 
 
@@ -103,7 +107,14 @@ def _lexicon(line, terms, label):
 
 
 def r_not_x_but_y(text):
-    return [(m.start(), "'not X, but Y' construction") for m in re.finditer(r"(?:\bnot\b|n't\b)[^.!?;]{1,80}?,\s*but\b", text, re.IGNORECASE)]
+    """The construction, with and without the comma: a negation, a noun phrase
+    beginning with an article or a minimiser, then "but". Revised 2026-09-05.
+    The old rule fired on any negation within eighty characters of a comma
+    and "but", which refused "I don't know your codebase yet, but I've
+    shipped", the everyday negation-comma-but sentence the voice rules ask
+    for, and missed the comma-less "not a reskin but a rebuild"."""
+    pat = r"(?:\bnot|n't)\s+(?:a|an|the|just|only|merely|simply|some)\b[^.!?;,]{1,40}?,?\s*but\b"
+    return [(m.start(), "'not X, but Y' construction") for m in re.finditer(pat, text, re.IGNORECASE)]
 
 
 def r_apply_opener(text, rules):

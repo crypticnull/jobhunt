@@ -49,3 +49,11 @@ class SaveGate(unittest.TestCase):
             path, findings = save_draft(POSTING, COMPANY, "I am sure it is right.\n", d, RULES)
         self.assertIsNone(path)
         self.assertEqual({f.level for f in findings}, {"warning"})
+
+
+class Placeholders(unittest.TestCase):
+    def test_an_unfilled_placeholder_is_refused(self):
+        with tempfile.TemporaryDirectory() as d:
+            path, findings = save_draft(POSTING, COMPANY, GOOD.replace("Acme", "{company}"), d, RULES)
+        self.assertIsNone(path)
+        self.assertTrue(any(f.rule == "placeholder" for f in findings))
