@@ -2,6 +2,44 @@
   "version": 1,
   "companies": [
     {
+      "slug": "1password",
+      "name": "1Password",
+      "careers_url": "https://1password.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "1password"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "activecampaign",
+      "name": "ActiveCampaign",
+      "careers_url": "https://www.activecampaign.com/careers",
+      "ats": {
+        "kind": "lever",
+        "board": "activecampaign"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Chicago, IL",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "airbnb",
       "name": "Airbnb",
       "careers_url": "https://careers.airbnb.com",
@@ -19,6 +57,25 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "same-everywhere",
       "hq": null
+    },
+    {
+      "slug": "amperity",
+      "name": "Amperity",
+      "careers_url": "https://amperity.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "amperity"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Seattle, WA",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "anthropic",
@@ -40,6 +97,25 @@
       "hq": null
     },
     {
+      "slug": "arenanet",
+      "name": "ArenaNet",
+      "careers_url": "https://arena.net/en/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "arenanet"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Bellevue, WA",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "away",
       "name": "Away",
       "careers_url": "https://www.away.com/careers",
@@ -57,6 +133,25 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "axon",
+      "name": "Axon",
+      "careers_url": "https://www.axon.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "axon"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Scottsdale, AZ",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "black-forest-labs",
@@ -78,6 +173,44 @@
       "hq": null
     },
     {
+      "slug": "boom-supersonic",
+      "name": "Boom Supersonic",
+      "careers_url": "https://boomsupersonic.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "boom"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Denver, CO",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "branch",
+      "name": "Branch",
+      "careers_url": "https://branch.co/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "branch"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Minneapolis, MN",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "brand-new-school",
       "name": "Brand New School",
       "careers_url": "https://www.brand-new-school.com/careers",
@@ -95,6 +228,63 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "brooks-running",
+      "name": "Brooks Running",
+      "careers_url": "https://www.brooksrunning.com/careers",
+      "ats": {
+        "kind": "lever",
+        "board": "brooksrunning"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Seattle, WA",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "buffer",
+      "name": "Buffer",
+      "careers_url": "https://buffer.com/journey",
+      "ats": {
+        "kind": "ashby",
+        "board": "buffer"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "bungie",
+      "name": "Bungie",
+      "careers_url": "https://www.bungie.net/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "bungie"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Bellevue, WA",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "calm",
@@ -116,6 +306,25 @@
       "hq": null
     },
     {
+      "slug": "cameo",
+      "name": "Cameo",
+      "careers_url": "https://www.cameo.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "cameo"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Chicago, IL",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "captions",
       "name": "Captions",
       "careers_url": "https://www.captions.ai/careers",
@@ -133,6 +342,63 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "censys",
+      "name": "Censys",
+      "careers_url": "https://censys.io/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "censys"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Ann Arbor, MI",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "clearwater-analytics",
+      "name": "Clearwater Analytics",
+      "careers_url": "https://clearwateranalytics.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "clearwater"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Boise, ID",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "clerk",
+      "name": "Clerk",
+      "careers_url": "https://clerk.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "Clerk"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "coinbase",
@@ -171,6 +437,25 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "cursor",
+      "name": "Cursor",
+      "careers_url": "https://anysphere.inc/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "cursor"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": null,
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "d-id",
@@ -268,6 +553,25 @@
       "hq": null
     },
     {
+      "slug": "dutch-bros",
+      "name": "Dutch Bros",
+      "careers_url": "https://www.dutchbros.com/careers",
+      "ats": {
+        "kind": "lever",
+        "board": "dutch"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Grants Pass, OR",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "elastic",
       "name": "Elastic",
       "careers_url": "https://www.elastic.tv/careers",
@@ -325,6 +629,44 @@
       "hq": null
     },
     {
+      "slug": "fal",
+      "name": "Fal",
+      "careers_url": "https://fal.ai/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "fal-ai"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": null,
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "fetch",
+      "name": "Fetch",
+      "careers_url": "https://www.fetch.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "fetch"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Madison, WI",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "figma",
       "name": "Figma",
       "careers_url": "https://www.figma.com/careers",
@@ -361,6 +703,25 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "filson",
+      "name": "Filson",
+      "careers_url": "https://www.filson.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "filson"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Seattle, WA",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "flawless-ai",
@@ -420,6 +781,25 @@
       "hq": null
     },
     {
+      "slug": "g2",
+      "name": "G2",
+      "careers_url": "https://www.g2.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "g2"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Chicago, IL",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "genmo",
       "name": "Genmo",
       "careers_url": "https://www.genmo.ai/careers",
@@ -439,6 +819,44 @@
       "hq": null
     },
     {
+      "slug": "ghost",
+      "name": "Ghost",
+      "careers_url": "https://ghost.org/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "ghost"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "gitlab",
+      "name": "GitLab",
+      "careers_url": "https://about.gitlab.com/jobs",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "gitlab"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "glossier",
       "name": "Glossier",
       "careers_url": "https://www.glossier.com/careers",
@@ -456,6 +874,44 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "grafana-labs",
+      "name": "Grafana Labs",
+      "careers_url": "https://grafana.com/about/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "grafanalabs"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "guild",
+      "name": "Guild",
+      "careers_url": "https://www.guildeducation.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "guild"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Denver, CO",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "headspace",
@@ -534,6 +990,63 @@
       "hq": null
     },
     {
+      "slug": "hotjar",
+      "name": "Hotjar",
+      "careers_url": "https://www.hotjar.com/careers",
+      "ats": {
+        "kind": "lever",
+        "board": "contentsquare"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "hudl",
+      "name": "Hudl",
+      "careers_url": "https://www.hudl.com/jobs",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "hudl"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Lincoln, NE",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "ibotta",
+      "name": "Ibotta",
+      "careers_url": "https://ibotta.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "ibotta"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Denver, CO",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "ideogram",
       "name": "Ideogram",
       "careers_url": "https://ideogram.ai/careers",
@@ -572,6 +1085,25 @@
       "hq": null
     },
     {
+      "slug": "jamf",
+      "name": "Jamf",
+      "careers_url": "https://www.jamf.com/about/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "jamf"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Minneapolis, MN",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "jellyfish-pictures",
       "name": "Jellyfish Pictures",
       "careers_url": "https://www.jellyfishpictures.co.uk/careers",
@@ -608,6 +1140,25 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "keen",
+      "name": "Keen",
+      "careers_url": "https://www.keenfootwear.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "keen"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Portland, OR",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "krea",
@@ -684,6 +1235,44 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "livefront",
+      "name": "Livefront",
+      "careers_url": "https://livefront.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "livefront"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Minneapolis, MN",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "lucid-software",
+      "name": "Lucid Software",
+      "careers_url": "https://lucid.co/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "lucidsoftware"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "South Jordan, UT",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "luma-ai",
@@ -819,6 +1408,44 @@
       "hq": null
     },
     {
+      "slug": "neon",
+      "name": "Neon",
+      "careers_url": "https://neon.tech/careers",
+      "ats": {
+        "kind": "lever",
+        "board": "neon"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "netlify",
+      "name": "Netlify",
+      "careers_url": "https://www.netlify.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "netlify"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "notion",
       "name": "Notion",
       "careers_url": "https://www.notion.com/careers",
@@ -855,6 +1482,25 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "onx-maps",
+      "name": "onX Maps",
+      "careers_url": "https://www.onxmaps.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "onxmaps"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Missoula, MT",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "openai",
@@ -895,6 +1541,25 @@
       "hq": null
     },
     {
+      "slug": "otter-products",
+      "name": "Otter Products",
+      "careers_url": "https://www.otterbox.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "otter"
+      },
+      "category": "brand-inhouse",
+      "tier": 4,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Fort Collins, CO",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "oura",
       "name": "Oura",
       "careers_url": "https://ouraring.com/careers",
@@ -914,6 +1579,44 @@
       "hq": null
     },
     {
+      "slug": "outreach",
+      "name": "Outreach",
+      "careers_url": "https://www.outreach.io/careers",
+      "ats": {
+        "kind": "lever",
+        "board": "outreach"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Seattle, WA",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "oyster",
+      "name": "Oyster",
+      "careers_url": "https://www.oysterhr.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "oyster"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "parallel-teeth",
       "name": "Parallel Teeth",
       "careers_url": "https://www.parallelteeth.com/careers",
@@ -931,6 +1634,25 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "path-robotics",
+      "name": "Path Robotics",
+      "careers_url": "https://www.path.tech/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "pathrobotics"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Columbus, OH",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "patreon",
@@ -971,6 +1693,25 @@
       "hq": null
     },
     {
+      "slug": "photoroom",
+      "name": "Photoroom",
+      "careers_url": "https://www.photoroom.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "photoroom"
+      },
+      "category": "ai-video",
+      "tier": 1,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": null,
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "pika",
       "name": "Pika",
       "careers_url": "https://pika.art/careers",
@@ -1009,6 +1750,44 @@
       "hq": null
     },
     {
+      "slug": "planetscale",
+      "name": "PlanetScale",
+      "careers_url": "https://planetscale.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "planetscale"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": null,
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "podium",
+      "name": "Podium",
+      "careers_url": "https://www.podium.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "podium81"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Lehi, UT",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "polaroid",
       "name": "Polaroid",
       "careers_url": "https://www.polaroid.com/careers",
@@ -1026,6 +1805,63 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "posthog",
+      "name": "PostHog",
+      "careers_url": "https://posthog.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "posthog"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "project44",
+      "name": "project44",
+      "careers_url": "https://www.project44.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "project44"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Chicago, IL",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "railway",
+      "name": "Railway",
+      "careers_url": "https://railway.app/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "railway"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "ramp",
@@ -1047,6 +1883,25 @@
       "hq": null
     },
     {
+      "slug": "read-ai",
+      "name": "Read AI",
+      "careers_url": "https://www.read.ai/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "read-ai"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Seattle, WA",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "recraft",
       "name": "Recraft",
       "careers_url": "https://www.recraft.ai/careers",
@@ -1064,6 +1919,177 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "recursion",
+      "name": "Recursion",
+      "careers_url": "https://www.recursion.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "recursionpharmaceuticals"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Salt Lake City, UT",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "reddit",
+      "name": "Reddit",
+      "careers_url": "https://www.redditinc.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "reddit"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "San Francisco, CA",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "redox",
+      "name": "Redox",
+      "careers_url": "https://www.redoxengine.com/careers",
+      "ats": {
+        "kind": "workable",
+        "board": "redox"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Madison, WI",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "relativity",
+      "name": "Relativity",
+      "careers_url": "https://www.relativity.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "relativity"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Chicago, IL",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "remote",
+      "name": "Remote",
+      "careers_url": "https://remote.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "remote"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "render",
+      "name": "Render",
+      "careers_url": "https://render.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "render"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "replit",
+      "name": "Replit",
+      "careers_url": "https://replit.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "replit"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": null,
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "resend",
+      "name": "Resend",
+      "careers_url": "https://resend.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "resend"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "revenuecat",
+      "name": "RevenueCat",
+      "careers_url": "https://www.revenuecat.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "revenuecat"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "ro",
@@ -1123,6 +2149,25 @@
       "hq": null
     },
     {
+      "slug": "rover",
+      "name": "Rover",
+      "careers_url": "https://www.rover.com/careers",
+      "ats": {
+        "kind": "lever",
+        "board": "rover"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Seattle, WA",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "runway",
       "name": "Runway",
       "careers_url": "https://runwayml.com/careers",
@@ -1140,6 +2185,44 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "scopely",
+      "name": "Scopely",
+      "careers_url": "https://www.scopely.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "scopely"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Culver City, CA",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "sentry",
+      "name": "Sentry",
+      "careers_url": "https://sentry.io/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "sentry"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "San Francisco, CA",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "skillshare",
@@ -1161,6 +2244,25 @@
       "hq": null
     },
     {
+      "slug": "sourcegraph",
+      "name": "Sourcegraph",
+      "careers_url": "https://sourcegraph.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "sourcegraph91"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "spotify",
       "name": "Spotify",
       "careers_url": "https://www.lifeatspotify.com/jobs",
@@ -1178,6 +2280,25 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "same-everywhere",
       "hq": null
+    },
+    {
+      "slug": "sprout-social",
+      "name": "Sprout Social",
+      "careers_url": "https://sproutsocial.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "sproutsocial"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Chicago, IL",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "squarespace",
@@ -1218,6 +2339,25 @@
       "hq": null
     },
     {
+      "slug": "stockx",
+      "name": "StockX",
+      "careers_url": "https://stockx.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "stockx"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Detroit, MI",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "strava",
       "name": "Strava",
       "careers_url": "https://www.strava.com/careers",
@@ -1256,6 +2396,25 @@
       "hq": null
     },
     {
+      "slug": "submittable",
+      "name": "Submittable",
+      "careers_url": "https://www.submittable.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "submittable"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Missoula, MT",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "suno",
       "name": "Suno",
       "careers_url": "https://suno.com/careers",
@@ -1273,6 +2432,25 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "supabase",
+      "name": "Supabase",
+      "careers_url": "https://supabase.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "supabase"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": null,
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "super-fiction",
@@ -1311,6 +2489,25 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "tailscale",
+      "name": "Tailscale",
+      "careers_url": "https://tailscale.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "tailscale"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "tavus",
@@ -1368,6 +2565,25 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "truveta",
+      "name": "Truveta",
+      "careers_url": "https://www.truveta.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "truveta"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Seattle, WA",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "twitch",
@@ -1446,6 +2662,44 @@
       "hq": null
     },
     {
+      "slug": "warp",
+      "name": "Warp",
+      "careers_url": "https://www.warp.dev/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "warp"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
+      "slug": "weave",
+      "name": "Weave",
+      "careers_url": "https://www.getweave.com/careers",
+      "ats": {
+        "kind": "ashby",
+        "board": "weave"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Lehi, UT",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "webflow",
       "name": "Webflow",
       "careers_url": "https://webflow.com/careers",
@@ -1484,6 +2738,25 @@
       "hq": null
     },
     {
+      "slug": "wizards-of-the-coast",
+      "name": "Wizards of the Coast",
+      "careers_url": "https://company.wizards.com/careers",
+      "ats": {
+        "kind": "greenhouse",
+        "board": "hasbro"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Renton, WA",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
+    },
+    {
       "slug": "world-labs",
       "name": "World Labs",
       "careers_url": "https://www.worldlabs.ai/careers",
@@ -1501,6 +2774,25 @@
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
       "hq": null
+    },
+    {
+      "slug": "zapier",
+      "name": "Zapier",
+      "careers_url": "https://zapier.com/jobs",
+      "ats": {
+        "kind": "ashby",
+        "board": "zapier"
+      },
+      "category": "product-inhouse",
+      "tier": 3,
+      "size": null,
+      "priority": 2,
+      "lead_proof": null,
+      "pay_model": "unknown",
+      "hq": "Remote",
+      "remote_notes": "",
+      "added": "2026-09-05",
+      "last_reviewed": "2026-09-05"
     },
     {
       "slug": "capslock",

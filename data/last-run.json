@@ -1,8 +1,8 @@
 {
-  "ran_at": "2026-09-04T08:01:28+00:00",
-  "companies": 88,
-  "pollable": 79,
-  "postings": 6425,
-  "open": 6153,
-  "poll_errors": 0
+  "ran_at": "2026-09-05T08:05:33+00:00",
+  "companies": 156,
+  "pollable": 147,
+  "postings": 9724,
+  "open": 9370,
+  "poll_errors": 4
 }
