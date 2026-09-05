@@ -75,14 +75,28 @@ def normalize_title(title):
     return re.sub(r"\s+", " ", t).strip()
 
 
-def parse_states(text, rules):
-    """A list of two-letter codes, ["US"] for nationwide, or None when the text names no list.
-    Two or more codes or state names in one run count as a list; a single mention does not."""
-    low = (text or "").lower()
-    for token in rules["gates"]["remote"]["nationwide_tokens"]:
-        if _term(token).search(low):
-            return ["US"]
+_STATE_ANCHOR = re.compile(
+    r"\b(?:eligible|located|reside|residing|based|live|living|hire|hiring|open to|candidates|employees|authorized|work)\b[^.]{0,40}?\b(?:in|from|within)\b",
+    re.IGNORECASE,
+)
+_PAY_BOILERPLATE = re.compile(r"pay (?:range|transparency)|salary range|compensation range|base salary|base pay", re.IGNORECASE)
+
+
+def _state_windows(body):
+    """The stretches of a body that can name where a hire may live. Pay
+    transparency boilerplate lists California, Colorado, New York and
+    Washington on every posting and is not a residency list."""
+    out = []
+    for m in _STATE_ANCHOR.finditer(body or ""):
+        window = body[m.end() : m.end() + 200]
+        if not _PAY_BOILERPLATE.search(body[max(0, m.start() - 80) : m.end() + 200]):
+            out.append(window)
+    return "\n".join(out)
+
+
+def _state_list(text):
     found = []
+    low = (text or "").lower()
     for m in re.finditer(r"\b((?:[A-Z]{2})(?:\s*[,/&]\s*|\s+and\s+|\s+or\s+)(?:[A-Z]{2}(?:\s*[,/&]\s*|\s+and\s+|\s+or\s+)?)+)\b", text or ""):
         codes = [c for c in re.findall(r"[A-Z]{2}", m.group(1)) if c in US_STATES]
         if len(codes) >= 2:
@@ -90,6 +104,33 @@ def parse_states(text, rules):
     names = [STATE_NAMES[n] for n in STATE_NAMES if re.search(r"\b" + n + r"\b", low)]
     if len(names) >= 2:
         found.extend(names)
+    return found
+
+
+def parse_states(text, rules, body=""):
+    """A list of two-letter codes, ["US"] for nationwide, or None when the text names no list.
+    Two or more codes or state names in one run count as a list; a single mention does not.
+
+    `text` is the location and is read whole. `body` is the description and is
+    read only where it can name a residency rule: the multiword nationwide
+    tokens anywhere, state lists only inside a window after a residency anchor.
+    Before 2026-09-05 the whole body was read and the bare token "us" matched
+    "join us", so every posting was nationwide and the state-list and time zone
+    rules only ever fired on bodies that never said "us"."""
+    low = (text or "").lower()
+    tokens = rules["gates"]["remote"]["nationwide_tokens"]
+    for token in tokens:
+        if _term(token).search(low):
+            return ["US"]
+    body_low = (body or "").lower()
+    if body_low:
+        for token in tokens:
+            if " " in token or "-" in token:  # multiword tokens carry their own context
+                if _term(token).search(body_low):
+                    return ["US"]
+    found = _state_list(text or "")
+    if body:
+        found.extend(_state_list(_state_windows(body)))
     return sorted(set(found)) if found else None
 
 
@@ -133,22 +174,29 @@ def gate_remote(p, rules):
     abroad = _hits(r.get("fail_location_patterns", []), loc)
     if abroad and not _hits(r["nationwide_tokens"], loc) and not parse_states(loc, rules):
         return "fail", [f"location is outside the US: {', '.join(abroad[:2])}"], False
-    states = parse_states((p.get("location") or "") + "\n" + (p.get("description") or ""), rules)
+    states = parse_states(p.get("location") or "", rules, body=p.get("description") or "")
     if states and states != ["US"]:
         if any(s not in states for s in r["fail_if_state_list_excludes"]):
             return "fail", [f"state list excludes {', '.join(r['fail_if_state_list_excludes'])}: {', '.join(states)}"], False
         if all(s not in states for s in r["flag_if_state_list_excludes_all_of"]):
             reasons.append(f"state list has no {' or '.join(r['flag_if_state_list_excludes_all_of'])} yet: {', '.join(states)}")
     nationwide = states == ["US"] or any(_term(t).search(loc) for t in r["nationwide_tokens"])
-    if not nationwide:
-        tz_ok = any(_term(t).search(body + "\n" + loc) for t in r["ok_timezone_phrases"])
-        # A time zone phrase is excused by an ok phrase; a payroll-default shape like "Remote (…)" is excused by a real state list.
-        flagged = [
-            f for f in _hits(r["flag_phrases"], loc + "\n" + body)
-            if not (tz_ok and ("time" in f or "hours" in f)) and not (states and "time" not in f and "hours" not in f)
-        ]
-        if flagged:
-            reasons.append(f"payroll-default or timezone language: {', '.join(flagged[:2])}")
+    tz_ok = any(_term(t).search(body + "\n" + loc) for t in r["ok_timezone_phrases"])
+    # A time zone phrase is excused by an ok phrase and flags even on a
+    # nationwide posting, since Eastern-only on "Remote - US" is still a
+    # constraint. A payroll-default shape like "Remote (…)" is excused by a
+    # real state list or a nationwide location.
+    tz_flags, shape_flags = [], []
+    for f in _hits(r["flag_phrases"], loc + "\n" + body):
+        is_tz = "time" in f or "hours" in f
+        if is_tz and not tz_ok:
+            tz_flags.append(f)
+        elif not is_tz and not nationwide and not states:
+            shape_flags.append(f)
+    if shape_flags:
+        reasons.append(f"payroll-default language: {', '.join(shape_flags[:2])}")
+    if tz_flags:
+        reasons.append(f"timezone language: {', '.join(tz_flags[:2])}")
     pacific = is_pacific(p, states, rules)
     if claim in r["require_claim"]:
         result = "flag" if reasons else "pass"
@@ -335,7 +383,14 @@ def evaluate(p, rules, company=None, now=None):
     # on the row, so he still decides, but a tier A title reaches the pile the
     # letter generator reads.
     override = out["title_tier"] in (piles.get("flag_override_title_tiers") or [])
-    held = bool(out["flags"]) and piles["flagged_always_review"] and not override
+    # A soft flag halves the remote marks and prints on the row but does not
+    # hold a tiered title in review. Payroll-default shapes like "Remote - New
+    # York" are soft: once the "us" bug was fixed they fire on real matches,
+    # and the point of fixing the gate was to surface those, not to move them
+    # from apply to review.
+    soft = piles.get("soft_flag_prefixes") or []
+    hard_flags = [f for f in out["flags"] if not (out["title_tier"] and any(f.startswith(x) for x in soft))]
+    held = bool(hard_flags) and piles["flagged_always_review"] and not override
     if titled and score["total"] >= piles["apply_min"] and not held:
         out["pile"] = "apply"
     elif score["total"] >= piles["review_min"] or out["flags"]:

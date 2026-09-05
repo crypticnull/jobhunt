@@ -217,7 +217,13 @@ class Headquarters(unittest.TestCase):
         return md
 
     def test_a_known_location_is_printed(self):
-        self.assertIn("Hillsboro, OR", self.md(hq="Hillsboro, OR"))
+        """The company HQ is labelled, and the posting's own location prints
+        before it, because the digest used to print the HQ where a reader takes
+        the posting location to be, so Reddit rows read San Francisco while the
+        posting said Remote - United States."""
+        md = self.md(hq="Hillsboro, OR")
+        self.assertIn("HQ Hillsboro, OR", md)
+        self.assertIn("remote · Remote - US · ", md)
 
     def test_an_unknown_location_adds_nothing(self):
         md = self.md()

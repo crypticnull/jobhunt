@@ -43,12 +43,34 @@ def html_to_text(s):
     return text.strip()
 
 
-_REMOTE_WORDS = ("remote", "anywhere", "distributed", "work from home", "wfh")
+_REMOTE_WORDS = ("remote", "anywhere", "distributed", "work from home", "wfh", "virtual", "telecommut", "home-based", "home based")
+
+# A location that names a country or a region and no city says nothing about
+# where the desk is. Before 2026-09-05 any of these was stamped onsite, which
+# was 6,069 of the 9,591 logged rows and the whole reason Figma, Vercel and
+# Dropbox polled a hundred postings each with none on target: Greenhouse has
+# no structured workplace field, so "United States" was a hard fail before
+# the body was read. Now it is unclear and the body decides.
+_NO_CITY = (
+    "united states", "united states of america", "us", "usa", "u.s.", "u.s.a.", "u.s", "north america",
+    "americas", "america", "multiple locations", "multiple", "various", "various locations", "flexible",
+    "global", "any location", "any", "nationwide", "worldwide", "n/a", "tbd", "other",
+    # countries and regions, which the abroad gate in score.py then judges by the location alone
+    "canada", "united kingdom", "uk", "europe", "emea", "apac", "latam", "germany", "france", "spain", "india",
+    "australia", "mexico", "brazil", "ireland", "netherlands", "poland", "portugal", "israel", "japan", "singapore",
+)
+
+
+def _no_city(loc):
+    """True when the location text is only country, region or filler words."""
+    parts = [x.strip() for x in re.split(r"[;,/|()\-]+", loc) if x.strip()]
+    return bool(parts) and all(x in _NO_CITY for x in parts)
 
 
 def classify_remote(location="", workplace_type=None):
     """remote | hybrid | onsite | unclear. A structured workplace type wins;
-    otherwise the location text decides, hybrid beating remote when both appear."""
+    otherwise the location text decides, hybrid beating remote when both appear,
+    and a country or region with no city is unclear rather than onsite."""
     wt = (workplace_type or "").strip().lower()
     if wt == "remote":
         return "remote"
@@ -61,6 +83,6 @@ def classify_remote(location="", workplace_type=None):
         return "hybrid"
     if any(w in loc for w in _REMOTE_WORDS):
         return "remote"
-    if not loc.strip():
+    if not loc.strip() or _no_city(loc):
         return "unclear"
     return "onsite"

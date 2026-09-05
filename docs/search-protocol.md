@@ -95,8 +95,12 @@ Pass, flag, or fail. Fail drops the listing. Flag passes at half marks on the re
 
 **Pass** requires all of:
 - `remote_claim` is `remote`, from the location field or the title.
-- No fake-remote phrase anywhere in the body. The list is in `scoring.json` under `remote.fail_phrases`. The core ones: hybrid, on-site, onsite, in-office, in office, remote for now, remote to start, initially remote, occasional office, days in the office, days per week in, commuting distance, local candidates, within N miles, must be located in, relocate to.
+- No fake-remote phrase anywhere in the body. The list is in `scoring.json` under `remote.fail_phrases`. The core ones: in-office, in office, remote for now, remote to start, initially remote, occasional office, days in the office, days per week in, commuting distance, local candidates, within N miles, relocate to. Revised 2026-09-05: "must be located in", "must reside in", "must live in" and "based in the" fail only when the place named is not the US, because "you must be based in the United States" is the standard payroll sentence on a US-remote role and was dropping genuine remote postings by the hundred. "hybrid" needs office or schedule words in the same sentence, so hybrid search and hybrid cloud stop failing the gate, and "on-site" spares a final on-site interview.
 - State list is `null`, nationwide, or contains PA and at least one of WA or OR.
+
+How `remote_claim` is read, revised 2026-09-05. A structured workplace field wins where the ATS has one. Where it does not, which is every Greenhouse board, the location text decides, and a location that names only a country or a region, "United States", "US", "North America", "Multiple Locations", is `unclear` rather than `onsite`, so the body gets to say. Before that date any location without a remote word was a hard fail before the body was read, which was 6,069 of the 9,591 logged rows on the first real digest and the whole reason Figma, Vercel and Dropbox polled a hundred postings each with none on target. A Greenhouse office named Remote makes a country location `remote` and a city location `unclear`, never a city `remote` on its own.
+
+How the state list is read, revised the same day. Nationwide tokens are read from the location, plus the multiword ones from the body. The bare token "us" was read from the whole body before, so "join us" made every posting nationwide and the state-list and time zone rules only ever fired on bodies that never said it. State lists in the body count only inside a residency sentence, "candidates must be located in", "eligible to work from", never inside pay-transparency boilerplate, which names California, Colorado, New York and Washington on every posting and is not a residency rule.
 
 **Fail** on any of:
 - `remote_claim` is `hybrid` or `onsite`.
@@ -107,13 +111,15 @@ Pass, flag, or fail. Fail drops the listing. Flag passes at half marks on the re
 
 **Flag** (pass at half marks, reason attached) on:
 - State list includes PA but neither WA nor OR. State lists change and it can be asked on the first call.
-- Location reads like "Remote (San Francisco)" or "Remote - New York" with no state list and no residency language. Usually a payroll default, not a requirement.
+- Location reads like "Remote (San Francisco)" or "Remote - New York" with no state list and no residency language. Usually a payroll default, not a requirement. This flag is soft: it halves the remote marks and prints on the row but does not hold a tiered title in review, because once the "us" bug was fixed it fires on real matches and the point was to surface them.
 - `remote_claim` is `unclear` but the body says remote and no fail phrase is present.
-- Time zone requirements tighter than "US time zones". Pacific-only is fine for someone moving to the Northwest and earns the full remote marks, Eastern-only is a flag, not a fail.
+- Time zone requirements tighter than "US time zones". Pacific-only is fine for someone moving to the Northwest and earns the full remote marks, Eastern-only is a flag, not a fail, and it flags on a nationwide posting too.
 
 ## Gate 2: comp isn't insulting
 
 Annualize first. Hourly times 2080. Ranges keep both ends. Gate on `salary_max`, because that's the number a negotiation can reach. Score on the midpoint, because that's the number they'll open with.
+
+Where an ATS publishes one range per office, which is how location-adjusted pay shows up, the range with the lowest maximum is the one gated and scored, because that is the tier a remote hire outside the headquarters city is paid. Revised 2026-09-05: Greenhouse ranges were merged min-of-mins and max-of-maxes, and Ashby took the first tier, so a location-adjusted employer cleared the gate on its San Francisco number. The text parser now reads every dollar range in a description and takes the first that reads as a salary, so a home office stipend listed before the base pay no longer hides it.
 
 **Pass**
 - `salary_max` ≥ 130,000.

@@ -78,6 +78,11 @@ class TextHelpers(unittest.TestCase):
         self.assertEqual(classify_remote("Remote or NYC, hybrid"), "hybrid")
         self.assertEqual(classify_remote("Austin, TX"), "onsite")
         self.assertEqual(classify_remote(""), "unclear")
+        # a country or a region with no city says nothing about the desk
+        for loc in ("United States", "US", "USA", "North America", "Multiple Locations", "Flexible", "United States; Canada"):
+            self.assertEqual(classify_remote(loc), "unclear", loc)
+        self.assertEqual(classify_remote("US - Virtual"), "remote")
+        self.assertEqual(classify_remote("Telecommute"), "remote")
         self.assertEqual(classify_remote("Austin, TX", "remote"), "remote")
         self.assertEqual(classify_remote("Remote", "OnSite"), "onsite")
 

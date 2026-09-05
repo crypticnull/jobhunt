@@ -611,3 +611,97 @@ class ThirdDigestFixes(unittest.TestCase):
         r = self.junk("Senior Design Engineer",
                       "Figma, prototyping, design systems, TypeScript, motion in the product.")
         self.assertEqual(r["title_tier"], "B")
+
+
+class RemoteGateReadsTheBody(unittest.TestCase):
+    """The 2026-09-05 review found 6,069 of 9,591 logged rows were one text
+    heuristic: any location without a remote word was stamped onsite before
+    the body was read. These pin the corrected gate."""
+
+    def test_a_country_location_with_a_remote_body_reaches_review(self):
+        r = score(row(remote_class="unclear", location="United States", description="This is a fully remote role anywhere in the US."), rules(), NOW, TIER2)
+        self.assertEqual(r["pile"], "review", r.get("drop_reason"))
+        self.assertTrue(any("remote in the body" in f for f in r["flags"]))
+
+    def test_a_city_location_is_still_onsite(self):
+        r = score(row(remote_class="onsite", location="Austin, TX", description="Fully remote."), rules(), NOW, TIER2)
+        self.assertEqual(r["drop_reason"], "remote: remote claim is onsite")
+
+    def test_us_residency_wording_is_not_a_fake_remote_phrase(self):
+        bodies = (
+            "This is a fully remote role. You must be based in the United States.",
+            "Remote. Candidates must be located in the US.",
+            "Remote. You must reside in the United States to be eligible.",
+            "Remote. Applicants must live within the U.S.",
+            "We use a hybrid search architecture and hybrid cloud deployments.",
+            "Remote. The final round is an on-site interview in Austin.",
+        )
+        for body in bodies:
+            r = score(row(description=body), rules(), NOW, TIER2)
+            self.assertIsNone(r.get("drop_reason"), body + " -> " + str(r.get("drop_reason")))
+
+    def test_residency_outside_the_us_still_fails(self):
+        for body in ("Remote. You must be based in the UK.", "Remote. Must reside in Germany.", "Remote, but hybrid schedule with three days in the office."):
+            r = score(row(description=body), rules(), NOW, TIER2)
+            self.assertEqual(r["pile"], "logged", body)
+            self.assertIn("fake-remote phrase", r["drop_reason"], body)
+
+    def test_join_us_no_longer_makes_a_posting_nationwide(self):
+        r = score(row(location="Remote (CA, NY, WA)", description="Join us. Figma."), rules(), NOW, TIER2)
+        self.assertEqual(r["pile"], "logged")
+        self.assertIn("state list excludes PA", r["drop_reason"])
+
+    def test_pay_boilerplate_is_not_a_state_list(self):
+        body = "Fully remote across the US. The pay range for this role in California, Colorado, New York and Washington is $150,000 to $180,000."
+        r = score(row(location="Remote - US", description=body), rules(), NOW, TIER2)
+        self.assertIsNone(r.get("drop_reason"), r.get("drop_reason"))
+
+    def test_a_residency_list_in_the_body_still_counts(self):
+        body = "Remote. Candidates must be located in California, Colorado or New York."
+        r = score(row(location="Remote", description=body), rules(), NOW, TIER2)
+        self.assertEqual(r["pile"], "logged")
+        self.assertIn("state list excludes PA", r["drop_reason"])
+
+    def test_eastern_hours_flag_on_a_nationwide_posting(self):
+        r = score(row(location="Remote - US", description="Must keep eastern time hours. About us: we are great."), rules(), NOW, TIER2)
+        self.assertEqual(fired(r, "remote")["value"], 12)
+        self.assertTrue(any("timezone" in f for f in r["flags"]))
+
+    def test_a_payroll_default_flag_does_not_hold_a_tiered_title(self):
+        r = score(row(title="Senior Design Engineer", location="Remote - New York",
+                      description="Figma, prototyping, design systems, TypeScript, product motion.",
+                      comp_min=200000, comp_max=260000, comp_found=1), rules(), NOW, TIER1)
+        self.assertTrue(any("payroll-default" in f for f in r["flags"]))
+        self.assertEqual(fired(r, "remote")["value"], 12)
+        self.assertEqual(r["pile"], "apply", "the flag prints and halves the marks but does not hide the match")
+
+    def test_remote_cities_abroad_fail(self):
+        for loc in ("Remote - London", "Remote, Toronto", "Remote - Europe", "Berlin (Remote)", "Remote - New Zealand"):
+            r = score(row(location=loc), rules(), NOW, TIER2)
+            self.assertEqual(r["pile"], "logged", loc)
+            self.assertIn("outside the US", r["drop_reason"], loc)
+
+
+class PayFollowsTheWorker(unittest.TestCase):
+    def test_greenhouse_gates_on_the_lowest_tier(self):
+        from scraper.adapters.greenhouse import _pay_range
+        tiers = [{"min_cents": 20000000, "max_cents": 25000000, "title": "SF"}, {"min_cents": 15000000, "max_cents": 19000000, "title": "All other US"}]
+        self.assertEqual(_pay_range(tiers), (150000, 190000, None))
+
+    def test_a_dropped_zero_does_not_become_a_minimum(self):
+        from scraper.adapters.greenhouse import _pay_range
+        self.assertEqual(_pay_range([{"min_cents": 2030000, "max_cents": 21400000, "currency_type": "USD"}]), (None, 214000, "USD"))
+
+    def test_ashby_walks_every_tier(self):
+        from scraper.adapters.ashby import _comp
+        c = {"compensationTiers": [
+            {"components": [{"compensationType": "Salary", "minValue": 200000, "maxValue": 250000, "currencyCode": "USD"}]},
+            {"components": [{"compensationType": "Salary", "minValue": 140000, "maxValue": 175000, "currencyCode": "USD"}]},
+        ]}
+        self.assertEqual(_comp(c), (140000, 175000, "USD"))
+
+    def test_a_stipend_before_the_salary_does_not_hide_it(self):
+        from scraper.salary import extract
+        found = extract("We offer a $1,000 to $2,000 home office stipend. The base salary range is $150,000 to $180,000.")
+        self.assertEqual(found[:2], (150000, 180000))
+        self.assertIsNone(extract("A $500 stipend and a $2,000 learning budget."))
