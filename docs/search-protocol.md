@@ -1,8 +1,8 @@
 # Search protocol
 
 ```
-version: 1.0
-date: 2026-09-01
+version: 1.1
+date: 2026-09-05
 status: final
 owner: Cowork agent
 consumer: opportunity scraper (coding project)
@@ -30,6 +30,8 @@ Matt Rodenbeck. Market-facing title Creative Technologist. Currently a senior mo
    - Workday, SmartRecruiters, Rippling and custom boards need per-company handling. Log them as `source_type: manual` until a fetcher exists.
 2. Aggregators with a remote filter: Wellfound, Otta / Welcome to the Jungle, We Work Remotely, Working Nomads, Remotive, Remote OK. LinkedIn only via the public job search pages and only within its terms, never with an authenticated session.
 3. Community boards, manual or semi-manual: Motionographer jobs, the ComfyUI Discord jobs channel, the aescripts community, Motion Design Slack groups, Creative Technologist listings on The Dots. These are low volume and high signal, a weekly manual sweep is fine for v1.
+
+Seed lists live in `data/seeds/*.txt` as `category | careers url | name`. The nightly job runs `scraper import data/seeds` before polling and skips any company already on the list, so a list dropped in that directory is taken in on its own. Added 2026-09-05, when a count of the corpus put the yield at 0.8% and showed the binding constraint was seed coverage rather than filter quality: the scraper can only find what it is pointed at, and it was pointed at 88 companies.
 
 Company boards first, aggregators second. Aggregators are where most fake-remote and underpaid listings come from, so they get the same gates but a lower prior.
 
@@ -59,6 +61,8 @@ Every listing becomes one record with these fields before any rule runs. Missing
 | `description_text` | string | plain text, HTML stripped, for keyword rules |
 | `contact_hint` | string or `null` | a named person from the posting, the team page, or the ATS `hiring_manager` field |
 
+The company record carries one more field as of 2026-09-05. `pay_model` is `same-everywhere`, `location-adjusted` or `unknown`, default unknown. Location-adjusted pay is what decides whether the move to Washington or Oregon costs money, so it is a field that can gate and score rather than a line in a memo. The digest prints it on every apply row so it gets asked on the first call instead of discovered at offer stage.
+
 Dedup by `id`, then by `company + title_norm` across sources within 14 days, keeping the company-board version when both exist.
 
 ## Gate 1: remote is real
@@ -75,6 +79,7 @@ Pass, flag, or fail. Fail drops the listing. Flag passes at half marks on the re
 - Any fail phrase present.
 - State list exists and does not include PA. He starts the job from Pennsylvania, so this is not negotiable for v1.
 - A single named city or metro with no state list and language like "based in", "located in", "must reside".
+- The location names another country and no US marker. Checked against the location only, never the body, because a US role can perfectly well mention EMEA teams. "Remote - US, Canada" passes; "Remote - LATAM" and "Electrical Design Engineer (Estonia)" do not. Added 2026-09-05 after those turned up inside the remote target set.
 
 **Flag** (pass at half marks, reason attached) on:
 - State list includes PA but neither WA nor OR. State lists change and it can be asked on the first call.
@@ -122,6 +127,8 @@ Deductions never drop a listing on their own. They sort it lower so it's read la
 Drop, with reason logged. Distinct from gates because they're about the work, not the terms.
 
 - Pure editing roles: "video editor", "editor" as the primary title with no motion, 3D, design or technical component.
+- Engineering roles wearing the same words. "Design Engineer" qualified by electrical, mechanical, civil, structural, precast, controls, HVAC, hardware or similar. Added 2026-09-05: the title match was catching civil and electrical engineering and polluting the highest-value tier, with Controls Design Engineer (Electrical), Electrical Design Engineer and Precast Design Engineer all live in the remote target set.
+- Pure UX by title: "user experience designer", "UX/UI designer", "product designer (UX". These were already listed as body phrases, but disqualifiers match phrases against the body only, so a posting titled User Experience Designer was never dropped. It mattered little while no product title could tier, and it matters now that one can.
 - Fixed-fee long-form animation bids. Any freelance or contract listing describing a full animated piece for a flat fee. This is Matt's rule and it's absolute.
 - Relocation required or "relocation assistance provided" as a substitute for remote.
 - Travel over 10%.
@@ -131,7 +138,7 @@ Drop, with reason logged. Distinct from gates because they're about the work, no
 
 **Flag, don't drop**
 - Unreal or Unity as the primary tool. Technical Artist listings often want a game engine. The eye and the pipeline thinking transfer, the engine doesn't, but it's worth Matt's call.
-- "Design Engineer" or "Design Technologist" where the body is mostly React or frontend. Sometimes the actual job is motion and prototyping, and the title is the company's convention.
+- Web frontend terms, react, typescript, frontend, front-end, **only where the title has not already earned tier A or B**. Revised 2026-09-05. Every design engineering posting names React and TypeScript, so flagging them sent the tier being promoted straight to review, which defeated the promotion. Where the title is untiered and the body is mostly frontend, the flag still stands and Matt decides.
 
 ## Score
 
@@ -153,10 +160,13 @@ Drop, with reason logged. Distinct from gates because they're about the work, no
 - `generative`: generative, diffusion, comfyui, stable diffusion, flux, wan, text-to-video, image-to-video, img2vid, ai video, ai image, gen ai, genai, lora, controlnet, upscaling
 - `software`: python, javascript, typescript, extendscript, cep, plugin, panel, scripting, automation, api, rest, node, tooling, agentic, llm, local models, llama.cpp, ollama
 - `pipeline`: pipeline, asset management, mam, dam, metadata, taxonomy, naming convention, iconik, frame.io, workflow, render farm, versioning
+- `product`: prototyping, prototype, figma, design system, design systems, component library, interaction design, design tokens. Added 2026-09-05. These are the terms the remote target set actually runs on, prototyping in 64.5% of it, Figma 42.6%, design systems 41.4%, and design systems carries the highest median comp of any term measured. It scores as intersection, and deliberately does not satisfy the tier B leg gate.
 
 **Title tiers**
-- Tier A (15): creative technologist, technical artist, design technologist, creative engineer, motion design engineer, creative developer, generative ai designer, generative ai artist, ai creative lead, ai creative director, creative ai engineer, pipeline td, motion technologist, technical director (motion or design context)
-- Tier B (10): motion designer, senior motion designer, lead motion designer, 3d motion designer, 3d artist, 3d generalist, art director (motion or 3d context), design engineer (only if the body scores the motion or 3d leg), when the body also hits the `generative` or `software` or `pipeline` leg
+- Tier A (15): creative technologist, technical artist, design technologist (zero occurrences in 6,425 postings as of 2026-09-05, kept here because it costs nothing and would be a bullseye, removed from the discovery term lists where it only spent match budget), creative engineer, motion design engineer, creative developer, generative ai designer, generative ai artist, ai creative lead, ai creative director, creative ai engineer, pipeline td, motion technologist, technical director (motion or design context)
+- Tier B (10): motion designer, senior motion designer, lead motion designer, 3d motion designer, 3d artist, 3d generalist, art director, design engineer, **product designer, brand designer, visual designer**, when the body also hits the `generative` or `software` or `pipeline` leg
+
+  Product and brand titles added 2026-09-05. Product Designer is 130 of the corpus against Motion Designer's 25, it is where the remote volume and the pay are, and roughly 29 of the 59 remote target roles are at AI video and image companies where those titles are how the work is advertised. Luma posted Creative Technologist twice and also Visual Designer Product. The leg gate is what reconciles that with the thesis: `product` alone never earns a tier, so a Product Designer role tiers at an AI video company that wants generative or pipeline work and does not tier at a bank. Pure UX is still dropped outright.
 - Tier C (5): motion designer, senior motion designer, 3d artist, animator, when the body hits none of `generative`, `software`, `pipeline`
 
 ## Piles

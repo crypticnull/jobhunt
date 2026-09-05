@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest import mock
 
 from scraper import companies
+from scraper import __main__ as main_mod
 from scraper.__main__ import main
 
 
@@ -93,3 +94,30 @@ class Cli(unittest.TestCase):
         code, out = self.run_cli("stats")
         self.assertEqual(code, 0)
         self.assertIn("postings 0", out)
+
+
+class SeedFiles(unittest.TestCase):
+    """The nightly job points import at a directory, so a seed list dropped into
+    data/seeds is taken in on its own rather than waiting for a command."""
+
+    def test_a_directory_yields_every_txt_sorted(self):
+        with tempfile.TemporaryDirectory() as d:
+            for name in ("b.txt", "a.txt", "notes.md"):
+                (Path(d) / name).write_text("", encoding="utf-8")
+            names = [f.name for f in main_mod.seed_files(d)]
+            self.assertEqual(names, ["a.txt", "b.txt"])
+
+    def test_a_file_yields_itself(self):
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "seeds.txt"
+            f.write_text("", encoding="utf-8")
+            self.assertEqual(main_mod.seed_files(str(f)), [f])
+
+    def test_a_missing_path_yields_that_path_so_the_error_is_reported(self):
+        self.assertEqual(main_mod.seed_files("/nonexistent/x.txt"), [Path("/nonexistent/x.txt")])
+
+    def test_the_shipped_seed_file_parses(self):
+        root = Path(__file__).resolve().parents[2]
+        rows = main_mod.parse_import_lines((root / "data" / "seeds" / "2026-09-05-narrowing.txt").read_text(encoding="utf-8"))
+        self.assertGreater(len(rows), 10)
+        self.assertTrue(all(u.startswith("http") for _, u, _ in rows))

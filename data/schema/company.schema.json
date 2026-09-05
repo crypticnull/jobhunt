@@ -4,40 +4,161 @@
   "title": "Target company list",
   "description": "Shape of data/companies.json (public, ADR-0010) and data/companies.example.json. One record per target company; the ATS slug is what the poller keys on. contacts and notes never appear in the public file; they live in data/local/companies.notes.json keyed by slug and are merged on load.",
   "type": "object",
-  "required": ["version", "companies"],
+  "required": [
+    "version",
+    "companies"
+  ],
   "additionalProperties": false,
   "properties": {
-    "version": { "type": "integer", "enum": [1] },
-    "companies": { "type": "array", "items": { "$ref": "#/$defs/company" } }
+    "version": {
+      "type": "integer",
+      "enum": [
+        1
+      ]
+    },
+    "companies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/company"
+      }
+    }
   },
   "$defs": {
     "company": {
       "type": "object",
-      "required": ["slug", "name", "ats", "category", "tier", "priority", "added", "last_reviewed"],
+      "required": [
+        "slug",
+        "name",
+        "ats",
+        "category",
+        "tier",
+        "priority",
+        "added",
+        "last_reviewed"
+      ],
       "additionalProperties": false,
       "properties": {
-        "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
-        "name": { "type": "string" },
-        "careers_url": { "type": ["string", "null"] },
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "careers_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "ats": {
           "type": "object",
-          "required": ["kind", "board"],
+          "required": [
+            "kind",
+            "board"
+          ],
           "additionalProperties": false,
           "properties": {
-            "kind": { "type": "string", "enum": ["greenhouse", "lever", "ashby", "workable", "smartrecruiters", "recruitee", "rss", "manual"] },
-            "board": { "type": ["string", "null"], "description": "The company's slug on that ATS, or a feed URL for rss, null for manual" }
+            "kind": {
+              "type": "string",
+              "enum": [
+                "greenhouse",
+                "lever",
+                "ashby",
+                "workable",
+                "smartrecruiters",
+                "recruitee",
+                "rss",
+                "manual"
+              ]
+            },
+            "board": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "The company's slug on that ATS, or a feed URL for rss, null for manual"
+            }
           }
         },
-        "category": { "type": "string", "enum": ["ai-video", "studio-ai", "product-inhouse", "brand-inhouse", "discovered"], "description": "discovered is what the feeds found on their own; give it a real category to tier it" },
-        "tier": { "type": ["integer", "null"], "enum": [1, 2, 3, 4, null], "description": "The protocol's company tier; defaults from category, null for a discovered company until Matt tiers it" },
-        "size": { "type": ["integer", "null"], "description": "Headcount when known; over 200 makes an unlisted salary tolerable" },
-        "priority": { "type": "integer", "enum": [1, 2, 3] },
-        "lead_proof": { "type": ["string", "null"], "description": "proof story id to lead with for this company" },
-        "remote_notes": { "type": "string" },
-        "contacts": { "type": "array", "description": "private, only ever in data/local", "items": { "type": "object" } },
-        "notes": { "type": "string" },
-        "added": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
-        "last_reviewed": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+        "category": {
+          "type": "string",
+          "enum": [
+            "ai-video",
+            "studio-ai",
+            "product-inhouse",
+            "brand-inhouse",
+            "discovered"
+          ],
+          "description": "discovered is what the feeds found on their own; give it a real category to tier it"
+        },
+        "tier": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "enum": [
+            1,
+            2,
+            3,
+            4,
+            null
+          ],
+          "description": "The protocol's company tier; defaults from category, null for a discovered company until Matt tiers it"
+        },
+        "size": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "Headcount when known; over 200 makes an unlisted salary tolerable"
+        },
+        "priority": {
+          "type": "integer",
+          "enum": [
+            1,
+            2,
+            3
+          ]
+        },
+        "lead_proof": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "proof story id to lead with for this company"
+        },
+        "remote_notes": {
+          "type": "string"
+        },
+        "contacts": {
+          "type": "array",
+          "description": "private, only ever in data/local",
+          "items": {
+            "type": "object"
+          }
+        },
+        "notes": {
+          "type": "string"
+        },
+        "added": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "last_reviewed": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "pay_model": {
+          "type": "string",
+          "enum": [
+            "same-everywhere",
+            "location-adjusted",
+            "unknown"
+          ],
+          "default": "unknown",
+          "description": "Whether pay is the same wherever you live. Location-adjusted pay is what decides whether the Pacific Northwest move costs money, so it belongs on the record rather than in a memo, and the digest prints it so it gets asked on the first call instead of discovered at offer stage."
+        }
       }
     }
   }
