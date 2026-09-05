@@ -17,7 +17,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "same-everywhere"
+      "pay_model": "same-everywhere",
+      "hq": null
     },
     {
       "slug": "anthropic",
@@ -35,7 +36,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "away",
@@ -53,7 +55,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "black-forest-labs",
@@ -71,7 +74,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "brand-new-school",
@@ -89,7 +93,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "calm",
@@ -107,7 +112,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "captions",
@@ -125,7 +131,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "coinbase",
@@ -143,7 +150,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "corridor-digital",
@@ -161,7 +169,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "d-id",
@@ -179,7 +188,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "descript",
@@ -197,7 +207,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "discord",
@@ -215,7 +226,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "dropbox",
@@ -233,7 +245,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "duolingo",
@@ -251,7 +264,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "elastic",
@@ -269,7 +283,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "elevenlabs",
@@ -287,7 +302,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "location-adjusted"
+      "pay_model": "location-adjusted",
+      "hq": null
     },
     {
       "slug": "epic-games",
@@ -305,7 +321,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "figma",
@@ -323,7 +340,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "figma-board",
@@ -341,7 +359,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "flawless-ai",
@@ -359,7 +378,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "foundry",
@@ -377,7 +397,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "framestore",
@@ -395,7 +416,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "genmo",
@@ -413,7 +435,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "glossier",
@@ -431,7 +454,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "headspace",
@@ -449,7 +473,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "hedra",
@@ -467,7 +492,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "heygen",
@@ -485,7 +511,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "higgsfield",
@@ -503,7 +530,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "ideogram",
@@ -521,7 +549,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "instacart",
@@ -539,7 +568,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "jellyfish-pictures",
@@ -557,7 +587,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "kapwing",
@@ -575,7 +606,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "krea",
@@ -593,7 +625,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "lightricks",
@@ -611,7 +644,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "linear",
@@ -629,7 +663,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "liquid-death",
@@ -647,7 +682,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "luma-ai",
@@ -665,7 +701,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "manvsmachine",
@@ -683,7 +720,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "masterclass",
@@ -701,7 +739,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "method-studios",
@@ -719,7 +758,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "midjourney",
@@ -737,7 +777,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "miro",
@@ -755,7 +796,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "monks",
@@ -773,7 +815,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "notion",
@@ -791,7 +834,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "odyssey",
@@ -809,7 +853,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "openai",
@@ -827,7 +872,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "opusclip",
@@ -845,7 +891,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "oura",
@@ -863,7 +910,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "parallel-teeth",
@@ -881,7 +929,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "patreon",
@@ -899,7 +948,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "peloton",
@@ -917,7 +967,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "pika",
@@ -935,7 +986,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "pixomondo",
@@ -953,7 +1005,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "polaroid",
@@ -971,7 +1024,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "ramp",
@@ -989,7 +1043,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "recraft",
@@ -1007,7 +1062,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "ro",
@@ -1025,7 +1081,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "robinhood",
@@ -1043,7 +1100,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "roblox",
@@ -1061,7 +1119,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "runway",
@@ -1079,7 +1138,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "skillshare",
@@ -1097,7 +1157,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "spotify",
@@ -1115,7 +1176,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "same-everywhere"
+      "pay_model": "same-everywhere",
+      "hq": null
     },
     {
       "slug": "squarespace",
@@ -1133,7 +1195,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "stability-ai",
@@ -1151,7 +1214,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "strava",
@@ -1169,7 +1233,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "stripe",
@@ -1187,7 +1252,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "location-adjusted"
+      "pay_model": "location-adjusted",
+      "hq": null
     },
     {
       "slug": "suno",
@@ -1205,7 +1271,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "super-fiction",
@@ -1223,7 +1290,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "synthesia",
@@ -1241,7 +1309,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "tavus",
@@ -1259,7 +1328,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "the-mill",
@@ -1277,7 +1347,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "topaz-labs",
@@ -1295,7 +1366,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "twitch",
@@ -1313,7 +1385,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "udio",
@@ -1331,7 +1404,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "vercel",
@@ -1349,7 +1423,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "viggle",
@@ -1367,7 +1442,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "webflow",
@@ -1385,7 +1461,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "whoop",
@@ -1403,7 +1480,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "world-labs",
@@ -1421,7 +1499,8 @@
       "remote_notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "capslock",
@@ -1439,7 +1518,8 @@
       "remote_notes": "",
       "added": "2026-09-02",
       "last_reviewed": "2026-09-02",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "iisd",
@@ -1457,7 +1537,8 @@
       "remote_notes": "",
       "added": "2026-09-02",
       "last_reviewed": "2026-09-02",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "ilogos",
@@ -1475,7 +1556,8 @@
       "remote_notes": "",
       "added": "2026-09-02",
       "last_reviewed": "2026-09-02",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "kazaar-fragrances",
@@ -1493,7 +1575,8 @@
       "remote_notes": "",
       "added": "2026-09-02",
       "last_reviewed": "2026-09-02",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "locals",
@@ -1511,7 +1594,8 @@
       "remote_notes": "",
       "added": "2026-09-02",
       "last_reviewed": "2026-09-02",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "loosegrip",
@@ -1529,7 +1613,8 @@
       "remote_notes": "",
       "added": "2026-09-02",
       "last_reviewed": "2026-09-02",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "ondeckglobal",
@@ -1547,7 +1632,8 @@
       "remote_notes": "",
       "added": "2026-09-02",
       "last_reviewed": "2026-09-02",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "performancepixel-gmbh",
@@ -1565,7 +1651,8 @@
       "remote_notes": "",
       "added": "2026-09-02",
       "last_reviewed": "2026-09-02",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "remote-talent-latam",
@@ -1583,7 +1670,8 @@
       "remote_notes": "",
       "added": "2026-09-02",
       "last_reviewed": "2026-09-02",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     }
   ]
 }

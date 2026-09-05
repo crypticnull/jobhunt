@@ -304,6 +304,17 @@ def evaluate(p, rules, company=None, now=None):
     score["total"] = sum(score.values())
     out["score"] = score
     piles = rules["piles"]
+    # Relevance floor. Remote 22 plus comp 20 plus a tier 1 company plus
+    # freshness is 57, over the review threshold, on a posting with no title
+    # fit and no intersection leg at all. That is how a Backend Engineer at a
+    # good company reaches the review pile, and with a cap of 40 a week it is
+    # how the pile fills with work Matt would never take. A posting has to be
+    # about something he does before comp and prestige can carry it.
+    relevant = out["title_tier"] is not None or bool(legs)
+    if not relevant:
+        out["pile"] = "logged"
+        out["drop_reason"] = "no title fit and no intersection"
+        return out
     if score["total"] >= piles["apply_min"] and not (out["flags"] and piles["flagged_always_review"]):
         out["pile"] = "apply"
     elif score["total"] >= piles["review_min"] or out["flags"]:

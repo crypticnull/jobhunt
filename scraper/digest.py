@@ -74,7 +74,9 @@ def _entry(row, companies):
     tier = company.get("tier")
     lines = [
         f"### {row['title']}, {name}" + (f" (tier {tier})" if tier else ""),
-        f"{row['remote_class']} · {_comp(row)} · first seen {row['first_seen'][:10]} · score {round(row['score'])}"
+        f"{row['remote_class']} · {_comp(row)}"
+        + (f" · {company['hq']}" if company.get("hq") else "")
+        + f" · first seen {row['first_seen'][:10]} · score {round(row['score'])}"
         + (f" · legs {', '.join(detail.get('legs_hit') or [])}" if detail.get("legs_hit") else ""),
         "Score: " + ", ".join(parts),
     ]
@@ -89,6 +91,25 @@ def _entry(row, companies):
         lines.append("Pay model unknown. Ask whether pay is the same wherever you live.")
     lines.append(f"{row['url']}  (id {row['id']}, `python -m scraper mark {row['id']} reviewed`)")
     return "\n".join(lines) + "\n"
+
+
+def dead_weight(store, rules, companies=None):
+    """Companies that have been polled enough to have shown something and have
+    shown nothing. Reported, never acted on: the list is Matt's and a scheduled
+    job does not get to shorten it."""
+    floor = rules.get("digest", {}).get("dead_weight_min_postings", 15)
+    rows = [r for r in store.company_yield() if r["on_target"] == 0 and r["postings"] >= floor]
+    if not rows:
+        return []
+    out = ["", "## Earning their poll", "",
+           f"Polled {floor} or more postings and cleared none of them. Worth a look before pruning: a company that should be posting design roles and is not may be a title filter miss rather than a dead company.", ""]
+    for r in rows:
+        c = (companies or {}).get(r["company_slug"]) or {}
+        name = c.get("name", r["company_slug"])
+        where = f", {c['hq']}" if c.get("hq") else ""
+        out.append(f"- {name}{where}: {r['postings']} postings, 0 on target")
+    out += ["", "Drop the ones you agree with: `python -m scraper drop " + " ".join(r["company_slug"] for r in rows[:5]) + "`"]
+    return out
 
 
 def source_health(store, since):
@@ -161,6 +182,7 @@ def build(store, rules, companies=None, now=None, since=None, heartbeat=None):
         out += [f"{len(piles['hidden'])} more scored below {lowest} and are held back rather than marked as seen. They return next week if nothing better arrives.", ""]
     out += ["## Logged, by reason", ""]
     out += [f"- {n:>3}  {reason}" for reason, n in sorted(drops.items(), key=lambda kv: -kv[1])] or ["- none"]
+    out += dead_weight(store, rules, companies)
     out += ["", "## Source health", ""]
     problems = source_health(store, since)
     out += [f"- {p}" for p in problems] or ["All sources answered."]

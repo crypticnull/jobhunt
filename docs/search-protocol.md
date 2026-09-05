@@ -31,7 +31,13 @@ Matt Rodenbeck. Market-facing title Creative Technologist. Currently a senior mo
 2. Aggregators with a remote filter: Wellfound, Otta / Welcome to the Jungle, We Work Remotely, Working Nomads, Remotive, Remote OK. LinkedIn only via the public job search pages and only within its terms, never with an authenticated session.
 3. Community boards, manual or semi-manual: Motionographer jobs, the ComfyUI Discord jobs channel, the aescripts community, Motion Design Slack groups, Creative Technologist listings on The Dots. These are low volume and high signal, a weekly manual sweep is fine for v1.
 
-Seed lists live in `data/seeds/*.txt` as `category | careers url | name`. The nightly job runs `scraper import data/seeds` before polling and skips any company already on the list, so a list dropped in that directory is taken in on its own. Added 2026-09-05, when a count of the corpus put the yield at 0.8% and showed the binding constraint was seed coverage rather than filter quality: the scraper can only find what it is pointed at, and it was pointed at 88 companies.
+Seed lists live in `data/seeds/*.txt` as `category | careers url | name`, with an optional fourth field for the headquarters as `City, ST`. The nightly job runs `scraper import data/seeds` before polling and skips any company already on the list, so a list dropped in that directory is taken in on its own. Added 2026-09-05, when a count of the corpus put the yield at 0.8% and showed the binding constraint was seed coverage rather than filter quality: the scraper can only find what it is pointed at, and it was pointed at 88 companies.
+
+A second list went in on 2026-09-05, 63 companies across the western states, weighted to ones nobody would put on a top 100. Two reasons. Matt moves to Washington or Oregon in June 2027, so a company already in the west is worth knowing about early. And the top 100 is a lagging indicator: every company on it was small once, and the roles worth having are often posted before a company is famous. The weight sits on Pacific Northwest and Los Angeles motion studios, Laika, House Special, Hinge, Instrument, Buck, Imaginary Forces, Prologue, because that is Matt's own discipline and none of them are on anyone's top 100; then mountain-west product companies in Utah, Colorado, Montana and Idaho; then western brands running real in-house creative teams, which is the closest analogue to his current job at a company he would rather work for.
+
+The remote gate did not move to accommodate any of it. Everything on that list still has to post a genuinely remote US role to reach the apply pile, and several of those studios will not. They are seeded anyway because they cost nothing to poll, because some do hire remote, and because if the gate is ever opened for Washington and Oregon they are already there.
+
+Discovery's caps went up the same day, from 15 boards and 30 postings a night to 40 and 80, and moved out of the function signature into `scoring.json` so they can be tuned without a code change. The old numbers were written when the list was ten companies long.
 
 Company boards first, aggregators second. Aggregators are where most fake-remote and underpaid listings come from, so they get the same gates but a lower prior.
 
@@ -61,7 +67,7 @@ Every listing becomes one record with these fields before any rule runs. Missing
 | `description_text` | string | plain text, HTML stripped, for keyword rules |
 | `contact_hint` | string or `null` | a named person from the posting, the team page, or the ATS `hiring_manager` field |
 
-The company record carries one more field as of 2026-09-05. `pay_model` is `same-everywhere`, `location-adjusted` or `unknown`, default unknown. Location-adjusted pay is what decides whether the move to Washington or Oregon costs money, so it is a field that can gate and score rather than a line in a memo. The digest prints it on every apply row so it gets asked on the first call instead of discovered at offer stage.
+The company record carries two more fields as of 2026-09-05. `hq` is the headquarters as `City, ST` or null, printed on every apply row, because a company already in the Pacific Northwest is worth noticing while the move is being planned. `pay_model` is `same-everywhere`, `location-adjusted` or `unknown`, default unknown. Location-adjusted pay is what decides whether the move to Washington or Oregon costs money, so it is a field that can gate and score rather than a line in a memo. The digest prints it on every apply row so it gets asked on the first call instead of discovered at offer stage.
 
 Dedup by `id`, then by `company + title_norm` across sources within 14 days, keeping the company-board version when both exist.
 
@@ -174,6 +180,7 @@ Drop, with reason logged. Distinct from gates because they're about the work, no
 - **Apply**: score ≥ 70. Goes to the cover letter generator with the listing record, the tier and the proof-point lead for that tier (see `proof-points.json` when it exists, until then tier 1 leads with the ComfyUI pipeline, tier 2 with AE Llama, tier 3 with the tooling record, tier 4 with franchise ownership).
 - **Review**: 50–69, plus anything with a flag regardless of score. Matt skims on Mondays.
 - **Logged**: under 50, and every gate fail and disqualifier, with a reason string.
+- **Relevance floor**, added 2026-09-05. A posting with no title tier and no intersection leg is logged whatever it scores. Remote 22 plus comp 20 plus a tier 1 company plus freshness is 57, over the review threshold, on a posting about nothing Matt does, which is how a Backend Engineer at a good company was reaching the review pile. With a cap of 40 a week that is how the pile fills with work he would never take. Comp and company prestige can carry a posting, but only after it is about something.
 
 Cap the apply pile at 12 per week. If more than 12 clear 70, sort by tier then score and push the rest to review. Matt sends 5 to 8 a week, all custom, the cap keeps the generator from producing letters nobody reads.
 
@@ -211,7 +218,7 @@ Every listing that passes the gates is written with this shape. The generator re
 
 ## Weekly digest
 
-Every Monday morning, one file or message with: count of new listings by source, apply pile sorted by tier then score, review pile with flag reasons, counts of drops by reason. The drop-reason counts are what get the rules tuned. That digest folds into the Monday report Matt already gets.
+Every Monday morning, one file or message with: count of new listings by source, apply pile sorted by tier then score, review pile with flag reasons, counts of drops by reason, and, added 2026-09-05, an "Earning their poll" section naming any company that has been polled fifteen or more postings and cleared none of them. That section reports and never acts: a company that should be posting design roles and is not may be a title filter miss rather than a dead company, so it prints the names and the prune command and stops. Shortening the target list is Matt's call, not a scheduled job's. The drop-reason counts are what get the rules tuned. That digest folds into the Monday report Matt already gets.
 
 ## Tuning schedule
 

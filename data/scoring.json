@@ -209,8 +209,10 @@
       "photo editor", "photo retoucher", "operations analyst", "operations consultant"
     ],
     "generic_company_names": ["company", "confidential", "n/a", "none", "unknown", "stealth", "?"],
-    "max_page_fetches": 12,
-    "max_company_name_words": 6
+    "max_page_fetches": 20,
+    "max_company_name_words": 6,
+    "board_cap": 40,
+    "posting_cap": 80
   },
 
   "piles": {
@@ -235,6 +237,7 @@
 
   "digest": {
     "day": "monday",
+    "dead_weight_min_postings": 15,
     "sections": ["new_by_source", "apply_pile", "review_pile_with_flags", "drops_by_reason"]
   },
 

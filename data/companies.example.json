@@ -19,7 +19,8 @@
       "notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "example-studio",
@@ -39,7 +40,8 @@
       "notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "example-brand",
@@ -59,7 +61,8 @@
       "notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     },
     {
       "slug": "example-manual",
@@ -79,7 +82,8 @@
       "notes": "",
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
-      "pay_model": "unknown"
+      "pay_model": "unknown",
+      "hq": null
     }
   ]
 }

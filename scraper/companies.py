@@ -76,7 +76,7 @@ def slugify(name):
     return s or "company"
 
 
-def record(slug, name, kind, board, category, priority=2, careers_url=None, lead_proof=None, today=None, tier=None, size=None):
+def record(slug, name, kind, board, category, priority=2, careers_url=None, lead_proof=None, today=None, tier=None, size=None, hq=None):
     if category not in CATEGORIES:
         raise ValueError(f"category must be one of {CATEGORIES}, got {category!r}")
     if kind not in KINDS:
@@ -95,6 +95,7 @@ def record(slug, name, kind, board, category, priority=2, careers_url=None, lead
         # Asked on the first call. Location-adjusted pay is what decides whether
         # the move north costs money, so it is a field rather than a note.
         "pay_model": "unknown",
+        "hq": hq,
         "remote_notes": "",
         "contacts": [],
         "notes": "",
