@@ -194,6 +194,8 @@
         "^intern",
         "(electrical|mechanical|civil|structural|precast|controls|hvac|plumbing|piping|thermal|process|manufacturing|packaging|hardware|firmware|asic|pcb|rtl|silicon|chip|analog|actuator|robotics|validation|verification|layout|\\brf\\b)[a-z ]* design engineer",
         "design engineer[^a-z]{0,3}\\((electrical|mechanical|civil|structural|hardware|controls)",
+        "design engineer[ ,:;/(-]{1,4}(electrical|mechanical|civil|structural|hardware|firmware|thermal|power|cooling|industrial|controls|hvac|piping|silicon|chip|analog|robotics)",
+        "data cent(er|re)[a-z ]* design engineer",
         "\\bp\\.?e\\.?\\b.{0,20}design engineer",
         "user experience designer",
         "\\bux\\b.{0,3}(/|and)?.{0,3}\\bui\\b designer",
@@ -363,10 +365,13 @@
           "logo animation"
         ],
         "generative": [
-          "diffusion",
+          "diffusion model",
+          "latent diffusion",
+          "diffusion transformer",
           "comfyui",
           "stable diffusion",
-          "flux",
+          "flux\\.1",
+          "\\bflux\\b (model|lora|checkpoint|dev|schnell|kontext)",
           "text-to-video",
           "text to video",
           "image-to-video",
@@ -384,7 +389,8 @@
           "kling",
           "\\bveo\\b",
           "sora",
-          "minimax",
+          "hailuo",
+          "minimax (video|ai|model)",
           "\\bltx\\b"
         ],
         "software": [
@@ -897,6 +903,10 @@
     "apply_min": 65,
     "review_min": 45,
     "flagged_always_review": true,
+    "flag_override_title_tiers": [
+      "A"
+    ],
+    "flag_note": "A flag holds a posting in review so Matt decides, except where the title is tier A. Added 2026-09-05, after Creative Technologist at Luma, the stated bullseye, scored 70 and sat in review because the body mentions Unity. A tier A title is the thing being searched for, so the flag prints on the row and the posting still reaches the pile the letter generator reads.",
     "apply_weekly_cap": 100,
     "review_weekly_cap": 100,
     "exceptional_min": 80,
