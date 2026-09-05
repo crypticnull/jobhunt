@@ -87,8 +87,10 @@ def cmd_curriculum(args):
     if args.write:
         out = Path(args.write)
         out.parent.mkdir(parents=True, exist_ok=True)
-        header = ["# Curriculum", "", "Written by the nightly job. What the postings in a pile ask for and", "data/skills.json does not claim, most-asked first. The same vocabulary", "steers the search, so learning down this list moves the piles.", ""]
-        out.write_text("\n".join(header + lines[1:] if lines else header + [text]) + "\n", encoding="utf-8")
+        # report() opens with its own "## Curriculum" heading, so the file
+        # takes the body from after it rather than stacking two headings.
+        body = [l for l in lines if l.strip() != "## Curriculum"] if lines else [text]
+        out.write_text("\n".join(["# Curriculum"] + body).strip() + "\n", encoding="utf-8")
         print(f"curriculum: {out}")
     else:
         print(text)

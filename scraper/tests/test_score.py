@@ -444,3 +444,37 @@ class Rebalance(unittest.TestCase):
         tier1 = score(row(**paid), rules(), NOW, TIER1)
         unknown = score(row(**paid), rules(), NOW, {})
         self.assertEqual(tier1["score"] - unknown["score"], 4, "tier 1 over unknown is 4 points, was 8")
+
+
+class CraftFloor(unittest.TestCase):
+    """The first real run put 894 postings in a pile, led by LLM, CI/CD and
+    GraphQL. Every software job hits the software leg, so "any leg" was not a
+    relevance test at all. Software and pipeline support a creative role; they
+    do not make one."""
+
+    def test_a_software_job_no_longer_clears_on_the_software_leg(self):
+        r = score(
+            row(title="Backend Engineer", description="Python, REST API, automation and tooling.",
+                comp_min=180000, comp_max=240000),
+            rules(), NOW, TIER2,
+        )
+        self.assertEqual(r["legs_hit"], ["software"])
+        self.assertEqual(r["pile"], "logged")
+        self.assertEqual(r["drop_reason"], "no title fit and no intersection")
+
+    def test_pipeline_alone_is_also_not_enough(self):
+        r = score(
+            row(title="Data Engineer", description="Asset management, metadata and versioning at scale.",
+                comp_min=180000, comp_max=240000),
+            rules(), NOW, TIER2,
+        )
+        self.assertEqual(r["pile"], "logged")
+
+    def test_a_craft_leg_clears_it(self):
+        for desc in ("After Effects and Cinema 4D.", "ComfyUI and diffusion work.", "Figma and design systems."):
+            r = score(row(title="Nondescript Role", description=desc), rules(), NOW, TIER2)
+            self.assertNotEqual(r["pile"], "logged", desc)
+
+    def test_a_tiered_title_still_clears_without_any_leg(self):
+        r = score(row(title="Creative Technologist", description="Nothing else to say."), rules(), NOW, TIER2)
+        self.assertNotEqual(r["pile"], "logged")

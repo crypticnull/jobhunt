@@ -318,7 +318,8 @@ def evaluate(p, rules, company=None, now=None):
     # good company reaches the review pile, and with a cap of 40 a week it is
     # how the pile fills with work Matt would never take. A posting has to be
     # about something he does before comp and prestige can carry it.
-    relevant = out["title_tier"] is not None or bool(legs)
+    craft = piles.get("relevance_legs") or []
+    relevant = out["title_tier"] is not None or any(l in craft for l in legs) if craft else (out["title_tier"] is not None or bool(legs))
     if not relevant:
         out["pile"] = "logged"
         out["drop_reason"] = "no title fit and no intersection"
