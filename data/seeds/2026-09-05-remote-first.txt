@@ -1,0 +1,51 @@
+# Remote-first companies, and the ones that pay the same wherever you sit.
+#
+# Matt's two guiding principles are remote, and no longform animation. This
+# list serves the first one directly. Every company here is either all-remote
+# by construction or known to run location-agnostic pay, which is the
+# difference between being allowed to live somewhere and being paid to.
+#
+# The seven at the top are the same-everywhere payers named in the narrowing
+# directive that were not already on the list. That matters more than it
+# sounds: a location-adjusted employer turns a move to a cheaper place into a
+# pay cut, so the freedom is on paper only.
+#
+# category | careers url | name | City, ST
+
+# Same-everywhere pay, per the directive
+product-inhouse | https://www.redditinc.com/careers | Reddit | San Francisco, CA
+product-inhouse | https://automattic.com/work-with-us | Automattic | Remote
+product-inhouse | https://basecamp.com/about/jobs | Basecamp | Chicago, IL
+product-inhouse | https://sourcegraph.com/careers | Sourcegraph | Remote
+product-inhouse | https://www.revenuecat.com/careers | RevenueCat | Remote
+product-inhouse | https://gumroad.com/jobs | Gumroad | Remote
+product-inhouse | https://www.zillow.com/careers | Zillow | Seattle, WA
+
+# All-remote by construction
+product-inhouse | https://about.gitlab.com/jobs | GitLab | Remote
+product-inhouse | https://zapier.com/jobs | Zapier | Remote
+product-inhouse | https://doist.com/careers | Doist | Remote
+product-inhouse | https://buffer.com/journey | Buffer | Remote
+product-inhouse | https://www.oysterhr.com/careers | Oyster | Remote
+product-inhouse | https://remote.com/careers | Remote | Remote
+product-inhouse | https://toggl.com/jobs | Toggl | Remote
+product-inhouse | https://www.hotjar.com/careers | Hotjar | Remote
+product-inhouse | https://ghost.org/careers | Ghost | Remote
+product-inhouse | https://posthog.com/careers | PostHog | Remote
+product-inhouse | https://cal.com/careers | Cal.com | Remote
+product-inhouse | https://tailscale.com/careers | Tailscale | Remote
+product-inhouse | https://1password.com/careers | 1Password | Remote
+product-inhouse | https://grafana.com/about/careers | Grafana Labs | Remote
+product-inhouse | https://www.netlify.com/careers | Netlify | Remote
+
+# Design-forward product companies whose motion work is product animation and
+# motion systems rather than campaign film, which is the shape Matt wants
+product-inhouse | https://sentry.io/careers | Sentry | San Francisco, CA
+product-inhouse | https://render.com/careers | Render | Remote
+product-inhouse | https://railway.app/careers | Railway | Remote
+product-inhouse | https://neon.tech/careers | Neon | Remote
+product-inhouse | https://clerk.com/careers | Clerk | Remote
+product-inhouse | https://resend.com/careers | Resend | Remote
+product-inhouse | https://liveblocks.io/careers | Liveblocks | Remote
+product-inhouse | https://www.warp.dev/careers | Warp | Remote
+product-inhouse | https://arc.net/careers | Arc | Remote

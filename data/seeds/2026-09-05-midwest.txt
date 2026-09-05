@@ -1,0 +1,40 @@
+# Midwest. Matt can work remote from anywhere and wants the freedom to live
+# where he likes without a commute, so this is coverage rather than a bet on a
+# city. Product companies with real design and motion needs, weighted to ones
+# that hire remote.
+#
+# category | careers url | name | City, ST
+
+# Chicago
+product-inhouse | https://sproutsocial.com/careers | Sprout Social | Chicago, IL
+product-inhouse | https://www.cameo.com/careers | Cameo | Chicago, IL
+product-inhouse | https://www.activecampaign.com/careers | ActiveCampaign | Chicago, IL
+product-inhouse | https://www.g2.com/careers | G2 | Chicago, IL
+product-inhouse | https://www.tempus.com/careers | Tempus | Chicago, IL
+product-inhouse | https://www.relativity.com/careers | Relativity | Chicago, IL
+product-inhouse | https://www.project44.com/careers | project44 | Chicago, IL
+product-inhouse | https://www.shipbob.com/careers | ShipBob | Chicago, IL
+
+# Minneapolis and Wisconsin
+product-inhouse | https://www.jamf.com/about/careers | Jamf | Minneapolis, MN
+product-inhouse | https://www.spscommerce.com/careers | SPS Commerce | Minneapolis, MN
+product-inhouse | https://wheniwork.com/careers | When I Work | Minneapolis, MN
+product-inhouse | https://branch.co/careers | Branch | Minneapolis, MN
+product-inhouse | https://livefront.com/careers | Livefront | Minneapolis, MN
+product-inhouse | https://www.fetch.com/careers | Fetch | Madison, WI
+product-inhouse | https://www.redoxengine.com/careers | Redox | Madison, WI
+
+# Michigan and Ohio
+product-inhouse | https://stockx.com/careers | StockX | Detroit, MI
+product-inhouse | https://aurora.tech/careers | Aurora | Pittsburgh, PA
+product-inhouse | https://censys.io/careers | Censys | Ann Arbor, MI
+product-inhouse | https://www.joinroot.com/careers | Root | Columbus, OH
+product-inhouse | https://www.covermymeds.com/careers | CoverMyMeds | Columbus, OH
+product-inhouse | https://www.path.tech/careers | Path Robotics | Columbus, OH
+product-inhouse | https://www.mrisoftware.com/careers | MRI Software | Cleveland, OH
+
+# Plains
+product-inhouse | https://www.hudl.com/jobs | Hudl | Lincoln, NE
+product-inhouse | https://buildertrend.com/careers | Buildertrend | Omaha, NE
+product-inhouse | https://www.dwolla.com/careers | Dwolla | Des Moines, IA
+product-inhouse | https://c2fo.com/careers | C2FO | Kansas City, MO

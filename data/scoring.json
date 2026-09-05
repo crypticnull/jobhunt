@@ -66,12 +66,16 @@
         "(electrical|mechanical|civil|structural|precast|controls|hvac|plumbing|piping|thermal|process|manufacturing|packaging|hardware|firmware|asic|pcb|\\brf\\b) design engineer",
         "design engineer[^a-z]{0,3}\\((electrical|mechanical|civil|structural|hardware|controls)",
         "\\bp\\.?e\\.?\\b.{0,20}design engineer",
-        "user experience designer", "\\bux\\b.{0,3}(/|and)?.{0,3}\\bui\\b designer", "product designer \\(ux"
+        "user experience designer", "\\bux\\b.{0,3}(/|and)?.{0,3}\\bui\\b designer", "product designer \\(ux",
+        "character animator", "feature animator", "storyboard artist", "layout artist",
+        "\\broto\\b", "matchmove", "\\bcompositor\\b"
       ],
       "phrases": [
         "relocation required", "relocation assistance",
         "travel (up to )?(1[1-9]|[2-9]\\d)%", "travel (up to )?\\d{2}%\\+",
         "fixed fee", "flat fee", "per project rate", "full animated (short|film|piece|video)",
+        "feature film", "animated feature", "feature animation", "episodic", "theatrical release",
+        "long-form", "longform", "television series", "broadcast series", "animated series",
         "pure ux", "user experience designer", "product designer \\(ux",
         "research scientist", "ml researcher", "machine learning engineer"
       ],
@@ -126,7 +130,7 @@
         "generative": ["generative", "diffusion", "comfyui", "stable diffusion", "flux", "wan", "text-to-video", "text to video", "image-to-video", "image to video", "img2vid", "ai video", "ai image", "gen ai", "genai", "gen-ai", "lora", "controlnet", "upscal", "inpaint", "runway", "kling", "veo", "sora", "minimax", "ltx"],
         "software": ["python", "javascript", "typescript", "extendscript", "cep", "plugin", "panel", "scripting", "automation", "api", "rest api", "restful", "node", "tooling", "agentic", "llm", "local models", "llama\\.cpp", "ollama", "cuda", "pytorch"],
         "pipeline": ["pipeline", "asset management", "mam", "dam", "metadata", "taxonomy", "naming convention", "iconik", "frame\\.io", "workflow", "render farm", "versioning", "asana", "shotgrid", "ftrack"],
-        "product": ["prototyping", "prototype", "figma", "design system", "design systems", "component library", "interaction design", "design tokens"]
+        "product": ["prototyping", "prototype", "figma", "design system", "design systems", "component library", "interaction design", "design tokens", "motion system", "motion systems", "product animation", "ui animation", "interface animation", "animation system", "motion guidelines", "micro-interaction", "microinteraction"]
       }
     },
     "title": {
@@ -137,7 +141,8 @@
           "creative technologist", "technical artist", "design technologist", "creative engineer",
           "motion design engineer", "creative developer", "generative ai designer", "generative ai artist",
           "generative artist", "ai creative lead", "ai creative director", "creative ai engineer", "creative ai",
-          "pipeline td", "pipeline technical director", "motion technologist", "technical director"
+          "pipeline td", "pipeline technical director", "motion technologist", "technical director",
+          "motion systems", "motion system designer", "product motion", "design systems engineer"
         ]
       },
       "tier_b": {
@@ -193,7 +198,8 @@
       "pipeline td", "pipeline technical director", "technical director", "look dev", "lookdev", "shader artist",
       "environment artist", "concept art", "storyboard", "styleframe", "previs", "matte painting",
       "\\bvfx\\b", "visual effects", "compositing", "motion capture", "art direction", "art director",
-      "brand motion", "kinetic type", "broadcast design", "title design"
+      "brand motion", "kinetic type", "broadcast design", "title design",
+      "motion system", "motion systems", "product animation", "ui animation", "interface animation"
     ],
     "exclude_title_patterns": [
       "account executive", "account manager", "sales", "\\bsdr\\b", "\\bbdr\\b", "business development",

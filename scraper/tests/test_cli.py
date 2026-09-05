@@ -144,11 +144,29 @@ class SeedHeadquarters(unittest.TestCase):
         with self.assertRaises(ValueError):
             main_mod.parse_import_lines("ai-video | https://x.com/careers | X | Bend, OR | extra")
 
-    def test_the_western_seed_file_parses_and_every_row_states_a_location(self):
+    def test_every_shipped_seed_file_parses(self):
         root = Path(__file__).resolve().parents[2]
-        rows = main_mod.parse_import_lines((root / "data" / "seeds" / "2026-09-05-western.txt").read_text(encoding="utf-8"))
-        self.assertGreater(len(rows), 50)
-        self.assertTrue(all(hq and ", " in hq for *_, hq in rows), "every western seed states City, ST")
+        files = sorted((root / "data" / "seeds").glob("*.txt"))
+        self.assertGreaterEqual(len(files), 4)
+        total = 0
+        for f in files:
+            rows = main_mod.parse_import_lines(f.read_text(encoding="utf-8"))
+            self.assertTrue(rows, f.name)
+            total += len(rows)
+        self.assertGreater(total, 100)
+
+    def test_no_seed_names_an_animation_or_vfx_studio(self):
+        """Matt's two guiding principles are remote and no longform animation.
+        The first western list led with Laika, Buck, Imaginary Forces and a
+        dozen more, which are both place-based and longform. He said no."""
+        root = Path(__file__).resolve().parents[2]
+        banned = ("laika", "buck", "imaginary forces", "prologue", "gentleman scholar",
+                  "house special", "bent image", "hinge digital", "digital domain",
+                  "territory studio", "wieden", "meow wolf")
+        for f in sorted((root / "data" / "seeds").glob("*.txt")):
+            names = [n.lower() for _, _, n, _ in main_mod.parse_import_lines(f.read_text(encoding="utf-8"))]
+            for b in banned:
+                self.assertFalse(any(b in n for n in names), f"{b} is seeded in {f.name}")
 
     def test_a_record_carries_the_headquarters_through(self):
         r = companies.record("laika", "Laika", "greenhouse", "laika", "studio-ai", hq="Hillsboro, OR")

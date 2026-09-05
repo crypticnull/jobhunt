@@ -17,6 +17,12 @@ Two hard gates run first. A listing that fails either gate is dropped regardless
 
 The scraper never decides to apply. It decides what Matt looks at.
 
+## The two guiding principles
+
+Stated by Matt on 2026-09-05 and they outrank everything below. **Remote**, so he can live where he likes without a commute, which means location-agnostic pay matters as much as a remote job title, because a location-adjusted employer turns a move to a cheaper place into a pay cut. And **no longform animation**, which is why the target is product animation and motion systems, motion embedded in a product rather than delivered as a film.
+
+Both were only half encoded before that date. The remote gate was already firm. The longform rule caught a fixed-fee bid for a full animated piece and missed a staff job on a feature or a series, and nothing in the ruleset scored product animation or motion systems at all.
+
 ## Who this is for
 
 Matt Rodenbeck. Market-facing title Creative Technologist. Currently a senior motion designer in Pennsylvania, moving to Washington or Oregon in June 2027. Remote only. Base floor $130,000. Target $150,000. Ask $160,000 to $170,000 at AI companies. See the plan for the positioning thesis, the short version is that the intersection of senior 3D and motion craft, a working local generative AI pipeline, shipping software with agentic coding, and pipeline literacy is what's being sold, and motion design alone is what's being avoided.
@@ -33,9 +39,9 @@ Matt Rodenbeck. Market-facing title Creative Technologist. Currently a senior mo
 
 Seed lists live in `data/seeds/*.txt` as `category | careers url | name`, with an optional fourth field for the headquarters as `City, ST`. The nightly job runs `scraper import data/seeds` before polling and skips any company already on the list, so a list dropped in that directory is taken in on its own. Added 2026-09-05, when a count of the corpus put the yield at 0.8% and showed the binding constraint was seed coverage rather than filter quality: the scraper can only find what it is pointed at, and it was pointed at 88 companies.
 
-A second list went in on 2026-09-05, 63 companies across the western states, weighted to ones nobody would put on a top 100. Two reasons. Matt moves to Washington or Oregon in June 2027, so a company already in the west is worth knowing about early. And the top 100 is a lagging indicator: every company on it was small once, and the roles worth having are often posted before a company is famous. The weight sits on Pacific Northwest and Los Angeles motion studios, Laika, House Special, Hinge, Instrument, Buck, Imaginary Forces, Prologue, because that is Matt's own discipline and none of them are on anyone's top 100; then mountain-west product companies in Utah, Colorado, Montana and Idaho; then western brands running real in-house creative teams, which is the closest analogue to his current job at a company he would rather work for.
+A second list went in on 2026-09-05, across the western states, weighted to ones nobody would put on a top 100. Two reasons. Matt moves to Washington or Oregon in June 2027, so a company already in the west is worth knowing about early. And the top 100 is a lagging indicator: every company on it was small once, and the roles worth having are often posted before a company is famous. Its first version led with fifteen animation, VFX and title studios on the reasoning that they were closest to Matt's own discipline. That was the wrong reasoning and he said so the same day: those studios are place-based and longform, which is both principles broken at once. They were removed before anything was imported. What remains is mountain-west and coastal product companies and western brands running real in-house creative teams.
 
-The remote gate did not move to accommodate any of it. Everything on that list still has to post a genuinely remote US role to reach the apply pile, and several of those studios will not. They are seeded anyway because they cost nothing to poll, because some do hire remote, and because if the gate is ever opened for Washington and Oregon they are already there.
+Two more lists went in with it. A remote-first list of companies that are all-remote by construction or known to pay the same wherever you sit, which is the one that serves the first principle directly, and a Midwest list, because he can work from anywhere and the point is coverage rather than a bet on a city.
 
 Discovery's caps went up the same day, from 15 boards and 30 postings a night to 40 and 80, and moved out of the function signature into `scoring.json` so they can be tuned without a code change. The old numbers were written when the list was ten companies long.
 
@@ -135,7 +141,7 @@ Drop, with reason logged. Distinct from gates because they're about the work, no
 - Pure editing roles: "video editor", "editor" as the primary title with no motion, 3D, design or technical component.
 - Engineering roles wearing the same words. "Design Engineer" qualified by electrical, mechanical, civil, structural, precast, controls, HVAC, hardware or similar. Added 2026-09-05: the title match was catching civil and electrical engineering and polluting the highest-value tier, with Controls Design Engineer (Electrical), Electrical Design Engineer and Precast Design Engineer all live in the remote target set.
 - Pure UX by title: "user experience designer", "UX/UI designer", "product designer (UX". These were already listed as body phrases, but disqualifiers match phrases against the body only, so a posting titled User Experience Designer was never dropped. It mattered little while no product title could tier, and it matters now that one can.
-- Fixed-fee long-form animation bids. Any freelance or contract listing describing a full animated piece for a flat fee. This is Matt's rule and it's absolute.
+- Longform animation in any form, staff or freelance. Fixed-fee bids for a full animated piece, and as of 2026-09-05 also feature film, animated feature, episodic, theatrical, television or broadcast series work, plus the film-pipeline titles that only exist to serve it: character animator, storyboard artist, layout artist, compositor, roto, matchmove. This is one of the two guiding principles and it is absolute.
 - Relocation required or "relocation assistance provided" as a substitute for remote.
 - Travel over 10%.
 - Contract-to-hire with a conversion salary below the floor, or no conversion salary stated.

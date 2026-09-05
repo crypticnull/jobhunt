@@ -377,3 +377,38 @@ class RelevanceFloor(unittest.TestCase):
         r = score(row(title="Creative Technologist", location="Remote - LATAM"), rules(), NOW, TIER1)
         self.assertEqual(r["pile"], "logged")
         self.assertIn("outside the US", r["drop_reason"])
+
+
+class GuidingPrinciples(unittest.TestCase):
+    """Matt named two: remote, and no longform animation. The second was only
+    half encoded, catching a fixed-fee bid for a full animated piece and
+    missing a staff job on a feature or a series."""
+
+    def test_longform_work_is_dropped(self):
+        for desc in (
+            "Animate sequences for our next animated feature.",
+            "Character work across an episodic series for streaming.",
+            "Long-form branded content, ten minutes a piece.",
+        ):
+            r = score(row(title="Motion Designer", description=desc + " comfyui python pipeline"), rules(), NOW, TIER2)
+            self.assertEqual(r["pile"], "logged", desc)
+
+    def test_film_pipeline_titles_are_dropped(self):
+        for title in ("Character Animator", "Storyboard Artist", "Layout Artist", "Compositor"):
+            r = score(row(title=title, description="python pipeline comfyui"), rules(), NOW, TIER2)
+            self.assertEqual(r["pile"], "logged", title)
+
+    def test_product_animation_is_the_bullseye_not_a_penalty(self):
+        r = score(
+            row(title="Motion Systems Designer",
+                description="Own our motion system and the product animation across the design system, prototyping in Figma.",
+                comp_min=150000, comp_max=180000),
+            rules(), NOW, TIER2,
+        )
+        self.assertEqual(r["title_tier"], "A")
+        self.assertIn("product", r["legs_hit"])
+        self.assertEqual(r["pile"], "apply")
+
+    def test_ui_animation_scores_the_product_leg(self):
+        r = score(row(title="Senior Product Designer", description="UI animation and interface animation for the app, plus Python tooling."), rules(), NOW, TIER2)
+        self.assertIn("product", r["legs_hit"])
