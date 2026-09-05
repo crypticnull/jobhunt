@@ -870,7 +870,7 @@
     "apply_min": 65,
     "review_min": 45,
     "flagged_always_review": true,
-    "apply_weekly_cap": 12,
+    "apply_weekly_cap": 100,
     "review_weekly_cap": 100,
     "exceptional_min": 80,
     "apply_sort": [

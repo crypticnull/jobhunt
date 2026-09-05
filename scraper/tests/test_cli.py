@@ -172,3 +172,34 @@ class SeedHeadquarters(unittest.TestCase):
         r = companies.record("laika", "Laika", "greenhouse", "laika", "studio-ai", hq="Hillsboro, OR")
         self.assertEqual(r["hq"], "Hillsboro, OR")
         self.assertIsNone(companies.record("x", "X", "greenhouse", "x", "ai-video")["hq"])
+
+
+class CurriculumCommand(unittest.TestCase):
+    """The nightly writes the study list into the repo rather than the log, so
+    it is versioned and the diff shows what the market started asking for."""
+
+    def run_cmd(self, *argv):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            code = main(list(argv))
+        return code, buf.getvalue()
+
+    def test_write_creates_the_file_and_names_it(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "nested" / "curriculum.md"
+            code, said = self.run_cmd("curriculum", "--db", ":memory:", "--write", str(out))
+            self.assertEqual(code, 0)
+            self.assertTrue(out.exists(), "the nightly must not fail when the directory is new")
+            self.assertIn(str(out), said)
+            self.assertIn("# Curriculum", out.read_text(encoding="utf-8"))
+
+    def test_an_empty_store_writes_a_file_rather_than_crashing(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "curriculum.md"
+            self.run_cmd("curriculum", "--db", ":memory:", "--write", str(out))
+            self.assertIn("Nothing clears the floor yet", out.read_text(encoding="utf-8"))
+
+    def test_without_write_it_prints(self):
+        code, said = self.run_cmd("curriculum", "--db", ":memory:")
+        self.assertEqual(code, 0)
+        self.assertIn("Nothing clears the floor yet", said)
