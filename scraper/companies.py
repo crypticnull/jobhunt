@@ -71,6 +71,26 @@ def save(path, data, notes=None):
             f.write("\n")
 
 
+def active(data):
+    """The records a poll, a check or a digest should see. A dropped company
+    stays on the list carrying the date it was dropped, so a seed import or a
+    discovery hit does not quietly put it back the next night."""
+    return [c for c in data["companies"] if not c.get("dropped")]
+
+
+def drop(data, slugs, today):
+    """Mark, never delete. Returns (dropped, unknown)."""
+    by_slug = {c["slug"]: c for c in data["companies"]}
+    dropped, unknown = [], []
+    for slug in slugs:
+        if slug in by_slug:
+            by_slug[slug]["dropped"] = today
+            dropped.append(slug)
+        else:
+            unknown.append(slug)
+    return dropped, unknown
+
+
 def slugify(name):
     s = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
     return s or "company"

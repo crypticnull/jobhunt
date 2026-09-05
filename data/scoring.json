@@ -499,19 +499,24 @@
           "motion guidelines",
           "micro-interaction",
           "microinteraction",
-          "storybook",
-          "prototyping",
+          "lottie",
+          "rive",
+          "bodymovin",
           "protopie",
           "origami",
           "framer(?! motion)",
-          "spline",
-          "rive",
-          "lottie",
-          "bodymovin",
           "smart animate",
-          "variable fonts"
+          "variable fonts",
+          "spline\\.design",
+          "spline 3d",
+          "motion tokens",
+          "motion principles",
+          "motion language",
+          "animation principles",
+          "design handoff"
         ]
-      }
+      },
+      "product_leg_note": "Revised twice on 2026-09-05. The whole product-motion vocabulary went in first, and the skeptics refused it: prototyping, storybook and prototype are discipline words every product and frontend posting uses, so they would have let tier B through on generic bodies. The leg carries the product-motion tool names and the motion-system phrases, which name the work rather than the discipline."
     },
     "title": {
       "max": 15,

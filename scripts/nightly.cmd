@@ -1,7 +1,8 @@
 @echo off
 rem The nightly task. Pull what was merged, take in any seed lists dropped into
-rem data\seeds (already-known companies are skipped and a name with no board
-rem becomes a hand-check record once, rather than being re-probed every night),
+rem data\seeds (already-known companies are skipped, the careers page is read
+rem for a board link, and the sixteen slug guesses per name are left to the
+rem one-off import Matt runs by hand, so unresolved names cost one request),
 rem poll, which also grows the list from the discovery feeds, write the study
 rem list, then push all three back so the repo copy is the live one and the
 rem curriculum is versioned rather than logged. Then back up. Run by Task
@@ -23,11 +24,11 @@ for /f "delims=" %%b in ('git rev-parse --abbrev-ref HEAD') do set "BRANCH=%%b"
 if not "%BRANCH%"=="main" set "GITOK="
 if not defined GITOK echo %date% %time% not on main but on %BRANCH%, git steps skipped >> "%STATUS%"
 if defined GITOK git -c rebase.autoStash=true pull --rebase --quiet origin main || echo %date% %time% pull failed >> "%STATUS%"
-%PY% -m scraper import data/seeds --manual || echo %date% %time% import failed >> "%STATUS%"
+%PY% -m scraper import data/seeds --no-guess || echo %date% %time% import failed >> "%STATUS%"
 %PY% -m scraper poll || echo %date% %time% poll failed >> "%STATUS%"
 %PY% -m scraper curriculum --write data/curriculum.md || echo %date% %time% curriculum failed >> "%STATUS%"
 if not defined GITOK goto :backup
-git add data/companies.json data/last-run.json data/curriculum.md
+git add data/companies.json data/last-run.json data/curriculum.md data/digests
 git diff --cached --quiet && goto :backup
 git commit --quiet -m "nightly: discovery and curriculum" || echo %date% %time% commit failed >> "%STATUS%"
 git push --quiet origin HEAD:main && goto :backup

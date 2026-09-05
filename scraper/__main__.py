@@ -219,7 +219,7 @@ def cmd_poll(args):
                 print(f"discover  failed, {type(e).__name__}: {e}. Polling the list as it stands.")
             for e in feed_errors:
                 print(f"  feed error: {e}")
-        results = poll(store, data["companies"])
+        results = poll(store, companies.active(data))
     finally:
         store.close()
     errors, skipped = 0, 0
@@ -235,7 +235,7 @@ def cmd_poll(args):
         print(f"skip   {skipped} companies have no pollable board, they are checked by hand")
     store = Store(args.db)
     try:
-        beat = maintain.heartbeat(store, data["companies"], HEARTBEAT, errors=errors)
+        beat = maintain.heartbeat(store, companies.active(data), HEARTBEAT, errors=errors)
     finally:
         store.close()
     print(f"{len(results)} companies, {errors} errors, {beat['open']} open postings in the store")
@@ -320,21 +320,19 @@ def cmd_discover(args):
 
 
 def cmd_drop(args):
-    """Remove companies from the list by slug. Their open postings close on the
-    next poll, because close_unlisted runs before any board is read. The digest
-    has told Matt to run this since the dead-weight section shipped, and until
-    2026-09-05 it did not exist."""
+    """Mark companies dropped by slug. The record stays on the list with the
+    date, so a seed import or discovery cannot put it back, and the poll, the
+    check and the digest skip it from then on. Its open postings close on the
+    next poll. The digest has told Matt to run this since the dead-weight
+    section shipped, and until 2026-09-05 it did not exist."""
     data = companies.load(args.companies)
-    before = {c["slug"] for c in data["companies"]}
-    unknown = [s for s in args.slugs if s not in before]
-    data["companies"] = [c for c in data["companies"] if c["slug"] not in set(args.slugs)]
+    dropped, unknown = companies.drop(data, args.slugs, utcnow()[:10])
     companies.save(args.companies, data)
-    dropped = sorted(before - {c["slug"] for c in data["companies"]})
     for slug in dropped:
         print(f"dropped   {slug}")
     for slug in unknown:
         print(f"unknown   {slug}: not on the list")
-    print(f"{len(dropped)} dropped, {len(data['companies'])} remain")
+    print(f"{len(dropped)} dropped, {len(companies.active(data))} active")
     return 0 if not unknown else 1
 
 

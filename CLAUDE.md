@@ -6,7 +6,7 @@ For a fresh Claude Code project. Most of this belongs in `CLAUDE.md` at the repo
 
 ## Who this is for
 
-Matt Rodenbeck. Product motion and motion systems designer who ships software, with ten years of senior motion and 3D craft underneath. Targeting senior remote roles at product companies, design engineer and product designer titles included, with pay that follows the worker, relocating to the Pacific Northwest by June 2027. Compensation figures and negotiation posture live in `data/local/brief.md`, which never touches git.
+Matt Rodenbeck. Senior motion and 3D designer who ships software, going to market as a creative technologist and aiming at product motion and motion systems roles at product companies, design engineer and product designer titles included, with pay that follows the worker, relocating to the Pacific Northwest by June 2027. Compensation figures and negotiation posture live in `data/local/brief.md`, which never touches git.
 
 He is technical. He built a commercial After Effects CEP panel driven by a local llama.cpp model across roughly 77 tools, with a 533-step self-test and a VRAM tier system. Do not explain basics. Do not over-scaffold.
 

@@ -166,9 +166,16 @@ def select(posting, company, lead=None, blocks=None, proof_root=PROOF):
     blocks = blocks or load_blocks()
     cat = company.get("category")
     family = role_family(posting.get("title"))
+    detail = json.loads(posting.get("score_json") or "{}")
+    # The scorer's own signal decides first: a tier B title with the product
+    # leg is a product-motion posting whatever the company's category says.
+    product = detail.get("title_tier") == "B" and "product" in (detail.get("legs_hit") or [])
+    if product and not family:
+        family = "product-designer"
     claim = next(((m, b) for m, b in blocks["claim"] if family and family in (m.get("for_roles") or [])), None)
     if claim is None:
         claim = next(((m, b) for m, b in blocks["claim"] if m.get("for") == cat and not m.get("for_roles")), None)
+    others = [(m, b) for m, b in blocks["claim"] if claim is None or m.get("id") != claim[0].get("id")]
     lead_id = choose_lead(company, lead, proof_root, posting)
     proof_meta, proof_body = load_proof(lead_id, proof_root)
     values = {"company": company.get("name", company.get("slug", "")), "role": posting.get("title", "")}
@@ -179,6 +186,7 @@ def select(posting, company, lead=None, blocks=None, proof_root=PROOF):
         "remote": (blocks["remote"][0][0], fill(blocks["remote"][0][1], **values)) if blocks["remote"] else None,
         "remote_needed": hedges(posting),
         "family": family,
+        "other_claims": others,
         "closes": [(m, fill(b, **values)) for m, b in blocks["close"]],
     }
 
@@ -240,6 +248,10 @@ def render_brief(posting, company, chosen, voice_rules, max_description=6000):
         out += [chosen["claim"][0].get("note", ""), "", chosen["claim"][1], ""]
     else:
         out += ["(no claim block for this category yet)", ""]
+    if chosen.get("other_claims"):
+        out += ["The other claims, in case the default reads wrong for this posting:", ""]
+        for m, b in chosen["other_claims"]:
+            out += [f"*{m.get('id')}*", "", b, ""]
     out += [f"### The proof story: {proof_meta.get('title', lead_id)}", "", proof_body, ""]
     if chosen["remote"]:
         verdict = "include it, the posting hedges on remote" if chosen["remote_needed"] else "skip it, the posting is clearly remote"

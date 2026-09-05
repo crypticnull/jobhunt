@@ -98,7 +98,7 @@ class Commands(unittest.TestCase):
         with mock.patch("sys.stdout", out):
             rc = main(["--companies", str(self.companies), "--db", str(self.db), "drop", "webflow", "nobody"])
         self.assertEqual(rc, 1)
-        left = [c["slug"] for c in companies.load(self.companies)["companies"]]
+        left = [c["slug"] for c in companies.active(companies.load(self.companies))]
         self.assertEqual(left, ["acme"])
         self.assertIn("unknown   nobody", out.getvalue())
 
@@ -139,3 +139,18 @@ class Footer(unittest.TestCase):
         log.write_text("Sat 09/05/2026  4:00:01.12 push failed\n", encoding="utf-8")
         lines = digest.source_health(self.s, "2026-08-30", status_log=log, now=datetime.now(timezone.utc))
         self.assertTrue(any("scheduled task" in ln and "push failed" in ln for ln in lines), lines)
+
+
+class DropIsAMarker(unittest.TestCase):
+    """The first version of drop deleted the record, and the next seed import
+    would have put the company straight back. The skeptics caught it."""
+
+    def test_a_dropped_company_stays_known_and_stops_being_polled(self):
+        data = {"version": 1, "companies": [
+            companies.record("acme", "Acme", "greenhouse", "acme", "product-inhouse", 2, "https://acme.com/careers"),
+            companies.record("webflow", "Webflow", "greenhouse", "webflow", "product-inhouse", 2, "https://webflow.com/careers"),
+        ]}
+        dropped, unknown = companies.drop(data, ["webflow", "nobody"], "2026-09-05")
+        self.assertEqual((dropped, unknown), (["webflow"], ["nobody"]))
+        self.assertEqual({c["slug"] for c in data["companies"]}, {"acme", "webflow"}, "still on the list, so import cannot re-add it")
+        self.assertEqual([c["slug"] for c in companies.active(data)], ["acme"])

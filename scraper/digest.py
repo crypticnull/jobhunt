@@ -113,7 +113,8 @@ def dead_weight(store, rules, companies=None):
     shown nothing. Reported, never acted on: the list is Matt's and a scheduled
     job does not get to shorten it."""
     floor = rules.get("digest", {}).get("dead_weight_min_postings", 15)
-    rows = [r for r in store.company_yield() if r["on_target"] == 0 and r["postings"] >= floor]
+    rows = [r for r in store.company_yield() if r["on_target"] == 0 and r["postings"] >= floor
+            and not ((companies or {}).get(r["company_slug"]) or {}).get("dropped")]
     if not rows:
         return []
     reasons = store.company_drop_reasons()
@@ -227,7 +228,9 @@ def build(store, rules, companies=None, now=None, since=None, heartbeat=None):
         out += [f"{len(piles['hidden'])} more scored below {lowest} and are held back rather than marked as seen. They return next week if nothing better arrives.", ""]
     out += ["## Logged, by reason", ""]
     out += [f"- {n:>3}  {reason}" for reason, n in sorted(drops.items(), key=lambda kv: -kv[1])] or ["- none"]
-    out += curriculum_mod.report([dict(r) for r in piles["apply"] + review], rules)
+    # The same population the nightly writes to data/curriculum.md, so the two
+    # study lists never disagree by construction.
+    out += curriculum_mod.report(store.study_rows(), rules)
     out += dead_weight(store, rules, companies)
     out += ["", "## Source health", ""]
     problems = source_health(store, since)
