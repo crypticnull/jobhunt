@@ -34,5 +34,6 @@ jobs:
       - run: npm run build
         working-directory: site
       - run: node tools/check_drift.mjs
+      - run: node tools/check_tokens.mjs
       - run: npm run lighthouse
         working-directory: site

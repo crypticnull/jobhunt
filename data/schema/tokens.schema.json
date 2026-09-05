@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tokens.schema.json",
+  "title": "Design tokens",
+  "description": "data/design/tokens.json. The one record the site's colours, grid and motion come from, rendered to CSS by tools/tokens.mjs.",
+  "type": "object",
+  "required": ["version", "colour", "grid", "motion"],
+  "properties": {
+    "version": {"type": "integer"},
+    "note": {"type": "string"},
+    "colour": {
+      "type": "object",
+      "required": ["light", "dark", "plate", "pairs"],
+      "properties": {
+        "light": {"type": "object"},
+        "dark": {"type": "object"},
+        "plate": {"type": "object"},
+        "roles": {"type": "object"},
+        "pairs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["fg", "bg", "text"],
+            "properties": {"fg": {"type": "string"}, "bg": {"type": "string"}, "text": {"type": "boolean"}}
+          }
+        }
+      }
+    },
+    "grid": {"type": "object"},
+    "motion": {
+      "type": "object",
+      "required": ["tokens", "scroll"],
+      "properties": {
+        "note": {"type": "string"},
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "default", "reduced", "used_by", "why"],
+            "properties": {
+              "name": {"type": "string", "pattern": "^[a-z-]+$"},
+              "default": {"type": "string"},
+              "reduced": {"type": "string"},
+              "used_by": {"type": "string"},
+              "why": {"type": "string"}
+            }
+          }
+        },
+        "scroll": {"type": "object", "required": ["default", "reduced"]}
+      }
+    }
+  }
+}

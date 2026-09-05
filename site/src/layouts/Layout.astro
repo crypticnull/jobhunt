@@ -3,6 +3,7 @@ import { Font } from "astro:assets";
 import { site } from "../site.config.mjs";
 import { build } from "../buildstamp.mjs";
 import Preferences from "../components/Preferences.astro";
+import "../styles/tokens.css";
 
 interface Props {
   title?: string;
@@ -83,111 +84,20 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
 
 <style is:global>
   /* ---- Tokens -------------------------------------------------------------
-     Light is the base and lives on bare :root, so the un-stamped document (the
-     default "system" setting, which stamps nothing) always has a full palette.
-     The dark block only redefines; nothing is defined for the first time
-     inside a media query or a [data-theme] block.
+     Every colour, space and duration comes from data/design/tokens.json,
+     rendered to src/styles/tokens.css by tools/tokens.mjs and imported above.
+     The contrast ratios are computed there, and tools/check_tokens.mjs fails
+     CI when the CSS is stale, a text pair falls under 4.5 to 1, or a component
+     writes a hex, a millisecond or a curve by hand. ADR-0012.
 
-     Measured contrast against --paper, light / dark:
-       ink        16.1 / 15.3     body text
-       muted       5.1 /  7.2     secondary text, passes AA at any size
-       marker      5.4 /  6.4     the one accent, safe for text
-       blueprint   5.6 /  7.4     figure captions and code labels
-       rule        1.3 /  1.3     DECORATIVE ONLY. Never put text in it.
-     Plate tokens are fixed rather than themed: the plate is dark in both
-     themes, and the light marker on it measures 3.2, which fails. */
+     The font variables stay here because they wrap the ones Astro generates:
+     those already carry the metric-matched local fallback and the stack from
+     astro.config.mjs, so the value inside var() is only for the case where the
+     font CSS never loaded at all. */
   :root {
-    --paper: #f1f2ef;
-    --ink: #141619;
-    --muted: #62676d;
-    --rule: #d3d6d3;
-    --field: #e6e8e5;
-    --marker: #b92d22;
-    --blueprint: #35648a;
-
-    /* Fixed in both themes. The plate is always a dark surface. */
-    --plate: #0b0c0d;
-    --plate-ink: #e6e8e4;
-    --plate-muted: #9aa0a6;
-    --plate-marker: #ff6157;
-
-    /* The generated variables already carry the metric-matched local fallback
-       and the stack declared in astro.config.mjs, so the value inside var() is
-       only for the case where the font CSS never loaded at all. */
     --display: var(--font-display, "Helvetica Neue", Arial, sans-serif);
     --body: var(--font-body, Georgia, "Times New Roman", serif);
     --mono: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
-
-    --content-max: 72rem;
-    --gutter: clamp(1rem, 4vw, 3rem);
-    --grid-gap: 1.5rem;
-    --measure: 66ch;
-
-    /* ---- Motion ----------------------------------------------------------
-       The work is the motion and the interface stays still. Every movement
-       the site makes is named here, and a component only ever writes a
-       token, never a number. Two columns: the value, and what it becomes
-       under reduced motion, which is a decision per movement rather than a
-       switch that zeroes everything.
-
-         token      default   reduced   used by
-         --t-quick  120ms     120ms     row hover tint. A colour change is not movement.
-         --t-fade   160ms     160ms     opacity fades, preview in, plate crossfade. Opacity is not movement,
-                                        and a hard cut between stills is worse for vestibular readers.
-         --t-slide  200ms     0ms       the chapter rail mark. Position change becomes a cut, same end state.
-         --t-blink  1000ms    0ms       the record dot while a clip plays. Becomes a steady dot, and a mono
-                                        PLAYING label sits beside it so the blink is never the only signal.
-         --ease-out            linear   anything entering or moving.
-         --ease-in             linear   anything leaving.
-         scroll     smooth    auto      anchor jumps. */
-    --t-quick: 120ms;
-    --t-fade: 160ms;
-    --t-slide: 200ms;
-    --t-blink: 1000ms;
-    --ease-out: cubic-bezier(0.2, 0, 0, 1);
-    --ease-in: cubic-bezier(0.4, 0, 1, 1);
-    color-scheme: light dark;
-  }
-  /* The reduced column, applied the same three-state way as the theme: the
-     system preference unless the visitor said otherwise, and an explicit
-     data-motion="reduce" on the root for the specimen page and for tests. */
-  @media (prefers-reduced-motion: reduce) {
-    :root:not([data-motion="full"]) {
-      --t-slide: 0ms;
-      --t-blink: 0ms;
-      --ease-out: linear;
-      --ease-in: linear;
-    }
-  }
-  :root[data-motion="reduce"] {
-    --t-slide: 0ms;
-    --t-blink: 0ms;
-    --ease-out: linear;
-    --ease-in: linear;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --paper: #0f1113;
-      --ink: #e6e8e4;
-      --muted: #9aa0a6;
-      --rule: #262a2e;
-      --field: #171a1d;
-      --marker: #ff6157;
-      --blueprint: #7aa7cc;
-    }
-  }
-  :root[data-theme="dark"] {
-    --paper: #0f1113;
-    --ink: #e6e8e4;
-    --muted: #9aa0a6;
-    --rule: #262a2e;
-    --field: #171a1d;
-    --marker: #ff6157;
-    --blueprint: #7aa7cc;
-    color-scheme: dark;
-  }
-  :root[data-theme="light"] {
-    color-scheme: light;
   }
 
   /* ---- Base --------------------------------------------------------------- */
@@ -631,13 +541,5 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     max-width: 70ch;
   }
 
-  /* Scroll is the one movement the tokens cannot carry, so it is the one
-     media query left. The wildcard 0.01ms override that used to live here
-     switched motion off rather than designing its absence; the tokens above
-     carry the reduced column now, per movement. */
-  @media (prefers-reduced-motion: no-preference) {
-    :root:not([data-motion="reduce"]) {
-      scroll-behavior: smooth;
-    }
-  }
+
 </style>

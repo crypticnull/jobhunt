@@ -99,6 +99,15 @@ def _entry(row, companies):
     return "\n".join(lines) + "\n"
 
 
+def _short_reason(reason):
+    """A drop reason as a few words: the prefix and the first clause."""
+    head = (reason or "").split(":")[0].strip()
+    rest = (reason or "")[len(head) + 1 :].strip()
+    if head in ("remote", "comp", "title", "disqualifier") and rest:
+        return f"{head}: {rest.split(',')[0][:40]}"
+    return (reason or "")[:48]
+
+
 def dead_weight(store, rules, companies=None):
     """Companies that have been polled enough to have shown something and have
     shown nothing. Reported, never acted on: the list is Matt's and a scheduled
@@ -107,13 +116,15 @@ def dead_weight(store, rules, companies=None):
     rows = [r for r in store.company_yield() if r["on_target"] == 0 and r["postings"] >= floor]
     if not rows:
         return []
+    reasons = store.company_drop_reasons()
     out = ["", "## Earning their poll", "",
-           f"Polled {floor} or more postings and cleared none of them. Worth a look before pruning: a company that should be posting design roles and is not may be a title filter miss rather than a dead company.", ""]
+           f"Polled {floor} or more postings and cleared none of them. The two most common drop reasons print beside each, so a gate miss and a real absence stop reading the same: a design-forward company whose postings all died on the remote claim is worth a look before it is dropped.", ""]
     for r in rows:
         c = (companies or {}).get(r["company_slug"]) or {}
         name = c.get("name", r["company_slug"])
         where = f", {c['hq']}" if c.get("hq") else ""
-        out.append(f"- {name}{where}: {r['postings']} postings, 0 on target")
+        why = ", ".join(f"{n} {_short_reason(reason)}" for reason, n in reasons.get(r["company_slug"], [])[:2])
+        out.append(f"- {name}{where}: {r['postings']} postings, 0 on target" + (f", {why}" if why else ""))
     out += ["", "Drop the ones you agree with: `python -m scraper drop " + " ".join(r["company_slug"] for r in rows[:5]) + "`"]
     return out
 

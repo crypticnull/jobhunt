@@ -276,3 +276,22 @@ class DeadWeight(unittest.TestCase):
         self.add("b", 30)
         rows = self.s.company_yield()
         self.assertEqual(rows[0]["company_slug"], "b", "most postings for nothing comes first")
+
+
+class DeadWeightReasons(unittest.TestCase):
+    """The dead-weight section printed counts only, so a title miss, a gate
+    miss and a real absence all read the same line. Now it says why."""
+
+    def test_the_top_reasons_print_beside_the_count(self):
+        import tempfile
+        from scraper.posting import posting as make
+        with tempfile.TemporaryDirectory() as d:
+            s = Store(Path(d) / "p.db")
+            for i in range(16):
+                p = make(source="greenhouse", source_id=str(i), company_slug="figma", url=f"https://x/{i}", remote="onsite", location="United States", title=f"Product Designer {i}", description="Figma.")
+                pid, _ = s.upsert(p, "2026-09-05T00:00:00+00:00")
+                s.set_score(pid, {"score": 0, "rules": [], "flags": [], "version": "2.0", "pile": "logged", "drop_reason": "remote: remote claim is onsite" if i < 14 else "no title fit and no intersection", "proof_lead": "x", "legs_hit": [], "curriculum": [], "title_tier": None, "remote": "fail", "comp": "pass"})
+            lines = digest.dead_weight(s, {"digest": {"dead_weight_min_postings": 15}}, {"figma": {"name": "Figma"}})
+            s.close()
+        joined = "\n".join(lines)
+        self.assertIn("Figma: 16 postings, 0 on target, 14 remote: remote claim is onsite, 2 no title fit", joined)

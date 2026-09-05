@@ -15,6 +15,7 @@ diagram.
 | `data/scoring.json` | `scoring.schema.json` | Matt, twin of `docs/search-protocol.md` | scraper, letters (the proof lead) |
 | `data/local/scoring.local.json` | `scoring.schema.json` | Matt | scraper (the comp floor and bands, merged over the public file) |
 | `data/voice/rules.json` | (milestone 5) | Matt | voicelint |
+| `data/design/tokens.json` | `tokens.schema.json` | Matt | `tools/tokens.mjs` renders it to `site/src/styles/tokens.css`, committed, and `tools/check_tokens.mjs` fails CI when that file is stale or a text pair falls under 4.5 to 1 |
 | `data/local/postings.db` | `db/schema.sql` | `scraper/store.py` only | digest, letters read-only |
 | `data/digests/` | | `scraper/digest.py`, pushed by the Sunday task | Matt, and Claude from chat |
 | `data/last-run.json` | | `scraper/poll`, pushed nightly | the digest, and Claude, to see a job that stopped |

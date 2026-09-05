@@ -126,6 +126,33 @@ def choose_lead(company, lead=None, proof_root=PROOF, posting=None):
     return "ae-llama"
 
 
+def vocabulary_asks(posting, rules=None, skills=None):
+    """The curriculum vocabulary the posting names, each marked claimed with its
+    evidence or gap, so the draft leads with claimed proof and knows the gap
+    before a word is written. Until 2026-09-05 the brief never read
+    skills.json, so claiming a skill changed no letter."""
+    from scraper import curriculum
+    from scraper.score import RULES_PATH, load_rules
+    rules = rules or load_rules(RULES_PATH)
+    vocab = (rules.get("curriculum") or {}).get("vocabulary") or {}
+    if skills is None:
+        try:
+            data = json.loads(curriculum.SKILLS_PATH.read_text(encoding="utf-8"))
+            skills = {s["term"].lower(): s.get("evidence", "") for s in data.get("skills", [])}
+        except OSError:
+            skills = {}
+    text = ((posting.get("title") or "") + "\n" + (posting.get("description") or "")).lower()
+    out = []
+    for area, terms in vocab.items():
+        for term in terms:
+            if curriculum._pattern(term).search(text):
+                name = curriculum.readable(term)
+                claimed = curriculum.claimed_by(term, set(skills))
+                evidence = next((e for t, e in skills.items() if t == name.lower() or t == term.lower()), None)
+                out.append(f"{name} (claimed: {evidence})" if claimed and evidence else (f"{name} (claimed)" if claimed else f"{name} (gap)"))
+    return out
+
+
 class _Fill(dict):
     def __missing__(self, key):
         return "{" + key + "}"
@@ -168,6 +195,9 @@ def _comp(p):
 def render_brief(posting, company, chosen, voice_rules, max_description=6000):
     detail = json.loads(posting.get("score_json") or "{}")
     why = [f"- {r['rule']} {r['value']:+d} ({r['why']})" for r in detail.get("rules", [])]
+    asks = vocabulary_asks(posting)
+    if asks:
+        why.append("- asks for: " + ", ".join(asks))
     if detail.get("pile"):
         why.insert(0, f"- pile: {detail['pile']}" + (f", title tier {detail.get('title_tier')}" if detail.get("title_tier") else "") + (f", legs {', '.join(detail['legs_hit'])}" if detail.get("legs_hit") else ""))
     flags = "; ".join(detail.get("flags", []))
