@@ -13,30 +13,6 @@
 #
 # category | careers url | name | City, ST
 
-# --- Pacific Northwest studios. The closest thing in the country to Matt's own
-# --- discipline, and all within a day's drive of where he is moving.
-studio-ai | https://www.laika.com/careers | Laika | Hillsboro, OR
-studio-ai | https://housespecial.com/careers | House Special | Portland, OR
-studio-ai | https://hingedigital.com/careers | Hinge Digital | Portland, OR
-studio-ai | https://bentimagelab.com/careers | Bent Image Lab | Portland, OR
-studio-ai | https://www.instrument.com/careers | Instrument | Portland, OR
-studio-ai | https://www.wk.com/careers | Wieden Kennedy | Portland, OR
-studio-ai | https://thesisagency.com/careers | Thesis | Portland, OR
-studio-ai | https://www.sockeye.com/careers | Sockeye | Portland, OR
-
-# --- Los Angeles motion and title design. Not the west Matt is moving to, but
-# --- this is where the discipline concentrates and several hire remote.
-studio-ai | https://buck.co/careers | Buck | Los Angeles, CA
-studio-ai | https://www.gentlemanscholar.com/careers | Gentleman Scholar | Los Angeles, CA
-studio-ai | https://www.imaginaryforces.com/careers | Imaginary Forces | Los Angeles, CA
-studio-ai | https://prologue.com/careers | Prologue | Venice, CA
-studio-ai | https://territorystudio.com/careers | Territory Studio | Los Angeles, CA
-studio-ai | https://www.digitaldomain.com/careers | Digital Domain | Playa Vista, CA
-
-# --- Experiential and immersive, where creative technologist is the actual
-# --- job title rather than a market-facing one.
-studio-ai | https://meowwolf.com/careers | Meow Wolf | Santa Fe, NM
-
 # --- Pacific Northwest games and consumer tech
 product-inhouse | https://www.bungie.net/careers | Bungie | Bellevue, WA
 product-inhouse | https://arena.net/en/careers | ArenaNet | Bellevue, WA
