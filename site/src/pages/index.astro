@@ -48,6 +48,12 @@ const builds = proof
     };
   });
 const workIntro = proof.find((p) => p.data.linked_projects.length > 0);
+// A study is ready to show when its hero is a real still. Until the exports
+// land the records carry an SVG placeholder, and a grid of dark tiles that say
+// "hero still pending" costs more credibility than the work earns, so the
+// section says what is true instead: the studies are being written and the
+// builds above are live.
+const ready = projects.filter((p) => p.data.hero.src.format !== "svg");
 ---
 
 <Layout>
@@ -85,9 +91,21 @@ const workIntro = proof.find((p) => p.data.linked_projects.length > 0);
   <section id="work">
     <h2>Selected work</h2>
     {workIntro && <p class="lede">{workIntro.data.summary}</p>}
-    <ul class="cards work-index">
+    {ready.length === 0 && (
+      <p class="pending">
+        The studies are being written and the stills arrive on their own schedule. The builds above are live, and the
+        records so far are{" "}
+        {projects.map((p, i) => (
+          <>
+            <a href={`/work/${p.id}`}>{p.data.title}</a>
+            {i < projects.length - 1 ? ", " : "."}
+          </>
+        ))}
+      </p>
+    )}
+    <ul class="cards work-index" hidden={ready.length === 0}>
       {
-        projects.map((p) => (
+        ready.map((p) => (
           <li>
             <a class="card work" href={`/work/${p.id}`}>
               <Still still={p.data.hero} sizes="(min-width: 60rem) 22rem, 100vw" />
