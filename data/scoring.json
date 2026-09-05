@@ -234,11 +234,11 @@
     "drop": {
       "title_patterns": [
         "^video editor$",
+        "^(junior|jr)\\b",
+        "^associate(?! (creative|design|art) director)",
+        "^intern(ship)?\\b",
         "^editor$",
-        "^junior",
-        "^associate",
         "^coordinator",
-        "^intern",
         "(electrical|mechanical|civil|structural|precast|controls|hvac|plumbing|piping|thermal|process|manufacturing|packaging|hardware|firmware|asic|pcb|rtl|silicon|chip|analog|actuator|robotics|validation|verification|layout|\\brf\\b)[a-z ]* design engineer",
         "design engineer[^a-z]{0,3}\\((electrical|mechanical|civil|structural|hardware|controls)",
         "design engineer[ ,:;/(-]{1,4}(electrical|mechanical|civil|structural|hardware|firmware|thermal|power|cooling|industrial|controls|hvac|piping|silicon|chip|analog|robotics)",
@@ -254,7 +254,11 @@
         "\\broto\\b",
         "matchmove",
         "\\bcompositor\\b",
-        "\\b(pcb|rtl|asic|actuator|silicon) (layout|design|package)"
+        "\\b(pcb|rtl|asic|actuator|silicon) (layout|design|package)",
+        "\\b(fx|vfx|cfx|lighting|rigging|creature|groom|previs|look ?dev(elopment)?|environment|texture) (artist|td|technical director|supervisor|lead)\\b",
+        "\\bcg supervisor",
+        "stop[ -]?motion",
+        "^(senior |staff |principal |lead )?(research scientist|ml researcher|machine learning engineer|ml engineer|applied scientist)"
       ],
       "phrases": [
         "relocation required",
@@ -277,25 +281,23 @@
         "animated series",
         "pure ux",
         "user experience designer",
-        "product designer \\(ux",
-        "research scientist",
-        "ml researcher",
-        "machine learning engineer"
+        "product designer \\(ux"
       ],
       "stale_after_days": 30,
-      "stale_unseen_days": 7
+      "stale_unseen_days": 7,
+      "note_2026_09_05": "'^associate' was dropping Associate Creative Director and '^intern' was dropping International Brand Designer. The ML disqualifiers moved from body phrases to title patterns because a Design Engineer at an AI company works 'alongside a research scientist' in every posting. The fx, lighting, rigging and creature titles are the film pipeline the second principle rejects."
     },
     "flag": {
       "engine": {
         "phrases": [
           "unreal",
-          "unity",
-          "ue5",
-          "shader",
-          "hlsl",
-          "glsl"
+          "\\bue[45]\\b",
+          "unity (engine|3d|developer|editor|project|game)",
+          "\\bin unity\\b",
+          "\\bhlsl\\b"
         ],
-        "reason": "game engine primary, Matt decides"
+        "reason": "game engine primary, Matt decides",
+        "note": "Revised 2026-09-05. 'shader' and 'glsl' are curriculum web-motion vocabulary, so they were holding a Design Engineer in review for the very words the search rewards, and bare 'unity' matched 'team unity'. The flag still holds a tier B title, because a motion designer whose primary tool is Unreal is engine work and Matt decides; tier A overrides as before."
       },
       "frontend": {
         "phrases": [
@@ -496,7 +498,18 @@
           "animation system",
           "motion guidelines",
           "micro-interaction",
-          "microinteraction"
+          "microinteraction",
+          "storybook",
+          "prototyping",
+          "protopie",
+          "origami",
+          "framer(?! motion)",
+          "spline",
+          "rive",
+          "lottie",
+          "bodymovin",
+          "smart animate",
+          "variable fonts"
         ]
       }
     },
@@ -517,7 +530,6 @@
           "ai creative lead",
           "ai creative director",
           "creative ai engineer",
-          "creative ai",
           "pipeline td",
           "pipeline technical director",
           "motion technologist",
@@ -525,8 +537,23 @@
           "motion systems",
           "motion system designer",
           "product motion",
-          "design systems engineer"
-        ]
+          "design systems engineer",
+          "creative ai (engineer|designer|artist|lead|director)"
+        ],
+        "requires_any_leg_for": {
+          "patterns": [
+            "technical director",
+            "pipeline td",
+            "pipeline technical director"
+          ],
+          "legs": [
+            "generative",
+            "software",
+            "pipeline",
+            "product"
+          ]
+        },
+        "note": "Revised 2026-09-05. Bare 'creative ai' put Creative AI Product Manager in apply at 80. 'technical director' and 'pipeline td' need a leg because Creature FX Technical Director at a VFX house tiered A and overrode every flag, which is the longform work the second principle rejects."
       },
       "tier_b": {
         "points": 10,
@@ -546,7 +573,14 @@
           "staff product designer",
           "principal product designer",
           "brand designer",
-          "visual designer"
+          "visual designer",
+          "interaction designer",
+          "ux engineer",
+          "prototyper",
+          "design systems? designer",
+          "motion design lead",
+          "motion director",
+          "product motion designer"
         ],
         "requires_any_leg": [
           "generative",
@@ -562,7 +596,8 @@
           "motion graphics designer",
           "3d artist",
           "animator",
-          "3d generalist"
+          "3d generalist",
+          "motion graphics artist"
         ],
         "requires_any_leg": []
       }
@@ -635,7 +670,12 @@
       "storyboard",
       "concept art",
       "pipeline td",
-      "brand studio"
+      "brand studio",
+      "design engineer",
+      "design systems",
+      "interaction design",
+      "product design",
+      "design technologist"
     ],
     "min_strong_without_title": 2,
     "strong_terms": [
@@ -671,7 +711,15 @@
       "text-to-video",
       "text to video",
       "image-to-video",
-      "image to video"
+      "image to video",
+      "lottie",
+      "rive",
+      "framer motion",
+      "gsap",
+      "design tokens",
+      "protopie",
+      "motion system",
+      "design systems"
     ],
     "require_any": [
       "after effects",
@@ -746,7 +794,21 @@
       "motion systems",
       "product animation",
       "ui animation",
-      "interface animation"
+      "interface animation",
+      "figma",
+      "design system",
+      "design systems",
+      "design tokens",
+      "component library",
+      "prototyping",
+      "interaction design",
+      "lottie",
+      "rive",
+      "framer motion",
+      "gsap",
+      "micro-interaction",
+      "motion tokens",
+      "design engineer"
     ],
     "exclude_title_patterns": [
       "account executive",
@@ -805,7 +867,10 @@
       "photo editor",
       "photo retoucher",
       "operations analyst",
-      "operations consultant"
+      "operations consultant",
+      "(electrical|mechanical|civil|structural|precast|controls|hvac|plumbing|piping|thermal|process|manufacturing|packaging|hardware|firmware|asic|pcb|rtl|silicon|chip|analog|actuator|robotics|validation|verification|layout|\\brf\\b|power|cooling|industrial|optical|aerospace|automotive|semiconductor)[a-z ]* design engineer",
+      "design engineer[ ,:;/(-]{1,4}(electrical|mechanical|civil|structural|hardware|firmware|thermal|power|cooling|industrial|controls|hvac|piping|silicon|chip|analog|robotics|optical)",
+      "data cent(er|re)[a-z ]* design engineer"
     ],
     "generic_company_names": [
       "company",
@@ -836,7 +901,6 @@
         "protopie",
         "origami",
         "framer(?! motion)",
-        "spline",
         "rive",
         "lottie",
         "bodymovin",
@@ -848,7 +912,16 @@
         "interface animation",
         "product animation",
         "smart animate",
-        "variable fonts"
+        "variable fonts",
+        "spline\\.design",
+        "spline 3d",
+        "motion principles",
+        "motion language",
+        "animation principles",
+        "motion tokens",
+        "interaction design",
+        "prototype",
+        "design handoff"
       ],
       "web-motion": [
         "framer motion",
@@ -859,12 +932,13 @@
         "react three fiber",
         "\\br3f\\b",
         "svg animation",
-        "canvas",
         "webgl",
         "shader",
         "glsl",
         "spring physics",
-        "easing curves"
+        "easing curves",
+        "canvas (2d|api|animation|element)",
+        "html canvas"
       ],
       "front-of-house": [
         "react",
@@ -887,13 +961,10 @@
         "reanimated"
       ],
       "realtime": [
-        "unreal",
-        "unity",
         "touchdesigner",
         "notch",
         "houdini",
         "blender",
-        "\\bvfx\\b",
         "real-time"
       ],
       "generative": [
@@ -944,7 +1015,8 @@
     "targets": [
       "product-motion",
       "web-motion"
-    ]
+    ],
+    "note_2026_09_05": "Bare 'canvas' scored a blank canvas and bare 'spline' scored spline interpolation. unreal, unity and vfx left the study list because the second principle rejects that work and the engine flag already handles it."
   },
   "piles": {
     "apply_min": 65,
@@ -972,7 +1044,12 @@
     "soft_flag_prefixes": [
       "remote: payroll-default"
     ],
-    "soft_flag_note": "Flags whose text starts with one of these halve the remote marks and print on the row but do not hold a tiered title in review. Added 2026-09-05 with the parse_states fix: payroll-default shapes like 'Remote - New York' were masked by the 'us' bug before and now fire on real matches."
+    "soft_flag_note": "Flags whose text starts with one of these halve the remote marks and print on the row but do not hold a tiered title in review. Added 2026-09-05 with the parse_states fix: payroll-default shapes like 'Remote - New York' were masked by the 'us' bug before and now fire on real matches.",
+    "apply_title_tiers": [
+      "A",
+      "B"
+    ],
+    "apply_title_tiers_note": "Tier C is a motion or 3D title with no generative, software, pipeline or product leg. It is review at most, because it is the work being left, and with posted comp at a tier 2 company it was reaching apply at 66."
   },
   "proof_lead_by_tier": {
     "1": "local-pipeline",

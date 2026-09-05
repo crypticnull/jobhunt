@@ -147,3 +147,23 @@ class Readability(unittest.TestCase):
         terms = {t for group in RULES["curriculum"]["vocabulary"].values() for t in group}
         for boilerplate in ("documentation", "stakeholder", "workshop", r"\bgit\b", "node", "ci/cd", "graphql"):
             self.assertNotIn(boilerplate, terms)
+
+
+class Plurals(unittest.TestCase):
+    def test_plural_forms_score(self):
+        for text in ("We maintain design systems.", "Own micro-interactions across the app.", "Motion systems for the product."):
+            self.assertIn("product-motion", curriculum.alignment(text, RULES), text)
+
+    def test_a_claim_retires_the_regex_form_of_a_term(self):
+        rows = [row(description="LLM and diffusion models daily.") for _ in range(3)]
+        found = {g["term"] for g in curriculum.gaps(rows, RULES, skills={"llm", "stable diffusion"})}
+        self.assertNotIn("\\bllm\\b", found)
+        self.assertNotIn("diffusion", found)
+
+    def test_boilerplate_words_are_not_the_vocabulary(self):
+        self.assertEqual(curriculum.alignment("You will have a blank canvas to build the team.", RULES), [])
+        self.assertEqual(curriculum.alignment("Catmull-Rom spline interpolation for our physics engine.", RULES), [])
+        self.assertIn("product-motion", curriculum.alignment("Motion principles and a motion language for the product.", RULES))
+
+    def test_an_alternation_reads_as_its_first_option(self):
+        self.assertEqual(curriculum.readable("canvas (2d|api|animation|element)"), "canvas 2d")

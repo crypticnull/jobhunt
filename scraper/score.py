@@ -266,8 +266,12 @@ def legs_hit(p, rules):
 def title_tier(p, legs, rules):
     t = rules["score"]["title"]
     tnorm = normalize_title(p.get("title"))
-    if any(_term(pat).search(tnorm) for pat in t["tier_a"]["patterns"]):
-        return "A", t["tier_a"]["points"]
+    needs = t["tier_a"].get("requires_any_leg_for") or {}
+    for pat in t["tier_a"]["patterns"]:
+        if _term(pat).search(tnorm):
+            if pat in needs.get("patterns", []) and not any(l in legs for l in needs.get("legs", [])):
+                break  # a Technical Director with no software, pipeline or generative leg is a film TD
+            return "A", t["tier_a"]["points"]
     if any(_term(pat).search(tnorm) for pat in t["tier_b"]["patterns"]) and any(l in legs for l in t["tier_b"]["requires_any_leg"]):
         return "B", t["tier_b"]["points"]
     if any(_term(pat).search(tnorm) for pat in t["tier_c"]["patterns"]):
@@ -304,9 +308,6 @@ def evaluate(p, rules, company=None, now=None):
         out["flags"] += [f"comp: {r}" for r in comp_reasons]
     body = (p.get("description") or "").lower()
     flag_rules = rules["disqualifiers"]["flag"]
-    engine = _hits(flag_rules["engine"]["phrases"], body)
-    if engine:
-        out["flags"].append(f"{flag_rules['engine']['reason']}: {', '.join(engine[:3])}")
 
     s = rules["score"]
     legs = legs_hit(p, rules)
@@ -319,11 +320,15 @@ def evaluate(p, rules, company=None, now=None):
     aligned = curriculum_mod.alignment(f"{p.get('title') or ''}\n{p.get('description') or ''}", rules)
     out["curriculum"] = aligned
     curriculum_points = curriculum_mod.points(aligned, rules)
-    fe = flag_rules.get("frontend")
-    if fe and tt not in fe.get("skip_if_title_tier_in", []):
-        hits = _hits(fe["phrases"], body)
-        if hits:
-            out["flags"].append(f"{fe['reason']}: {', '.join(hits[:3])}")
+    # Engine and frontend language flag rather than drop, and neither holds a
+    # title that has already earned a tier: every design engineering posting
+    # names React, and the engine words that are left are the real engines.
+    for key in ("engine", "frontend"):
+        fr = flag_rules.get(key)
+        if fr and tt not in fr.get("skip_if_title_tier_in", []):
+            hits = _hits(fr["phrases"], body)
+            if hits:
+                out["flags"].append(f"{fr['reason']}: {', '.join(hits[:3])}")
     comp_points = 0
     if comp_result == "flag" and mid is not None:
         comp_points = s["comp"]["flagged"]
@@ -376,7 +381,8 @@ def evaluate(p, rules, company=None, now=None):
     # does not fit is not one Matt can write a credible letter for, whatever the
     # body scores, and it is how an Economist and a PCB Layout Engineer reached
     # apply on generic body language. They still reach review.
-    titled = out["title_tier"] is not None or not piles.get("apply_requires_title_tier")
+    apply_tiers = piles.get("apply_title_tiers", ["A", "B", "C"])
+    titled = out["title_tier"] in apply_tiers or not piles.get("apply_requires_title_tier")
     # A flag holds a posting in review so Matt decides, except where the title is
     # tier A. Creative Technologist at Luma is the stated bullseye and it scored
     # 70 and sat in review because the body mentions Unity. The flag still prints

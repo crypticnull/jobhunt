@@ -219,3 +219,25 @@ class Caps(unittest.TestCase):
         sig = inspect.signature(discover.grow)
         self.assertIsNone(sig.parameters["board_cap"].default)
         self.assertIsNone(sig.parameters["posting_cap"].default)
+
+
+class ProductMotionTitles(unittest.TestCase):
+    """Discovery kept no product-motion or design-engineer posting before
+    2026-09-05, so the mechanism ADR-0009 relies on to find companies early was
+    blind to the direction the search had taken."""
+
+    def kept(self, title, body):
+        return bool(discover.relevant({"title": title, "text": body}, RULES))
+
+    def test_design_and_product_titles_are_kept(self):
+        self.assertTrue(self.kept("Design Engineer", "React, Framer Motion, Figma, micro-interactions."))
+        self.assertTrue(self.kept("Senior Product Designer", "Figma, prototyping, design systems."))
+        self.assertTrue(self.kept("Design Systems Engineer", "Design tokens and a component library."))
+        self.assertTrue(self.kept("Interaction Designer", "Prototyping in Figma, Lottie."))
+
+    def test_a_hardware_design_engineer_is_not(self):
+        self.assertFalse(self.kept("Mechanical Design Engineer", "Prototyping enclosures in CAD."))
+        self.assertFalse(self.kept("Design Engineer, Electrical", "Prototyping boards."))
+
+    def test_a_plain_frontend_job_still_needs_a_design_title(self):
+        self.assertFalse(self.kept("Senior Frontend Engineer", "React, design system components, Figma handoff."))
