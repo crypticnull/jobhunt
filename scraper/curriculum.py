@@ -27,6 +27,14 @@ ROOT = Path(__file__).resolve().parent.parent
 SKILLS_PATH = ROOT / "data" / "skills.json"
 
 
+def readable(term):
+    """A vocabulary term as a person would write it. The terms are regexes so
+    that llm does not match llms-of-the-valley, and nobody should have to read
+    the escaping."""
+    import re as _re
+    return _re.sub(r"\\b|\(\?![^)]*\)|\\", "", term).strip()
+
+
 def _pattern(term):
     if re.search(r"[\\^$.|?*+()\[\]{}]", term):
         return re.compile(term, re.IGNORECASE)
@@ -106,7 +114,7 @@ def report(rows, rules, skills=None, limit=None):
            f"What the {len(rows)} postings you are looking at ask for and the skills file does not claim, most-asked first. This is the study list, and it is the same vocabulary that steers the search, so learning down this list moves the piles.", ""]
     for g in found[:limit]:
         comp = f", median {g['median_comp'] // 1000}k" if g["median_comp"] else ""
-        out.append(f"- {g['term']} ({g['area']}): {g['postings']} of {len(rows)}, {g['share']}%{comp}")
+        out.append(f"- {readable(g['term'])} ({g['area']}): {g['postings']} of {len(rows)}, {g['share']}%{comp}")
     if len(found) > limit:
         out.append(f"- and {len(found) - limit} more below the top {limit}")
     return out

@@ -805,8 +805,7 @@
         "houdini",
         "blender",
         "\\bvfx\\b",
-        "real-time",
-        "realtime"
+        "real-time"
       ],
       "generative": [
         "comfyui",
@@ -827,10 +826,6 @@
         "python",
         "javascript",
         "rest api",
-        "graphql",
-        "\\bgit\\b",
-        "ci/cd",
-        "node",
         "automation",
         "tooling",
         "agentic",
@@ -855,10 +850,7 @@
         "metadata",
         "naming convention",
         "versioning",
-        "design ops",
-        "documentation",
-        "workshop",
-        "stakeholder"
+        "design ops"
       ]
     },
     "targets": [
@@ -876,7 +868,14 @@
     "apply_sort": [
       "company_tier",
       "score.total"
-    ]
+    ],
+    "relevance_legs": [
+      "3d",
+      "motion",
+      "generative",
+      "product"
+    ],
+    "relevance_note": "A posting is relevant when the title tiers, or the body hits a craft leg. Software and pipeline are deliberately excluded: they support a creative role rather than define one, and every backend job in the corpus hits them, which is how 894 postings reached a pile on the first real run."
   },
   "proof_lead_by_tier": {
     "1": "local-pipeline",

@@ -124,3 +124,26 @@ class Backwards(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Readability(unittest.TestCase):
+    """The first written study list printed raw regexes at a person."""
+
+    def test_word_boundaries_and_lookaheads_are_stripped(self):
+        self.assertEqual(curriculum.readable(r"\bllm\b"), "llm")
+        self.assertEqual(curriculum.readable(r"framer(?! motion)"), "framer")
+        self.assertEqual(curriculum.readable(r"three\.js"), "three.js")
+        self.assertEqual(curriculum.readable("figma"), "figma")
+
+    def test_the_report_prints_the_readable_form(self):
+        rows = [{"description": "We use an LLM in the loop.", "title": "", "comp_max": 200000}] * 4
+        text = "\n".join(curriculum.report(rows, RULES, skills=set()))
+        self.assertIn("- llm (engineering)", text)
+        self.assertNotIn(r"\b", text)
+
+    def test_boilerplate_is_no_longer_in_the_vocabulary(self):
+        """documentation and stakeholder led the first study list. A curriculum
+        that says learn documentation is noise."""
+        terms = {t for group in RULES["curriculum"]["vocabulary"].values() for t in group}
+        for boilerplate in ("documentation", "stakeholder", "workshop", r"\bgit\b", "node", "ci/cd", "graphql"):
+            self.assertNotIn(boilerplate, terms)
