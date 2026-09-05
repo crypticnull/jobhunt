@@ -1,6 +1,6 @@
 ---
 id: remote
 kind: remote
-note: Only when the posting hedges on remote. Skip it when remote is clearly stated.
+note: Only when the posting hedges on remote. Skip it when remote is clearly stated. Never the endurance numbers, they were struck from the resume on 2026-09-04 and they stay struck.
 ---
-On remote, I've delivered nine projects and 58 tasks in sixteen weeks from my own workstation, an RTX 5090 machine I built and maintain, including 3D door models built, rendered and delivered inside a single day. Remote isn't a concession for me, it's where the work already gets done.
+On remote, the After Effects panel and the generative pipeline were both built and shipped from my own desk, and the last four flagship event cycles were delivered from the same one. Remote isn't a concession for me, it's where the work already gets done.

@@ -41,7 +41,7 @@ Both were only half encoded before that date. The remote gate was already firm. 
 
 ## Who this is for
 
-Matt Rodenbeck. Market-facing title Creative Technologist. Currently a senior motion designer in Pennsylvania, moving to Washington or Oregon in June 2027. Remote only. Base floor $130,000. Target $150,000. Ask $160,000 to $170,000 at AI companies. See the plan for the positioning thesis, the short version is that the intersection of senior 3D and motion craft, a working local generative AI pipeline, shipping software with agentic coding, and pipeline literacy is what's being sold, and motion design alone is what's being avoided.
+Matt Rodenbeck. Market-facing title Creative Technologist. Currently a senior motion designer in Pennsylvania, moving to Washington or Oregon in June 2027. Remote only. The base floor, the target and the ask live in data/local/brief.md and data/local/scoring.local.json, and every number that describes the comp band is null in the public ruleset. See the plan for the positioning thesis, the short version is that the intersection of senior 3D and motion craft, a working local generative AI pipeline, shipping software with agentic coding, and pipeline literacy is what's being sold, and motion design alone is what's being avoided.
 
 ## Sources, in priority order
 
@@ -126,15 +126,15 @@ Annualize first. Hourly times 2080. Ranges keep both ends. Gate on `salary_max`,
 Where an ATS publishes one range per office, which is how location-adjusted pay shows up, the range with the lowest maximum is the one gated and scored, because that is the tier a remote hire outside the headquarters city is paid. Revised 2026-09-05: Greenhouse ranges were merged min-of-mins and max-of-maxes, and Ashby took the first tier, so a location-adjusted employer cleared the gate on its San Francisco number. The text parser now reads every dollar range in a description and takes the first that reads as a salary, so a home office stipend listed before the base pay no longer hides it.
 
 **Pass**
-- `salary_max` ≥ 130,000.
+- `salary_max` at or over the pass floor in `data/local/scoring.local.json`.
 - Salary not posted, and `company_tier` is 1, 2 or 3, or `company_size` > 200.
 
 **Flag** (passes, low comp score, reason attached)
-- `salary_max` between 110,000 and 129,999. Worth a look only at tier 1 or 2 where equity and a fast band correction are plausible. At tier 3 or 4 this is a soft drop, so score it but push it to review, never apply.
+- `salary_max` between the flag floor and the pass floor. Worth a look only at tier 1 or 2 where equity and a fast band correction are plausible. At tier 3 or 4 this is a soft drop, so score it but push it to review, never apply.
 
 **Fail**
-- `salary_max` < 110,000.
-- Hourly under $85 for contract or freelance, annualized. The floor is firm, so a contract posting that lists an annual figure is held to the same number.
+- `salary_max` under the flag floor.
+- Hourly under the contract floor for contract or freelance work, annualized. The floor is firm, so a contract posting that lists an annual figure is held to the same number.
 - Salary not posted, company not on `data/companies.json` with a tier, and size unknown or under 200. Most states with remote-hiring companies require posted ranges now, so a remote-US listing with no range is itself a signal.
 - Any unpaid test project, take-home or "design exercise" described as longer than two hours, or any spec work.
 

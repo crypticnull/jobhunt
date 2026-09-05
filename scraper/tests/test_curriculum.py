@@ -167,3 +167,32 @@ class Plurals(unittest.TestCase):
 
     def test_an_alternation_reads_as_its_first_option(self):
         self.assertEqual(curriculum.readable("canvas (2d|api|animation|element)"), "canvas 2d")
+
+
+class Evidence(unittest.TestCase):
+    """A skill claimed without evidence removes itself from the study list and
+    never gets learned, and until 2026-09-05 nothing checked the evidence
+    resolved to anything."""
+
+    def test_every_claim_points_at_a_record(self):
+        import json
+        from pathlib import Path
+        root = Path(__file__).resolve().parents[2]
+        data = json.loads((root / "data" / "skills.json").read_text(encoding="utf-8"))
+        proofs = {p.stem for p in (root / "data" / "proof").glob("*.md")}
+        projects = {p.name for p in (root / "data" / "projects").iterdir() if p.is_dir()}
+        pipelines = {p.name for p in (root / "data" / "pipelines").iterdir() if p.is_dir()}
+        bad = []
+        for s in data["skills"]:
+            for key in ("term", "area", "evidence"):
+                self.assertIn(key, s, s)
+            if s["evidence"] != "resume" and s["evidence"] not in proofs | projects | pipelines:
+                bad.append((s["term"], s["evidence"]))
+        self.assertEqual(bad, [], "evidence that resolves to nothing")
+
+    def test_what_the_site_already_proves_is_claimed(self):
+        claimed = curriculum.load_skills()
+        for term in ("accessibility", "performance budget", "core web vitals", "responsive", "variable fonts"):
+            self.assertIn(term, claimed, term)
+        for term in ("figma", "design system", "prototyping"):
+            self.assertNotIn(term, claimed, term + " is a study item until there is something to point at")

@@ -8,6 +8,17 @@ if [ -n "$bad" ]; then
   echo "pre-commit: data/local/ and the assets/ staging folder never touch git (ADR-0002)." >&2
   exit 1
 fi
+# The comp band never touches git either (ADR-0002). Paths were guarded, content
+# was not, and the floor, target and ask came back in a public doc one day after
+# they left CLAUDE.md. A dollar figure in the low hundreds of thousands anywhere
+# outside the tests and the fixtures is refused.
+figures=$(git diff --cached -U0 -- . ':!*/tests/*' ':!*/fixtures/*' | grep -E '^\+' | grep -E '\$1[0-9]{2},[0-9]{3}' | head -3)
+if [ -n "$figures" ]; then
+  echo "pre-commit: refusing a comp figure in a public file:" >&2
+  echo "$figures" >&2
+  echo "pre-commit: the band lives in data/local/brief.md and data/local/scoring.local.json (ADR-0002)." >&2
+  exit 1
+fi
 limit=$((50 * 1024 * 1024))
 heavy=""
 for f in $(git diff --cached --name-only --diff-filter=AM); do
