@@ -1,0 +1,367 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { build } from "../buildstamp.mjs";
+import tokens from "../../../data/design/tokens.json";
+import { ratios } from "../../../tools/tokens.mjs";
+
+// Everything on this page is read from the same record the site's CSS is
+// rendered from, so what it shows cannot disagree with what the visitor is
+// looking at. The ratios are computed here at build, never typed.
+const r = ratios(tokens);
+const ratio = (fg, bg, theme) => r.find((x) => x.fg === fg && x.bg === bg && x.theme === theme)?.ratio;
+const names = Object.keys(tokens.colour.light);
+const plateNames = Object.keys(tokens.colour.plate);
+const repoFile = (path) => (build.sha ? `https://github.com/crypticnull/jobhunt/blob/${build.sha}/${path}` : `https://github.com/crypticnull/jobhunt/blob/main/${path}`);
+const title = "System";
+const description = "Every colour, size, space and duration on this site comes from one file, and this page reads the same file.";
+---
+
+<Layout title={title} description={description}>
+  <p class="eyebrow">System · Paper and Plate · tokens {tokens.version}{build.sha && ` · ${build.sha}`}</p>
+  <h1>This site is built from one record, and this page is that record rendered.</h1>
+  <p class="lede">
+    Every colour, space and duration on the site comes from one file. This page reads the same file, so what it shows
+    can't disagree with what you're looking at. The checks that keep it honest run on every push and are linked beside
+    each rule.
+  </p>
+
+  <section class="sys" id="colour">
+    <h2><span class="n">01</span> Colour</h2>
+    <p>
+      Two palettes and a fixed plate. Light is the base, dark only redefines, and the plate is dark in both because the
+      work reads at cinema contrast whatever the page does. Every ratio below is computed from the record when the site
+      is built.
+    </p>
+    <div class="swatches">
+      {
+        names.map((name) => (
+          <div class="swatch">
+            <div class="chips">
+              <span class="chip" style={`background:${tokens.colour.light[name]}`} title={`${name}, light`} />
+              <span class="chip" style={`background:${tokens.colour.dark[name]}`} title={`${name}, dark`} />
+            </div>
+            <span class="name">{name}</span>
+            <span class="hex">{tokens.colour.light[name]} · {tokens.colour.dark[name]}</span>
+            <span class="role">{tokens.colour.roles?.[name]}</span>
+          </div>
+        ))
+      }
+      {
+        plateNames.map((name) => (
+          <div class="swatch">
+            <div class="chips">
+              <span class="chip" style={`background:${tokens.colour.plate[name]}`} title={`${name}, fixed`} />
+            </div>
+            <span class="name">{name}</span>
+            <span class="hex">{tokens.colour.plate[name]} · fixed</span>
+            <span class="role">{tokens.colour.roles?.[name] ?? "on the plate"}</span>
+          </div>
+        ))
+      }
+    </div>
+    <div class="tablewrap">
+      <table class="ratios">
+        <caption>Contrast, WCAG 2 relative luminance, computed at build. Text pairs need 4.5 to 1 and the build fails under it.</caption>
+        <thead><tr><th scope="col">Pair</th><th scope="col">Light</th><th scope="col">Dark</th><th scope="col">Use</th></tr></thead>
+        <tbody>
+          {
+            tokens.colour.pairs.map((p) => (
+              <tr>
+                <th scope="row">{p.fg} on {p.bg}</th>
+                <td class={ratio(p.fg, p.bg, "light") < 4.5 && p.text ? "fails" : ""}>{ratio(p.fg, p.bg, "light")?.toFixed(2)}</td>
+                <td class={ratio(p.fg, p.bg, "dark") < 4.5 && p.text ? "fails" : ""}>{ratio(p.fg, p.bg, "dark")?.toFixed(2)}</td>
+                <td>{p.text ? "text" : "decorative, never text"}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sys" id="grid">
+    <h2><span class="n">02</span> Space and grid</h2>
+    <p>The reading column, the gutter and the gap, as the page uses them.</p>
+    <dl class="facts">
+      {Object.entries(tokens.grid).map(([k, v]) => <><dt>{k}</dt><dd>{v}</dd></>)}
+    </dl>
+  </section>
+
+  <section class="sys" id="motion">
+    <h2><span class="n">03</span> Motion</h2>
+    <p>
+      {tokens.motion.note} This visit is receiving the{" "}
+      <span class="visit"><span class="when-full">default</span><span class="when-reduce">reduced</span></span> column.
+      Each row plays on request only, so this page never moves until you ask it to.
+    </p>
+    <div class="tablewrap">
+      <table class="motion">
+        <caption>Every movement on the site, its default and its reduced value, and why.</caption>
+        <thead><tr><th scope="col">Token</th><th scope="col">Default</th><th scope="col">Reduced</th><th scope="col">Used by</th><th scope="col">Why the reduced value</th><th scope="col"></th></tr></thead>
+        <tbody>
+          {
+            tokens.motion.tokens.map((m) => (
+              <tr>
+                <th scope="row">--{m.name}</th>
+                <td>{m.default}</td>
+                <td>{m.reduced}</td>
+                <td>{m.used_by}</td>
+                <td>{m.why}</td>
+                <td>
+                  {m.name.startsWith("t-") ? (
+                    <button type="button" class="play" data-token={m.name} aria-label={`Play ${m.name} once`}>
+                      <span class="box" data-box />
+                      play
+                    </button>
+                  ) : null}
+                </td>
+              </tr>
+            ))
+          }
+          <tr>
+            <th scope="row">scroll</th>
+            <td>{tokens.motion.scroll.default}</td>
+            <td>{tokens.motion.scroll.reduced}</td>
+            <td>anchor jumps</td>
+            <td>A jump is a jump.</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sys" id="rules">
+    <h2><span class="n">04</span> Rules, with their teeth beside them</h2>
+    <p>Each rule names what enforces it. The ones that nothing enforces yet say so, which is more honest than a page of ticks.</p>
+    <ol class="rules">
+      {
+        tokens.rules.map((x) => (
+          <li>
+            <p>{x.rule}</p>
+            <a class="enforce" href={repoFile(x.enforcement)}>{x.enforcement}</a>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section class="sys" id="endpoints">
+    <h2><span class="n">05</span> Endpoints</h2>
+    <p>The record this page is rendered from, served as it is on disk.</p>
+    <dl class="facts">
+      <dt>tokens</dt>
+      <dd><a href="/system/tokens.json">/system/tokens.json</a></dd>
+      <dt>source</dt>
+      <dd><a href={repoFile("data/design/tokens.json")}>data/design/tokens.json</a> at {build.sha || "main"}</dd>
+      <dt>renderer</dt>
+      <dd><a href={repoFile("tools/tokens.mjs")}>tools/tokens.mjs</a></dd>
+      <dt>guard</dt>
+      <dd><a href={repoFile("tools/check_tokens.mjs")}>tools/check_tokens.mjs</a></dd>
+    </dl>
+  </section>
+</Layout>
+
+<script>
+  // One movement per press, on a 48px square in a fixed box, using the token
+  // the row names, so the specimen runs the reduced value when that is the
+  // column the visitor is receiving. Nothing plays on load or on scroll.
+  for (const b of document.querySelectorAll<HTMLButtonElement>("button.play")) {
+    const box = b.querySelector<HTMLElement>("[data-box]");
+    const token = b.dataset.token;
+    if (!box || !token) continue;
+    box.style.transition = `transform var(--${token}) var(--ease-out), opacity var(--${token}) var(--ease-out)`;
+    b.addEventListener("click", () => {
+      box.classList.remove("moved");
+      void box.offsetWidth;
+      box.classList.add("moved");
+      setTimeout(() => box.classList.remove("moved"), 1200);
+    });
+  }
+</script>
+
+<style>
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 1rem;
+  }
+  .sys {
+    margin: 3rem 0 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+  }
+  .sys h2 .n {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--marker);
+    margin-right: 0.75rem;
+    vertical-align: middle;
+  }
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+    gap: var(--grid-gap);
+    margin: 1.5rem 0;
+  }
+  .swatch {
+    display: grid;
+    gap: 0.2rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+  }
+  .chips {
+    display: flex;
+    height: 3rem;
+    border: 1px solid var(--rule);
+  }
+  .chip {
+    flex: 1;
+  }
+  .swatch .name {
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .swatch .hex,
+  .swatch .role {
+    color: var(--muted);
+  }
+  .swatch .role {
+    font-family: var(--body);
+    font-size: 0.85rem;
+    letter-spacing: 0;
+  }
+  .tablewrap {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.9rem;
+  }
+  caption {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    padding: 0 0 0.5rem;
+  }
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.5rem 0.75rem 0.5rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  thead th {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  tbody th {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .ratios td:nth-child(2),
+  .ratios td:nth-child(3),
+  .motion td:nth-child(2),
+  .motion td:nth-child(3) {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  td.fails {
+    color: var(--marker);
+  }
+  .visit .when-reduce {
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(:root:not([data-motion="full"])) .visit .when-full {
+      display: none;
+    }
+    :global(:root:not([data-motion="full"])) .visit .when-reduce {
+      display: inline;
+    }
+  }
+  :global(:root[data-motion="reduce"]) .visit .when-full {
+    display: none;
+  }
+  :global(:root[data-motion="reduce"]) .visit .when-reduce {
+    display: inline;
+  }
+  .play {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font: inherit;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: none;
+    border: 1px solid var(--rule);
+    padding: 0.35rem 0.6rem;
+    cursor: pointer;
+  }
+  .play:hover {
+    color: var(--marker);
+    border-color: currentColor;
+  }
+  .play:focus-visible {
+    outline: 2px solid var(--marker);
+    outline-offset: 3px;
+  }
+  /* A fixed 3rem track so the specimen never shifts the row. */
+  .play .box {
+    display: block;
+    width: 3rem;
+    height: 0.75rem;
+    position: relative;
+  }
+  .play .box::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0.75rem;
+    height: 0.75rem;
+    background: var(--marker);
+    transition: inherit;
+  }
+  .play .box.moved::before {
+    transform: translateX(2.25rem);
+  }
+  .rules {
+    margin: 1.5rem 0;
+    padding-left: 1.25rem;
+    max-width: var(--measure);
+  }
+  .rules li {
+    margin: 0 0 1rem;
+  }
+  .rules p {
+    margin: 0 0 0.25rem;
+  }
+  .enforce {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--blueprint);
+  }
+</style>
