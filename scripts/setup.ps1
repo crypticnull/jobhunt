@@ -37,6 +37,9 @@ if (-not $py) {
   exit 1
 }
 Ok "python found as '$py'"
+New-Item -ItemType Directory -Force "data\local" | Out-Null
+Set-Content -Path "data\local\python.txt" -Value $py -NoNewline
+Ok "wrote data\local\python.txt so the scheduled scripts use the same interpreter"
 
 $name = (git config user.name) 2>$null
 $email = (git config user.email) 2>$null

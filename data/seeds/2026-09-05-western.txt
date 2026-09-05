@@ -5,11 +5,10 @@
 # top 100 is a lagging indicator: every company on it was small once, and the
 # roles worth having are often the ones posted before a company is famous.
 #
-# The remote gate has not moved. Everything here still has to post a genuinely
-# remote US role to reach the apply pile, and a good number of these studios
-# will not. They are seeded anyway because they cost nothing to poll, because
-# some of them do hire remote, and because if the gate is ever opened for
-# Washington and Oregon they are already on the list.
+# The remote gate has not moved and never will. Everything here still has to
+# post a genuinely remote US role to reach the apply pile, and a good number
+# of these companies will not. They are seeded anyway because they cost
+# nothing to poll and because some of them do hire remote.
 #
 # category | careers url | name | City, ST
 

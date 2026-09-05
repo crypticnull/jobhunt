@@ -2,6 +2,7 @@
 import { Font } from "astro:assets";
 import { site } from "../site.config.mjs";
 import { build } from "../buildstamp.mjs";
+import Preferences from "../components/Preferences.astro";
 
 interface Props {
   title?: string;
@@ -18,6 +19,18 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
+    {/* The one script that runs before paint, and the only inline one on the
+        site: a stored theme or motion choice is stamped on the root here so
+        the first frame is already right. Twelve lines, try/catch wrapped, and
+        a blocked storage API leaves the system setting. ADR-0013. */}
+    <script is:inline>
+      try {
+        var t = localStorage.getItem("theme");
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+        var m = localStorage.getItem("motion");
+        if (m === "reduce") document.documentElement.setAttribute("data-motion", m);
+      } catch (e) {}
+    </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{pageTitle}</title>
     <meta name="description" content={description ?? site.sub} />
@@ -59,6 +72,7 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
         <span aria-hidden="true">·</span>
         <span>{site.location}</span>
       </p>
+      <Preferences />
       <p class="colophon">
         Set in Archivo, Source Serif 4 and IBM Plex Mono, self-hosted. Built static with Astro.
         {build.sha && <> Deployed from <a href={build.href}>{build.sha}</a> on {build.date}.</>}
@@ -108,7 +122,48 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     --gutter: clamp(1rem, 4vw, 3rem);
     --grid-gap: 1.5rem;
     --measure: 66ch;
+
+    /* ---- Motion ----------------------------------------------------------
+       The work is the motion and the interface stays still. Every movement
+       the site makes is named here, and a component only ever writes a
+       token, never a number. Two columns: the value, and what it becomes
+       under reduced motion, which is a decision per movement rather than a
+       switch that zeroes everything.
+
+         token      default   reduced   used by
+         --t-quick  120ms     120ms     row hover tint. A colour change is not movement.
+         --t-fade   160ms     160ms     opacity fades, preview in, plate crossfade. Opacity is not movement,
+                                        and a hard cut between stills is worse for vestibular readers.
+         --t-slide  200ms     0ms       the chapter rail mark. Position change becomes a cut, same end state.
+         --t-blink  1000ms    0ms       the record dot while a clip plays. Becomes a steady dot, and a mono
+                                        PLAYING label sits beside it so the blink is never the only signal.
+         --ease-out            linear   anything entering or moving.
+         --ease-in             linear   anything leaving.
+         scroll     smooth    auto      anchor jumps. */
+    --t-quick: 120ms;
+    --t-fade: 160ms;
+    --t-slide: 200ms;
+    --t-blink: 1000ms;
+    --ease-out: cubic-bezier(0.2, 0, 0, 1);
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
     color-scheme: light dark;
+  }
+  /* The reduced column, applied the same three-state way as the theme: the
+     system preference unless the visitor said otherwise, and an explicit
+     data-motion="reduce" on the root for the specimen page and for tests. */
+  @media (prefers-reduced-motion: reduce) {
+    :root:not([data-motion="full"]) {
+      --t-slide: 0ms;
+      --t-blink: 0ms;
+      --ease-out: linear;
+      --ease-in: linear;
+    }
+  }
+  :root[data-motion="reduce"] {
+    --t-slide: 0ms;
+    --t-blink: 0ms;
+    --ease-out: linear;
+    --ease-in: linear;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -129,6 +184,10 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     --field: #171a1d;
     --marker: #ff6157;
     --blueprint: #7aa7cc;
+    color-scheme: dark;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
   }
 
   /* ---- Base --------------------------------------------------------------- */
@@ -393,16 +452,16 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     column-gap: var(--grid-gap);
     padding: 1.1rem 0;
     text-decoration: none;
-    transition: background-color 120ms ease;
+    transition: background-color var(--t-quick) var(--ease-out);
   }
-  .card:hover {
+  a.card:hover {
     background: var(--field);
     color: inherit;
   }
   .card h3 {
     margin: 0 0 0.3em;
   }
-  .card:hover h3 {
+  a.card:hover h3 {
     color: var(--marker);
   }
   .card p {
@@ -572,17 +631,12 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     max-width: 70ch;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
+  /* Scroll is the one movement the tokens cannot carry, so it is the one
+     media query left. The wildcard 0.01ms override that used to live here
+     switched motion off rather than designing its absence; the tokens above
+     carry the reduced column now, per movement. */
   @media (prefers-reduced-motion: no-preference) {
-    html {
+    :root:not([data-motion="reduce"]) {
       scroll-behavior: smooth;
     }
   }

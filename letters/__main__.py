@@ -8,6 +8,7 @@ Nothing here sends anything. The generator drafts, Matt decides.
 """
 
 import argparse
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -54,9 +55,21 @@ def cmd_brief(args):
     return 0
 
 
+def placeholders(text):
+    """An unfilled {company} or {role} is the one machine-written tell a save
+    should catch for free, and until 2026-09-05 it was accepted and filed."""
+    from .voicelint import Finding
+    out = []
+    for i, line in enumerate(text.splitlines(), 1):
+        for m in re.finditer(r"\{[a-z_]+\}", line):
+            out.append(Finding("draft", i, m.start() + 1, "placeholder", f"unfilled placeholder {m.group(0)}", "error"))
+    return out
+
+
 def save_draft(posting, company, draft_text, letters_dir, rules, today=None):
     """Lint, then file. Returns (path, findings); path is None when refused."""
     findings = check_text(draft_text, "letter", rules, "draft")
+    findings += placeholders(draft_text)
     if findings:
         return None, findings
     today = today or date.today().isoformat()

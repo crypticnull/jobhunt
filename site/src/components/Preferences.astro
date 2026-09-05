@@ -1,0 +1,115 @@
+---
+// Theme and motion, each three states with the system setting as the default
+// and an explicit choice that wins in both directions. The same pattern the
+// tokens in Layout.astro were written for, and until 2026-09-05 nothing on the
+// site set the attribute, so the third state was unreachable. Native radios,
+// so arrow keys, one tab stop and the checked state come for free. The
+// fieldsets ship disabled and the script enables them, so without JavaScript
+// they read as a label rather than a broken control. Motion has no "full"
+// override on purpose: a person who asked their system for less motion is not
+// offered a button that argues with them.
+const groups = [
+  { key: "theme", legend: "Theme", options: [["system", "System"], ["light", "Light"], ["dark", "Dark"]] },
+  { key: "motion", legend: "Motion", options: [["system", "System"], ["reduce", "Reduce"]] },
+];
+---
+
+<div class="prefs" data-prefs>
+  {
+    groups.map((g) => (
+      <fieldset class="pref" disabled data-pref={g.key}>
+        <legend>{g.legend}</legend>
+        {g.options.map(([value, label]) => (
+          <label>
+            <input type="radio" name={`pref-${g.key}`} value={value} checked={value === "system"} />
+            <span>{label}</span>
+          </label>
+        ))}
+      </fieldset>
+    ))
+  }
+</div>
+
+<script>
+  // The head script in Layout.astro already stamped the root before paint;
+  // this only has to reflect that state and write changes back.
+  const KEYS = { theme: "data-theme", motion: "data-motion" } as const;
+  const root = document.documentElement;
+  for (const set of document.querySelectorAll<HTMLFieldSetElement>("fieldset[data-pref]")) {
+    const key = set.dataset.pref as keyof typeof KEYS;
+    const attr = KEYS[key];
+    const current = root.getAttribute(attr) || "system";
+    const input = set.querySelector<HTMLInputElement>(`input[value="${current}"]`);
+    if (input) input.checked = true;
+    set.disabled = false;
+    set.addEventListener("change", (e) => {
+      const value = (e.target as HTMLInputElement).value;
+      try {
+        if (value === "system") {
+          root.removeAttribute(attr);
+          localStorage.removeItem(key);
+        } else {
+          root.setAttribute(attr, value);
+          localStorage.setItem(key, value);
+        }
+      } catch {
+        /* storage blocked: the attribute still applies for this page */
+      }
+    });
+  }
+</script>
+
+<style>
+  .prefs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    margin: 0 0 0.75rem;
+  }
+  .pref {
+    display: flex;
+    align-items: center;
+    gap: 0 1rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-inline-size: 0;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .pref legend {
+    float: left;
+    padding: 0;
+    margin-right: 0.25rem;
+    color: var(--muted);
+  }
+  .pref label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2.75rem; /* a 44px target on a phone, the row height is fixed by it */
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .pref:disabled label {
+    cursor: default;
+    color: var(--muted);
+  }
+  .pref input {
+    margin: 0;
+    accent-color: var(--marker);
+  }
+  .pref input:focus-visible {
+    outline: 2px solid var(--marker);
+    outline-offset: 3px;
+  }
+  /* The checked label carries the mark. Colour only, no movement, because the
+     page does not fade between themes either: a crossfade sends every colour
+     through a grey it was never designed to be. */
+  .pref input:checked + span {
+    color: var(--marker);
+  }
+</style>

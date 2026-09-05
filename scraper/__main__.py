@@ -23,7 +23,7 @@ from pathlib import Path
 from . import adapters, companies, curriculum, digest, discover, maintain, manual
 from .poll import enrich, poll
 from .score import load_rules, score
-from .store import STATES, Store
+from .store import STATES, Store, utcnow
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_COMPANIES = ROOT / "data" / "companies.json"
@@ -80,7 +80,7 @@ def cmd_curriculum(args):
     what a dropped posting wants is not a reason to learn anything."""
     rules = load_rules()
     store = Store(args.db)
-    rows = [r for r in store.open_postings() if r.get("pile") in ("apply", "review")]
+    rows = store.study_rows()
     store.close()
     lines = curriculum.report(rows, rules)
     text = "\n".join(lines) if lines else f"Nothing clears the floor yet, from {len(rows)} postings in a pile."
@@ -89,8 +89,17 @@ def cmd_curriculum(args):
         out.parent.mkdir(parents=True, exist_ok=True)
         # report() opens with its own "## Curriculum" heading, so the file
         # takes the body from after it rather than stacking two headings.
+        tiered = sum(1 for r in rows if (r.get("title_tier") or "") in ("A", "B"))
+        header = [
+            "# Curriculum",
+            "",
+            f"Written {utcnow()[:10]} by the nightly job, ruleset {rules['version']}, from {len(rows)} open postings in apply and review "
+            f"that are not yet marked skipped, rejected or applied, {tiered} of them with a tier A or B title. "
+            "What those postings ask for and data/skills.json does not claim, most-asked first. "
+            "The same vocabulary steers the search, so claiming a term with evidence retires it here and the letter can say so.",
+        ]
         body = [l for l in lines if l.strip() != "## Curriculum"] if lines else [text]
-        out.write_text("\n".join(["# Curriculum"] + body).strip() + "\n", encoding="utf-8")
+        out.write_text("\n".join(header + body).strip() + "\n", encoding="utf-8")
         print(f"curriculum: {out}")
     else:
         print(text)
