@@ -241,6 +241,22 @@ class Store:
         out = [{"company_slug": r["company_slug"], "postings": r["postings"], "on_target": r["on_target"] or 0} for r in rows]
         return sorted(out, key=lambda r: (r["on_target"], -r["postings"]))
 
+    def company_drop_reasons(self):
+        """{company_slug: [(reason, n), ...]} most common first, over logged
+        rows. This is what lets the dead-weight section say why a company's
+        postings died, so a gate miss and a real absence stop printing the
+        same line."""
+        rows = self.db.execute(
+            "SELECT company_slug, drop_reason, COUNT(*) AS n FROM postings "
+            "WHERE pile = 'logged' AND drop_reason IS NOT NULL GROUP BY company_slug, drop_reason"
+        ).fetchall()
+        out = {}
+        for r in rows:
+            out.setdefault(r["company_slug"], []).append((r["drop_reason"], r["n"]))
+        for slug in out:
+            out[slug].sort(key=lambda x: -x[1])
+        return out
+
     def stats(self, since=None):
         """Counts. With `since` (ISO date or datetime), the period fields count
         only what happened on or after it; the totals stay whole-store."""

@@ -114,3 +114,18 @@ class TheRoleChoosesTheClaim(unittest.TestCase):
         for meta, body in b["claim"] + b["opening"]:
             first = body.strip().split(".")[0].lower()
             self.assertIsNone(re.search(r"\bi'?m an? [a-z ]*motion designer", first), meta["id"])
+
+
+class TheBriefKnowsTheGap(unittest.TestCase):
+    def test_asks_are_marked_claimed_or_gap(self):
+        asks = assemble.vocabulary_asks(posting(description="Figma, design systems and After Effects, with ComfyUI."), skills={"after effects": "ae-llama", "comfyui": "local-pipeline"})
+        joined = " ".join(asks)
+        self.assertIn("figma (gap)", joined)
+        self.assertIn("design system (gap)", joined)
+        self.assertIn("after effects (claimed: ae-llama)", joined)
+
+    def test_the_brief_prints_the_line(self):
+        chosen = assemble.select(posting(description="Figma and prototyping."), company())
+        from letters.voicelint import load_rules
+        md = assemble.render_brief(posting(description="Figma and prototyping."), company(), chosen, load_rules())
+        self.assertIn("asks for: ", md)
