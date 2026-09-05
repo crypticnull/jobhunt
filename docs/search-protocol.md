@@ -1,7 +1,7 @@
 # Search protocol
 
 ```
-version: 1.1
+version: 2.0
 date: 2026-09-05
 status: final
 owner: Cowork agent
@@ -11,7 +11,7 @@ machine twin: scoring.json (same rules as data, must stay in sync)
 
 ## Purpose
 
-Rules for which job listings are worth Matt's time. The scraper collects, normalizes, gates, scores and sorts. Matt only ever sees the apply pile and the review pile. Everything else is logged with a reason so the rules can be tuned at the Nov 16 checkpoint.
+Rules for which job listings are worth Matt's time. The scraper collects, normalizes, gates, scores and sorts. Matt only ever sees the apply pile and the review pile. Everything else is logged with a reason so the rules can be tuned at the Oct 5 checkpoint.
 
 Two hard gates run first. A listing that fails either gate is dropped regardless of score. Then a 100-point score, deductions for underpaid tells, and a threshold sort into piles.
 
@@ -45,12 +45,12 @@ Matt Rodenbeck. Market-facing title Creative Technologist. Currently a senior mo
 
 ## Sources, in priority order
 
-1. Careers pages of companies in `targets.csv`, through their ATS. These are the highest-value listings and the ones where unlisted salary is tolerable. Greenhouse, Lever and Ashby all expose public JSON, so poll those directly rather than scraping HTML.
+1. Careers pages of companies in `data/companies.json`, through their ATS. These are the highest-value listings and the ones where unlisted salary is tolerable. Greenhouse, Lever and Ashby all expose public JSON, so poll those directly rather than scraping HTML.
    - Greenhouse: `https://boards-api.greenhouse.io/v1/boards/{board_token}/jobs?content=true`
    - Lever: `https://api.lever.co/v0/postings/{company}?mode=json`
    - Ashby: `https://api.ashbyhq.com/posting-api/job-board/{org}` (public postings, includes compensation when the company enables it)
    - Workday, SmartRecruiters, Rippling and custom boards need per-company handling. Log them as `source_type: manual` until a fetcher exists.
-2. Aggregators with a remote filter: Wellfound, Otta / Welcome to the Jungle, We Work Remotely, Working Nomads, Remotive, Remote OK. LinkedIn only via the public job search pages and only within its terms, never with an authenticated session.
+2. Remote job feeds with a documented API or RSS: Remotive, We Work Remotely, Himalayas, Jobicy, Arbeitnow, RemoteOK, and the month's Hacker News "Who is hiring" thread. These are discovery sources: a posting that names a creative-technical role and links to a board adds that company to the list. LinkedIn, Indeed and any board whose terms forbid it are never read.
 3. Community boards, manual or semi-manual: Motionographer jobs, the ComfyUI Discord jobs channel, the aescripts community, Motion Design Slack groups, Creative Technologist listings on The Dots. These are low volume and high signal, a weekly manual sweep is fine for v1.
 
 Seed lists live in `data/seeds/*.txt` as `category | careers url | name`, with an optional fourth field for the headquarters as `City, ST`. The nightly job runs `scraper import data/seeds` before polling and skips any company already on the list, so a list dropped in that directory is taken in on its own. Added 2026-09-05, when a count of the corpus put the yield at 0.8% and showed the binding constraint was seed coverage rather than filter quality: the scraper can only find what it is pointed at, and it was pointed at 88 companies.
@@ -59,7 +59,7 @@ A second list went in on 2026-09-05, across the western states, weighted to ones
 
 Two more lists went in with it. A remote-first list of companies that are all-remote by construction or known to pay the same wherever you sit, which is the one that serves the first principle directly, and a Midwest list, because he can work from anywhere and the point is coverage rather than a bet on a city.
 
-Discovery's caps went up the same day, from 15 boards and 30 postings a night to 40 and 80, and moved out of the function signature into `scoring.json` so they can be tuned without a code change. The old numbers were written when the list was ten companies long.
+Discovery's caps went up the same day, from 15 boards and 30 postings a night to 40 and 100, and moved out of the function signature into `scoring.json` so they can be tuned without a code change. The old numbers were written when the list was ten companies long.
 
 Company boards first, aggregators second. Aggregators are where most fake-remote and underpaid listings come from, so they get the same gates but a lower prior.
 
@@ -70,10 +70,10 @@ Every listing becomes one record with these fields before any rule runs. Missing
 | field | type | notes |
 |---|---|---|
 | `id` | string | stable hash of `source + external_id` or `source + url` |
-| `source` | string | `greenhouse`, `lever`, `ashby`, `wellfound`, `linkedin`, `manual`, etc |
+| `source` | string | `greenhouse`, `lever`, `ashby`, `workable`, `smartrecruiters`, `recruitee`, `rss`, `manual`, or a discovery feed |
 | `url` | string | canonical listing URL |
-| `company` | string | as posted, then matched against `targets.csv` by normalized name and domain |
-| `company_tier` | 1–4 or `null` | from `targets.csv`; `null` if unknown |
+| `company` | string | as posted, then matched against `data/companies.json` by slug |
+| `company_tier` | 1–4 or `null` | from `data/companies.json`; `null` if unknown |
 | `company_size` | int or `null` | headcount if the source or targets file has it |
 | `title` | string | as posted |
 | `title_norm` | string | lowercased, punctuation stripped, seniority words kept |
@@ -135,10 +135,10 @@ Where an ATS publishes one range per office, which is how location-adjusted pay 
 **Fail**
 - `salary_max` < 110,000.
 - Hourly under $85 for contract or freelance, annualized. The floor is firm, so a contract posting that lists an annual figure is held to the same number.
-- Salary not posted, company not in `targets.csv`, and size unknown or under 200. Most states with remote-hiring companies require posted ranges now, so a remote-US listing with no range is itself a signal.
+- Salary not posted, company not on `data/companies.json` with a tier, and size unknown or under 200. Most states with remote-hiring companies require posted ranges now, so a remote-US listing with no range is itself a signal.
 - Any unpaid test project, take-home or "design exercise" described as longer than two hours, or any spec work.
 
-Log every gate-2 fail with its reason. The Nov 16 checkpoint reviews the `unlisted_salary_unknown_company` bucket specifically, because that's the rule most likely to be throwing away good listings.
+Log every gate-2 fail with its reason. The Oct 5 checkpoint reviews the `unlisted_salary_unknown_company` bucket specifically, because that's the rule most likely to be throwing away good listings.
 
 ## Underpaid tells
 
@@ -197,8 +197,8 @@ The leg term lists were cut back hard on 2026-09-05, after the first real digest
 **Intersection legs** (5 each, max 20)
 - `3d`: cinema 4d, c4d, redshift, octane, houdini, blender, maya, 3d modeling, 3d modelling, 3d animation, 3d artist, 3d generalist, hard surface, retopology, uv mapping, look dev, lookdev, texturing, lighting and rendering, render farm
 - `motion`: after effects, motion design, motion designer, motion graphics, animation, compositing, premiere, brand motion, kinetic type, logo animation
-- `generative`: diffusion model, latent diffusion, diffusion transformer, comfyui, stable diffusion, flux.1, flux (model|lora|checkpoint|dev|schnell|kontext), text-to-video, text to video, image-to-video, image to video, img2vid, ai video, ai image, generative video, generative image, generative art, lora, controlnet, upscal, inpaint, kling, veo, sora, hailuo, minimax (video|ai|model), ltx
-- `software`: python, javascript, typescript, extendscript, cep, plugin, panel, scripting, automation, api, rest, node, tooling, agentic, llm, local models, llama.cpp, ollama
+- `generative`: diffusion model, latent diffusion, diffusion transformer, comfyui, stable diffusion, flux.1, flux model, text-to-video, text to video, image-to-video, image to video, img2vid, ai video, ai image, generative video, generative image, generative art, lora, controlnet, upscal, inpaint, kling, veo, sora, hailuo, minimax video, ltx
+- `software`: python, javascript, typescript, extendscript, cep, plugin, panel, scripting, automation, api, rest api, restful, node, tooling, agentic, llm, local models, llama.cpp, ollama, cuda, pytorch
 - `pipeline`: pipeline, asset management, mam, dam, metadata, taxonomy, naming convention, iconik, frame.io, workflow, render farm, versioning, asana, shotgrid, ftrack
 
   The `generative` terms were bounded again on 2026-09-05, after the Economist posting at OpenAI kept its generative leg through the first cut. Bare `diffusion` matched the diffusion of innovation, bare `flux` matched a market in flux, and bare `minimax` matched minimax regret. Each is now written in its product sense, `diffusion model` and `latent diffusion` and `diffusion transformer`, `flux.1` and Flux checkpoints and LoRAs, `hailuo` and MiniMax video. Three words that name both an economics idea and a model family, which is exactly the shape of false positive the first cut was for.
@@ -258,7 +258,7 @@ Every Monday morning, one file or message with: count of new listings by source,
 
 ## Tuning schedule
 
-- Sep 2 to Sep 6: collect only, compressed from a month on 2026-09-02 because Matt does not expect to still be in his current job in two. Use the first digests to check the gates aren't throwing away obvious fits. A posting scoring 85 or better is named in the digest anyway; it will not wait.
+- Sep 2 to Sep 6: collect only, compressed from a month on 2026-09-02 because Matt does not expect to still be in his current job in two. Use the first digests to check the gates aren't throwing away obvious fits. A posting scoring 80 or better is named in the digest anyway; it will not wait.
 - Sep 6: first apply pile, the very first digest.
 - Oct 5 checkpoint: if tier 1 and 2 response rate is under 10% after 20 applications, the problem is the materials, not the rules. If the apply pile is thin, loosen `unlisted_salary_unknown_company` first, then title tier B, in that order. Never loosen gate 1.
 

@@ -28,12 +28,18 @@ The time is a setting, not a rule. `setup.cmd 03:00` or
 `scripts/nightly.cmd` at 04:00, registered to catch up rather than skip if
 the machine was off or asleep at the time, and at the lowest scheduler
 priority so an overnight render keeps the CPU: pull main, then `python -m
-scraper poll`,
+scraper import data/seeds --manual`, which takes in any list dropped there
+and keeps a name with no board as a hand-check record so it is never
+re-probed, then `python -m scraper poll`,
 which reads the discovery feeds, adds the boards they give away, polls
-every board, and scores everything on the way in, then push the company
-list if it grew, then a backup to the directory in
+every board, and scores everything on the way in, then `python -m scraper
+curriculum --write data/curriculum.md`, then push all three if anything
+changed, then a backup to the directory in
 `data/local/backup-dir.txt`. A missed night costs nothing;
-postings are closed and reopened by what the next poll sees.
+postings are closed and reopened by what the next poll sees. Any step
+that fails writes one line to `data/local/nightly-status.log`, and the
+Sunday digest prints those lines in its source health footer, so a job
+that stops says so where it can be read.
 
 Every poll writes `data/last-run.json` and the nightly job pushes it, so a
 job that quietly stopped is visible in the repo rather than only in its
@@ -53,8 +59,12 @@ digest can be read and talked about from chat.
 2. Mark what you are not doing so it never comes back:
    `python -m scraper mark <id> skipped`.
 3. Pick what you will write to this week. `python -m scraper mark <id>
-   reviewed`. The apply pile is already capped at twelve; three is a good
-   week.
+   reviewed`. The apply pile sorts by tier then score and is capped at a
+   hundred, so the order is the signal; three letters is a good week.
+4. Read the "Earning their poll" section and drop what you agree with:
+   `python -m scraper drop <slug> <slug>`. A company that should be
+   posting design roles and is not may be a gate miss, so read its drop
+   reasons in the same section before dropping it.
 
 That is the whole week when work is bad. The digest still arrives, the
 statuses still move, nothing rots.

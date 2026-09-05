@@ -202,7 +202,7 @@ def collect(get_json=None, get_text=None, sources=SOURCES, errors=None):
         fn = FEEDS[name]
         try:
             items += fn(get_text) if name == "wwr" else fn(get_json)
-        except (http.HttpError, ValueError, KeyError, TypeError, AttributeError) as e:
+        except Exception as e:  # a feed that answers with an HTML challenge page raises ParseError, and one dead feed must never stop the poll
             if errors is not None:
                 errors.append(f"{name}: {type(e).__name__}: {e}")
     return items
