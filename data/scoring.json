@@ -124,7 +124,38 @@
         "netherlands",
         "\\bireland\\b",
         "australia",
-        "singapore"
+        "singapore",
+        "\\bjapan\\b",
+        "\\bkorea\\b",
+        "\\bchina\\b",
+        "\\btaiwan\\b",
+        "\\bisrael\\b",
+        "\\bfrance\\b",
+        "\\bitaly\\b",
+        "sweden",
+        "denmark",
+        "norway",
+        "finland",
+        "switzerland",
+        "austria",
+        "\\bczech\\b",
+        "hungary",
+        "bulgaria",
+        "\\bserbia\\b",
+        "\\bturkey\\b",
+        "\\begypt\\b",
+        "south africa",
+        "\\bkenya\\b",
+        "\\bnigeria\\b",
+        "\\bvietnam\\b",
+        "thailand",
+        "indonesia",
+        "malaysia",
+        "\\bchile\\b",
+        "\\bperu\\b",
+        "\\buruguay\\b",
+        "costa rica",
+        "\\bpanama\\b"
       ]
     },
     "comp": {
@@ -161,7 +192,7 @@
         "^associate",
         "^coordinator",
         "^intern",
-        "(electrical|mechanical|civil|structural|precast|controls|hvac|plumbing|piping|thermal|process|manufacturing|packaging|hardware|firmware|asic|pcb|\\brf\\b) design engineer",
+        "(electrical|mechanical|civil|structural|precast|controls|hvac|plumbing|piping|thermal|process|manufacturing|packaging|hardware|firmware|asic|pcb|rtl|silicon|chip|analog|actuator|robotics|validation|verification|layout|\\brf\\b)[a-z ]* design engineer",
         "design engineer[^a-z]{0,3}\\((electrical|mechanical|civil|structural|hardware|controls)",
         "\\bp\\.?e\\.?\\b.{0,20}design engineer",
         "user experience designer",
@@ -173,7 +204,8 @@
         "layout artist",
         "\\broto\\b",
         "matchmove",
-        "\\bcompositor\\b"
+        "\\bcompositor\\b",
+        "\\b(pcb|rtl|asic|actuator|silicon) (layout|design|package)"
       ],
       "phrases": [
         "relocation required",
@@ -301,15 +333,22 @@
           "c4d",
           "redshift",
           "octane",
-          "3d",
-          "modeling",
-          "modelling",
-          "lighting",
-          "texturing",
-          "rendering",
           "houdini",
           "blender",
-          "maya"
+          "\\bmaya\\b",
+          "3d modeling",
+          "3d modelling",
+          "3d animation",
+          "3d artist",
+          "3d generalist",
+          "hard surface",
+          "retopology",
+          "uv mapping",
+          "look dev",
+          "lookdev",
+          "texturing",
+          "lighting and rendering",
+          "render farm"
         ],
         "motion": [
           "after effects",
@@ -324,12 +363,10 @@
           "logo animation"
         ],
         "generative": [
-          "generative",
           "diffusion",
           "comfyui",
           "stable diffusion",
           "flux",
-          "wan",
           "text-to-video",
           "text to video",
           "image-to-video",
@@ -337,19 +374,18 @@
           "img2vid",
           "ai video",
           "ai image",
-          "gen ai",
-          "genai",
-          "gen-ai",
-          "lora",
+          "generative video",
+          "generative image",
+          "generative art",
+          "\\blora\\b",
           "controlnet",
           "upscal",
           "inpaint",
-          "runway",
           "kling",
-          "veo",
+          "\\bveo\\b",
           "sora",
           "minimax",
-          "ltx"
+          "\\bltx\\b"
         ],
         "software": [
           "python",
@@ -392,8 +428,7 @@
           "ftrack"
         ],
         "product": [
-          "prototyping",
-          "prototype",
+          "figma prototyp",
           "figma",
           "design system",
           "design systems",
@@ -463,7 +498,8 @@
         "requires_any_leg": [
           "generative",
           "software",
-          "pipeline"
+          "pipeline",
+          "product"
         ]
       },
       "tier_c": {
@@ -815,7 +851,6 @@
         "diffusion",
         "text to video",
         "image to video",
-        "runway",
         "midjourney",
         "veo",
         "sora",
@@ -875,7 +910,8 @@
       "generative",
       "product"
     ],
-    "relevance_note": "A posting is relevant when the title tiers, or the body hits a craft leg. Software and pipeline are deliberately excluded: they support a creative role rather than define one, and every backend job in the corpus hits them, which is how 894 postings reached a pile on the first real run."
+    "relevance_note": "A posting is relevant when the title tiers, or the body hits a craft leg. Software and pipeline are deliberately excluded: they support a creative role rather than define one, and every backend job in the corpus hits them, which is how 894 postings reached a pile on the first real run.",
+    "apply_requires_title_tier": true
   },
   "proof_lead_by_tier": {
     "1": "local-pipeline",

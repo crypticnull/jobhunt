@@ -324,7 +324,12 @@ def evaluate(p, rules, company=None, now=None):
         out["pile"] = "logged"
         out["drop_reason"] = "no title fit and no intersection"
         return out
-    if score["total"] >= piles["apply_min"] and not (out["flags"] and piles["flagged_always_review"]):
+    # The apply pile is what the letter generator reads. A posting whose title
+    # does not fit is not one Matt can write a credible letter for, whatever the
+    # body scores, and it is how an Economist and a PCB Layout Engineer reached
+    # apply on generic body language. They still reach review.
+    titled = out["title_tier"] is not None or not piles.get("apply_requires_title_tier")
+    if titled and score["total"] >= piles["apply_min"] and not (out["flags"] and piles["flagged_always_review"]):
         out["pile"] = "apply"
     elif score["total"] >= piles["review_min"] or out["flags"]:
         out["pile"] = "review"
