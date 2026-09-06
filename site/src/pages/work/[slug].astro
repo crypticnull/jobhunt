@@ -4,6 +4,7 @@ import Layout from "../../layouts/Layout.astro";
 import Still from "../../components/Still.astro";
 import Video from "../../components/Video.astro";
 import ChapterRail from "../../components/ChapterRail.astro";
+import Mask from "../../components/Mask.astro";
 import { CHAPTER_ORDER } from "../../schemas.mjs";
 
 export async function getStaticPaths() {
@@ -31,6 +32,17 @@ const rendered = await Promise.all(
 
 const kinds = ["storyboard", "styleframe", "wip", "breakdown"] as const;
 const labels = { storyboard: "Storyboards", styleframe: "Styleframes", wip: "In progress", breakdown: "Breakdown" };
+
+// What this study is still waiting for. The page renders the finished shape in
+// wire mode so the reading order, the rail and the motion can be judged before
+// a single asset exists, and every box here goes away on its own the day the
+// record behind it lands.
+const CHAPTER_LABELS = { final: "Final", brief: "Brief", boards: "Boards", frames: "Styleframes", build: "Build", delivery: "Delivery" };
+const have = new Set(rendered.map((c) => c.data.kind));
+const absent = CHAPTER_ORDER.filter((k) => !have.has(k));
+const heroPending = d.hero.src.format === "svg";
+const noVideo = !d.video || d.video.provider === "none";
+const videoRatio = d.video ? `${d.video.width} / ${d.video.height}` : "16 / 9";
 ---
 
 <Layout title={d.title} description={d.summary}>
@@ -38,7 +50,17 @@ const labels = { storyboard: "Storyboards", styleframe: "Styleframes", wip: "In 
   <h1>{d.title}</h1>
   <p class="lede">{d.summary}</p>
 
-  {d.video ? <Video video={d.video} poster={d.hero} title={d.title} /> : <figure class="frame"><Still still={d.hero} loading="eager" /></figure>}
+  {
+    !noVideo ? (
+      <Video video={d.video} poster={d.hero} title={d.title} />
+    ) : heroPending ? (
+      <Mask label="Final film" need="Export plus a poster frame, or a hero still if there is no film" ratio={videoRatio} />
+    ) : (
+      <figure class="frame">
+        <Still still={d.hero} loading="eager" />
+      </figure>
+    )
+  }
 
   <dl class="facts">
     <dt>Year</dt>
@@ -55,16 +77,26 @@ const labels = { storyboard: "Storyboards", styleframe: "Styleframes", wip: "In 
     <dd>{d.role}</dd>
     <dt>Discipline</dt>
     <dd>{d.disciplines.join(", ")}</dd>
-    {d.tools.length > 0 && (
+    {d.tools.length > 0 ? (
       <>
         <dt>Tools</dt>
         <dd>{d.tools.join(", ")}</dd>
       </>
+    ) : (
+      <>
+        <dt class="wire-only">Tools</dt>
+        <dd class="wire-only"><Mask label="Tools" need="The list" lines={1} /></dd>
+      </>
     )}
-    {d.turnaround && (
+    {d.turnaround ? (
       <>
         <dt>Turnaround</dt>
         <dd>{d.turnaround}</dd>
+      </>
+    ) : (
+      <>
+        <dt class="wire-only">Turnaround</dt>
+        <dd class="wire-only"><Mask label="Turnaround" need="Only where it is impressive" lines={1} /></dd>
       </>
     )}
   </dl>
@@ -88,7 +120,16 @@ const labels = { storyboard: "Storyboards", styleframe: "Styleframes", wip: "In 
   }
 
   {
-    d.stills.length > 0 && (
+    absent.map((kind) => (
+      <section class="chapter wire-only" id={kind}>
+        <h2>{CHAPTER_LABELS[kind]}</h2>
+        <Mask label={`${CHAPTER_LABELS[kind]} chapter`} need={`data/projects/${entry.id}/chapters/*-${kind}.md`} lines={4} measure />
+      </section>
+    ))
+  }
+
+  {
+    d.stills.length > 0 ? (
       <>
         <h2>Stills</h2>
         <ul class="grid">
@@ -99,12 +140,36 @@ const labels = { storyboard: "Storyboards", styleframe: "Styleframes", wip: "In 
           ))}
         </ul>
       </>
+    ) : (
+      <div class="wire-only">
+        <h2>Stills</h2>
+        <ul class="grid">
+          {[0, 1, 2].map(() => (
+            <li>
+              <Mask label="Still" need="Exports" ratio="16 / 9" />
+            </li>
+          ))}
+        </ul>
+      </div>
     )
   }
 
   {
     kinds.map((kind) => {
       const items = d.process.filter((p) => p.kind === kind);
+      if (items.length === 0)
+        return (
+          <div class="wire-only">
+            <h2>{labels[kind]}</h2>
+            <ul class="grid">
+              {[0, 1, 2].map(() => (
+                <li>
+                  <Mask label={labels[kind]} need="Process material" ratio="16 / 9" />
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
       return (
         items.length > 0 && (
           <>

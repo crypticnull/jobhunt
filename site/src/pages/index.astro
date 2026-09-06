@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import Still from "../components/Still.astro";
+import Mask from "../components/Mask.astro";
 import { site } from "../site.config.mjs";
 
 const byOrder = (a: { data: { order: number } }, b: { data: { order: number } }) => a.data.order - b.data.order;
@@ -54,12 +55,19 @@ const workIntro = proof.find((p) => p.data.linked_projects.length > 0);
 // section says what is true instead: the studies are being written and the
 // builds above are live.
 const ready = projects.filter((p) => p.data.hero.src.format !== "svg");
+const waiting = projects.filter((p) => p.data.hero.src.format === "svg");
+const ratio = (p) => `${p.data.hero.width} / ${p.data.hero.height}`;
 ---
 
 <Layout>
   <section class="hero">
     <h1>{site.hero}</h1>
     <p class="sub">{site.sub}</p>
+    <Mask
+      label="Hero motion"
+      need="Undecided. A looping clip, a still, or nothing at all. The sentence has to land in four seconds either way."
+      ratio="21 / 9"
+    />
   </section>
 
   <section id="builds">
@@ -92,7 +100,7 @@ const ready = projects.filter((p) => p.data.hero.src.format !== "svg");
     <h2>Selected work</h2>
     {workIntro && <p class="lede">{workIntro.data.summary}</p>}
     {ready.length === 0 && (
-      <p class="pending">
+      <p class="pending live-only">
         The studies are being written and the stills arrive on their own schedule. The builds above are live, and the
         records so far are{" "}
         {projects.map((p, i) => (
@@ -103,7 +111,25 @@ const ready = projects.filter((p) => p.data.hero.src.format !== "svg");
         ))}
       </p>
     )}
-    <ul class="cards work-index" hidden={ready.length === 0}>
+    <ul class:list={["cards", "work-index", ready.length === 0 && "wire-only"]}>
+      {
+        waiting.map((p) => (
+          <li class="wire-only">
+            <a class="card work" href={`/work/${p.id}`}>
+              <Mask label={p.data.title} need="Hero still" ratio={ratio(p)} />
+              <div class="body">
+                <h3>{p.data.title}</h3>
+                <Mask label="Card summary" lines={2} />
+                <span class="meta">
+                  {p.data.year}
+                  {p.data.franchise ? ` · ${p.data.franchise}` : ""}
+                  {p.data.turnaround ? ` · ${p.data.turnaround}` : " · turnaround?"}
+                </span>
+              </div>
+            </a>
+          </li>
+        ))
+      }
       {
         ready.map((p) => (
           <li>
@@ -169,5 +195,6 @@ const ready = projects.filter((p) => p.data.hero.src.format !== "svg");
         </>
       )}
     </p>
+    {!site.email && <Mask label="Contact address" need="Waiting on the domain" lines={1} measure />}
   </section>
 </Layout>

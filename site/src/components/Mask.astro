@@ -1,0 +1,35 @@
+---
+// A content slot with no record behind it yet.
+//
+// It renders nothing on the live site and a labelled box in wire mode, so the
+// layout, the motion and the interactions can be designed and judged at true
+// size long before the content exists. The point of putting it here rather
+// than in a separate wireframe file is that a mask is what renders when a
+// record is *absent*, so every box disappears by itself the day its record
+// lands. There is no second copy of the site to keep in step and nothing to
+// delete later.
+//
+// It never fakes words. A text slot draws rules at the real line height and
+// measure, which is what you need to judge density, and says what belongs
+// there in the label. Lorem would make the page look finished, which is the
+// one thing a wireframe must not do.
+interface Props {
+  label: string; // what belongs in this slot
+  need?: string; // what has to be produced or decided before it can be filled
+  ratio?: string; // aspect ratio for a media slot, e.g. "16 / 9"
+  lines?: number; // line count for a text slot
+  measure?: boolean; // hold the prose measure rather than the container width
+  tag?: string; // element to render as, default div
+}
+const { label, need, ratio, lines, measure = false, tag = "div" } = Astro.props;
+const Tag = tag as any;
+const style = [ratio ? `aspect-ratio:${ratio}` : null, measure ? "max-width:var(--measure)" : null]
+  .filter(Boolean)
+  .join(";");
+---
+
+<Tag class:list={["mask", lines && "mask-text", ratio && "mask-media"]} style={style} data-label={label}>
+  <span class="mask-label">{label}</span>
+  {need && <span class="mask-need">{need}</span>}
+  {lines && <span class="mask-lines" aria-hidden="true">{Array.from({ length: lines }, (_, i) => <span style={`width:${[100, 96, 88, 92, 64][i % 5]}%`} />)}</span>}
+</Tag>
