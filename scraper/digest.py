@@ -26,6 +26,10 @@ def _week(now):
     return f"{y}-W{w:02d}"
 
 
+def _since(now, days=7):
+    return (now - timedelta(days=days)).isoformat()
+
+
 def _tier(row, companies):
     c = (companies or {}).get(row["company_slug"]) or {}
     return c.get("tier") or 9
@@ -239,7 +243,7 @@ def code_stamp(root=None):
 def build(store, rules, companies=None, now=None, since=None, heartbeat=None):
     """Returns (markdown, surfaced_ids). `companies` is {slug: record}."""
     now = now or datetime.now(timezone.utc)
-    since = since or (now - timedelta(days=7)).isoformat()
+    since = since or _since(now)
     piles = select(store, rules, companies, now)
     by_source = store.new_by_source(since)
     drops = store.drop_counts(since)
@@ -302,5 +306,9 @@ def write(store, rules, path_dir, companies=None, now=None, heartbeat=None):
     path_dir.mkdir(parents=True, exist_ok=True)
     path = path_dir / f"{_week(now)}.md"
     path.write_text(md, encoding="utf-8")
+    # The page goes out with the markdown rather than on request, so the week
+    # is a dated file either way and the two can never be out of step by a run.
+    from . import digest_html
+    digest_html.write(store, rules, path_dir, companies, now)
     store.mark_digested(ids, utcnow(), digest_hash)
     return path, len(ids)
