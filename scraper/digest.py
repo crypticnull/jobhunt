@@ -157,8 +157,16 @@ def source_health(store, since, status_log=None, now=None):
         key = (r["source"], r["company_slug"], r["error"])
         counted.setdefault(key, []).append(r["ran_at"][:10])
     dead = store.never_answered(since)
+    # A source whose latest poll succeeded is fixed, so its old errors are
+    # history rather than health. Workable rate-limited four companies on the
+    # 5th, answered all four on the 6th, and the footer still led with the
+    # four 429s. A footer that keeps crying wolf for a week is a footer that
+    # gets read past, and then the real outage has no warning left.
+    recovered = store.recovered_since(since)
     problems = []
     for (source, slug, error), days in counted.items():
+        if (source, slug) in recovered:
+            continue
         when = f"{len(days)} polls, last {days[0]}" if len(days) > 1 else days[0]
         line = f"{source}/{slug}: {error} ({when})"
         if len(days) > 1 and (source, slug) in dead:

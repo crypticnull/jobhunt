@@ -232,6 +232,19 @@ class Store:
         ).fetchall()
         return {(r["source"], r["company_slug"]) for r in rows if (r["ok"] or 0) == 0}
 
+    def recovered_since(self, since):
+        """{(source, company_slug)} whose most recent poll in the window
+        succeeded. An error that has since been fixed is history, not health,
+        and a footer that keeps naming it for a week is a footer that gets
+        read past, which costs the real outage its only warning."""
+        rows = self.db.execute(
+            "SELECT source, company_slug, ok FROM poll_log WHERE ran_at >= ? ORDER BY id DESC", (since,)
+        ).fetchall()
+        latest = {}
+        for r in rows:
+            latest.setdefault((r["source"], r["company_slug"]), r["ok"])
+        return {k for k, ok in latest.items() if ok}
+
     def zero_twice_running(self):
         """(company_slug, source) pairs whose last two successful polls saw nothing."""
         rows = self.db.execute("SELECT company_slug, source, postings_seen FROM poll_log WHERE ok = 1 ORDER BY id DESC").fetchall()

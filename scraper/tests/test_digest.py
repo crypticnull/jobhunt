@@ -190,12 +190,31 @@ class Digest(unittest.TestCase):
         self.assertIn("on the list without being polled", line)
 
     def test_a_board_that_answers_sometimes_is_only_drifting(self):
-        for day in ("03", "04"):
+        """Still failing on the latest poll, so it stays in the footer, but it
+        has answered inside the window so it is drifting rather than absent."""
+        self.s.log_poll("2026-09-03T02:30:00+00:00", "workable", "redox", True, 12, 2)
+        for day in ("04", "05"):
             self.s.log_poll(f"2026-09-{day}T02:30:00+00:00", "workable", "redox", False, error="503 down")
-        self.s.log_poll("2026-09-05T02:30:00+00:00", "workable", "redox", True, 12, 2)
         problems = digest.source_health(self.s, SEEN, status_log="/nonexistent")
         line = next(p for p in problems if p.startswith("workable/redox"))
         self.assertNotIn("without being polled", line)
+
+    def test_an_error_that_has_since_been_fixed_leaves_the_footer(self):
+        """Workable rate-limited four companies on the 5th and answered all
+        four on the 6th, and the footer still led with the four 429s."""
+        self.s.log_poll("2026-09-04T02:30:00+00:00", "workable", "d-id", False, error="429 too many requests")
+        self.s.log_poll("2026-09-05T02:30:00+00:00", "workable", "d-id", False, error="429 too many requests")
+        problems = digest.source_health(self.s, SEEN, status_log="/nonexistent")
+        self.assertTrue(any(p.startswith("workable/d-id") for p in problems))
+        self.s.log_poll("2026-09-06T02:30:00+00:00", "workable", "d-id", True, 2, 0)
+        problems = digest.source_health(self.s, SEEN, status_log="/nonexistent")
+        self.assertFalse(any(p.startswith("workable/d-id") for p in problems), "it is answering again")
+
+    def test_a_source_still_failing_stays_in_the_footer(self):
+        self.s.log_poll("2026-09-04T02:30:00+00:00", "workable", "redox", True, 12, 0)
+        self.s.log_poll("2026-09-05T02:30:00+00:00", "workable", "redox", False, error="503 down")
+        problems = digest.source_health(self.s, SEEN, status_log="/nonexistent")
+        self.assertTrue(any(p.startswith("workable/redox") for p in problems))
 
     def test_all_sources_answered(self):
         md, _ = digest.build(self.s, self.r, now=NOW)
