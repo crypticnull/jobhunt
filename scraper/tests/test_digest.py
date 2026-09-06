@@ -175,7 +175,7 @@ class Digest(unittest.TestCase):
         self.s.log_poll("2026-09-05T02:30:00+00:00", "greenhouse", "acme", True, 4, 0)
         md, _ = digest.build(self.s, self.r, now=NOW)
         self.assertIn("lever/brand: 503 down", md)
-        self.assertIn("ashby/quiet: zero postings on the last two polls", md)
+        self.assertIn("ashby/quiet: answers, and has had nothing open for two polls", md)
         self.assertNotIn("greenhouse/acme", md.split("## Source health")[1])
 
     def test_a_board_that_never_answers_is_called_what_it_is(self):
@@ -215,6 +215,40 @@ class Digest(unittest.TestCase):
         self.s.log_poll("2026-09-05T02:30:00+00:00", "workable", "redox", False, error="503 down")
         problems = digest.source_health(self.s, SEEN, status_log="/nonexistent")
         self.assertTrue(any(p.startswith("workable/redox") for p in problems))
+
+    def test_a_company_off_the_list_stops_being_reported_as_broken(self):
+        """Twelve studios came off the list on the 5th under the second
+        principle, and workable/pixomondo went on reporting the 429 it threw
+        the day it was removed. Nothing polls it any more, so nothing can ever
+        mark it recovered, and the line would have stayed in the footer for
+        good. A source that is not polled is not a health problem."""
+        self.s.log_poll("2026-09-05T02:30:00+00:00", "workable", "pixomondo", False, error="429 too many requests")
+        self.s.log_poll("2026-09-04T02:30:00+00:00", "ashby", "gone", True, 0, 0)
+        self.s.log_poll("2026-09-05T02:30:00+00:00", "ashby", "gone", True, 0, 0)
+        live = {"kept": {"slug": "kept"}}
+        problems = digest.source_health(self.s, SEEN, status_log="/nonexistent", companies=live)
+        self.assertEqual([p for p in problems if "pixomondo" in p or "gone" in p], [])
+        # Without the list there is nothing to check against, so it still reports.
+        problems = digest.source_health(self.s, SEEN, status_log="/nonexistent")
+        self.assertTrue(any("pixomondo" in p for p in problems))
+
+    def test_a_company_marked_dropped_is_off_the_list_too(self):
+        self.s.log_poll("2026-09-05T02:30:00+00:00", "workable", "monks", False, error="429 too many requests")
+        live = {"monks": {"slug": "monks", "dropped": "2026-09-05"}}
+        problems = digest.source_health(self.s, SEEN, status_log="/nonexistent", companies=live)
+        self.assertEqual([p for p in problems if "monks" in p], [])
+
+    def test_an_empty_board_is_not_called_an_outage(self):
+        """zero_twice_running only reads polls that succeeded, so the endpoint
+        answered and returned nothing. That is a company with nothing open, not
+        a broken slug, and it should not read like a 429."""
+        for day in ("04", "05"):
+            self.s.log_poll(f"2026-09-{day}T02:30:00+00:00", "ashby", "flawless-ai", True, 0, 0)
+        live = {"flawless-ai": {"slug": "flawless-ai"}}
+        line = next(p for p in digest.source_health(self.s, SEEN, status_log="/nonexistent", companies=live)
+                    if p.startswith("ashby/flawless-ai"))
+        self.assertIn("answers", line)
+        self.assertNotIn("zero postings", line)
 
     def test_all_sources_answered(self):
         md, _ = digest.build(self.s, self.r, now=NOW)
