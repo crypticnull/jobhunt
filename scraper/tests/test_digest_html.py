@@ -108,10 +108,29 @@ class Page(unittest.TestCase):
         colour the brand could have had."""
         from pipeline import design
         score = design.tokens()["colour"]["score"]
-        for theme in ("light", "dark"):
-            names = {f"score-{r}" for r in digest_html.RULES_ORDER}
-            self.assertEqual(set(score[theme]), names, theme)
-            self.assertEqual(len(set(score[theme].values())), len(names), f"{theme}: two rules share a colour")
+        self.assertEqual(set(score["hue"]), {f"score-h-{r}" for r in digest_html.RULES_ORDER})
+        hues = [int(v) for v in score["hue"].values()]
+        self.assertEqual(len(set(hues)), len(hues), "two rules share a hue")
+        # Every stop shares the lightness and one of two chromas, so the hue is
+        # the only thing that differs and one lever moves the whole set.
+        emitted = dict(design.score_vars(score))
+        self.assertEqual(set(emitted), {f"score-{r}" for r in digest_html.RULES_ORDER})
+        for name, value in emitted.items():
+            self.assertIn("var(--score-l)", value, name)
+            self.assertTrue("var(--score-c)" in value or "var(--score-c-quiet)" in value, name)
+
+    def test_loud_is_measured_rather_than_chosen(self):
+        """A rule that never differs between postings is ink without
+        information. Over the forty real postings of the week to 6 September
+        intersection took five values and comp three, while remote was +22 on
+        thirty nine of forty and human never appeared at all."""
+        from pipeline import design
+        score = design.tokens()["colour"]["score"]
+        self.assertIn("intersection", score["loud"])
+        self.assertIn("comp", score["loud"])
+        self.assertNotIn("remote", score["loud"])
+        self.assertNotIn("human", score["loud"])
+        self.assertTrue(set(score["loud"]) <= set(digest_html.RULES_ORDER))
 
     def test_the_strip_and_the_breakdown_agree(self):
         """Same encoding at two sizes. Learn the strip once and the detail
@@ -120,9 +139,26 @@ class Page(unittest.TestCase):
             self.assertIn(f"var(--score-{rule})", self.html)
         self.assertNotIn('class="neg"', self.html, "sign is carried by the number, not a second colour")
 
-    def test_the_legend_names_every_stop(self):
-        for rule in digest_html.RULES_ORDER:
+    def test_the_legend_names_only_what_is_drawn(self):
+        """A stop for a rule nobody can find on the page is a colour with
+        nothing to point at. human has never scored on a posting."""
+        for rule in ("comp", "intersection"):
             self.assertIn(f'<b><i style="background:var(--score-{rule})"></i>{rule}</b>', self.html)
+        for rule in ("remote", "human"):
+            self.assertNotIn(f'</i>{rule}</b>', self.html, rule)
+
+    def test_remote_is_out_of_the_strip_and_still_in_the_breakdown(self):
+        """It was +22 on thirty nine of the forty postings of the week to
+        6 September, so it spent a third of every bar saying the same thing,
+        and the location already prints at the foot of the card. The breakdown
+        keeps it, because that is the audit and it has to sum to the score."""
+        self.assertNotIn("remote", digest_html.STRIP_ORDER)
+        self.assertIn("remote", digest_html.RULES_ORDER)
+        strip = self.html.split('<div class="strip">')[1].split("</div>")[0]
+        self.assertNotIn("--score-remote", strip)
+        rows = self.html.split('<div class="rows">')[1].split("</div></div>")[0]
+        self.assertIn("--score-remote", rows)
+        self.assertIn("<b>+22</b>", rows)
 
     def test_nothing_is_fetched_from_anywhere(self):
         """It opens from disk, off a plane, in a year. No request leaves it."""

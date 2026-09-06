@@ -64,10 +64,12 @@
         },
         "score": {
           "type": "object",
-          "description": "One colour per scoring rule for the strip under a posting. Decorative, never text, so no contrast pair measures them.",
+          "description": "One colour per scoring rule, composed in OKLCH from a shared lightness and one of two chromas so the hue is the only thing that differs. Decorative, never text, so no contrast pair measures them.",
           "required": [
             "light",
-            "dark"
+            "dark",
+            "hue",
+            "loud"
           ],
           "properties": {
             "note": {
@@ -76,15 +78,26 @@
             "light": {
               "type": "object",
               "additionalProperties": {
-                "type": "string",
-                "pattern": "^#[0-9a-f]{6}$"
+                "type": "string"
               }
             },
             "dark": {
               "type": "object",
               "additionalProperties": {
-                "type": "string",
-                "pattern": "^#[0-9a-f]{6}$"
+                "type": "string"
+              }
+            },
+            "hue": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "loud": {
+              "type": "array",
+              "description": "Rules whose value actually differs between postings, measured rather than chosen. These take the full chroma; the rest recede.",
+              "items": {
+                "type": "string"
               }
             }
           }
