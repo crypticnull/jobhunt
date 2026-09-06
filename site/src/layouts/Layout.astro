@@ -82,6 +82,52 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
       <a href="/wire">Slot inventory</a>
       <a href="?nowire">Turn off</a>
     </div>
+    <script>
+      // The fringe ramp. A pointer over a line of type lifts the words nearest
+      // it and fades out with distance, across a band set by --slip-band, so a
+      // title answers where the eye is rather than all at once. Only opacity
+      // varies: the slip itself is a group move in CSS and nothing here moves
+      // a word, which is what keeps the line reading as one flat sheet printed
+      // slightly wrong rather than as letters on separate planes.
+      //
+      // Smoothstep rather than a linear falloff, because a linear edge is
+      // visible as an edge and the whole idea is a soft brush.
+      for (const line of document.querySelectorAll<HTMLElement>("[data-slip]")) {
+        const words = Array.from(line.querySelectorAll<HTMLElement>(".w"));
+        if (!words.length) continue;
+        let queued = false;
+        let px = 0;
+        let py = 0;
+        const paint = () => {
+          queued = false;
+          const band =
+            parseFloat(getComputedStyle(line).getPropertyValue("--slip-band")) *
+            parseFloat(getComputedStyle(document.documentElement).fontSize);
+          for (const w of words) {
+            const r = w.getBoundingClientRect();
+            // Both axes, because a title can wrap and a word sitting directly
+            // under the cursor on the next line is not near it. Vertical
+            // distance counts eightfold so one line away is out of the band entirely
+            // rather than glowing along with the row you are reading.
+            const dx = px - (r.left + r.width / 2);
+            const dy = (py - (r.top + r.height / 2)) * 8;
+            const t = Math.max(0, 1 - Math.hypot(dx, dy) / (band || 1));
+            w.style.setProperty("--lift", String(t * t * (3 - 2 * t)));
+          }
+        };
+        line.addEventListener("pointermove", (e) => {
+          px = e.clientX;
+          py = e.clientY;
+          if (!queued) {
+            queued = true;
+            requestAnimationFrame(paint);
+          }
+        });
+        line.addEventListener("pointerleave", () => {
+          for (const w of words) w.style.removeProperty("--lift");
+        });
+      }
+    </script>
     <main id="main">
       <slot />
     </main>
@@ -686,10 +732,16 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     position: relative;
     display: inline-block;
   }
+  /* The true word is last and positioned, so it paints over its own ghosts.
+     This used to be a negative z-index on the ghost, which put the fringe
+     behind the page background, where it was computed on every hover and seen
+     by nobody. */
+  .slip .true {
+    position: relative;
+  }
   .slip .ghost {
     position: absolute;
     inset: 0;
-    z-index: -1;
     opacity: 0;
     transform: translateX(0);
     pointer-events: none;
@@ -704,17 +756,27 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
   .slip .ghost.b {
     color: var(--blueprint);
   }
-  .slip .w:hover .ghost.m,
+  /* The slip is a group move: hovering anywhere in the line sends every ghost
+     the same distance at the same moment, because a press does not slip one
+     word at a time. Per-word hover was legible as eleven separate effects,
+     which is noise rather than a printing fault. */
+  .slip:hover .ghost.m,
   a:focus-visible .slip .ghost.m {
-    opacity: 1;
     transform: translateX(var(--slip-x));
   }
-  /* The other plate goes the other way. A press does not slip in one
-     direction only. */
-  .slip .w:hover .ghost.b,
+  .slip:hover .ghost.b,
   a:focus-visible .slip .ghost.b {
-    opacity: 1;
     transform: translateX(calc(var(--slip-x) * -1));
+  }
+  /* Brightness is the only thing that varies along the line, and it is driven
+     from the pointer: --lift is set per word by script, one over a smooth
+     falloff, so the fringe is strongest under the cursor and gone by the edge
+     of the band. Keyboard focus has no pointer, so it lights the whole line. */
+  .slip .ghost {
+    opacity: calc(var(--lift, 0));
+  }
+  a:focus-visible .slip .ghost {
+    opacity: 1;
   }
 
   /* ---- A1, the hero arrives ----------------------------------------------

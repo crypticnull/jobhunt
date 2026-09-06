@@ -1,22 +1,22 @@
 ---
-// Misregistration, per word.
+// Misregistration, ramped from the pointer.
 //
 // When a press runs out of register the plates print a hair apart and you get
-// a coloured fringe beside the type. This is that, on purpose and on hover:
-// each word carries two ghosts of itself, marker and blueprint, and pointing
-// at the word slides them off the true impression in opposite directions,
-// which is what a four colour press actually does when it slips. One fringe
-// reads as a hover glow. Two read as a printing fault, and they spend the
-// second accent colour, which otherwise does almost nothing on the site.
+// a coloured fringe beside the type. This is that, on purpose and on hover.
 //
-// The unit is the word rather than the line, so the page responds exactly
-// where you are looking rather than everywhere at once. It is split at build
-// time and the ghost is a real element marked aria-hidden, so nothing is
-// announced twice and nothing depends on generated content being ignored.
+// Two rules make it read as one printed thing rather than a row of separate
+// effects. The slip is a group move: every ghost in the line travels the same
+// distance at the same moment, because a press does not slip one word at a
+// time. And the fringe fades with distance from the pointer, across a band
+// wider than any single word, so the line answers where the eye is without
+// anything jumping. Nothing moves toward the reader and nothing moves apart.
+// It is one flat sheet, printed slightly wrong, brightest where you are
+// looking.
 //
-// Motion: the offset takes --t-slide, which is a cut under reduce, so a
-// visitor who asked for less motion gets the fringe without the travel. The
-// tint takes --t-fade, because opacity is not the part that makes anyone ill.
+// The true word is the last child and positioned, so it paints over its own
+// ghosts without any of them needing a negative z-index. The earlier version
+// used z-index -1, which put the fringe behind the page background, where it
+// was computed on every hover and visible to nobody.
 interface Props {
   text: string;
   tag?: string;
@@ -26,7 +26,7 @@ const Tag = tag as any;
 const words = text.split(/(\s+)/);
 ---
 
-<Tag class="slip">
+<Tag class="slip" data-slip>
   {
     words.map((w) =>
       w.trim() === "" ? (
@@ -35,7 +35,7 @@ const words = text.split(/(\s+)/);
         <span class="w">
           <span class="ghost b" aria-hidden="true">{w}</span>
           <span class="ghost m" aria-hidden="true">{w}</span>
-          {w}
+          <span class="true">{w}</span>
         </span>
       ),
     )
