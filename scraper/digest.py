@@ -114,7 +114,15 @@ def dead_weight(store, rules, companies=None):
     shown nothing. Reported, never acted on: the list is Matt's and a scheduled
     job does not get to shorten it."""
     floor = rules.get("digest", {}).get("dead_weight_min_postings", 15)
+    # Same ghost as the source health footer. company_yield reads the postings
+    # table, which keeps every row a company ever produced, so a company that
+    # has left the list entirely goes on being nominated for dropping. The
+    # W36 digest asked Matt to drop monks and elastic, and both had been off
+    # the list since the 5th. A company already gone is not dead weight, and a
+    # command that names it does nothing but make the section look wrong.
+    known = None if companies is None else set(companies)
     rows = [r for r in store.company_yield() if r["on_target"] == 0 and r["postings"] >= floor
+            and (known is None or r["company_slug"] in known)
             and not ((companies or {}).get(r["company_slug"]) or {}).get("dropped")]
     if not rows:
         return []

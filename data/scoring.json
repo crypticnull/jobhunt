@@ -197,10 +197,10 @@
         "tel aviv",
         "\\btokyo\\b",
         "sao paulo",
-        "são paulo",
+        "s\u00e3o paulo",
         "mexico city",
         "buenos aires",
-        "bogot[aá]",
+        "bogot[a\u00e1]",
         "\\bmadrid\\b",
         "barcelona",
         "\\blisbon\\b",
@@ -395,7 +395,6 @@
     "intersection": {
       "max": 20,
       "per_leg": 5,
-      "max_legs": 4,
       "legs": {
         "3d": [
           "cinema 4d",
@@ -508,6 +507,10 @@
           "component library",
           "interaction design",
           "design tokens",
+          "variable fonts",
+          "design handoff"
+        ],
+        "product-motion": [
           "motion system",
           "motion systems",
           "product animation",
@@ -524,17 +527,21 @@
           "origami",
           "framer(?! motion)",
           "smart animate",
-          "variable fonts",
           "spline\\.design",
           "spline 3d",
           "motion tokens",
           "motion principles",
           "motion language",
-          "animation principles",
-          "design handoff"
+          "animation principles"
         ]
       },
-      "product_leg_note": "Revised twice on 2026-09-05. The whole product-motion vocabulary went in first, and the skeptics refused it: prototyping, storybook and prototype are discipline words every product and frontend posting uses, so they would have let tier B through on generic bodies. The leg carries the product-motion tool names and the motion-system phrases, which name the work rather than the discipline."
+      "product_leg_note": "Revised twice on 2026-09-05. The whole product-motion vocabulary went in first, and the skeptics refused it: prototyping, storybook and prototype are discipline words every product and frontend posting uses, so they would have let tier B through on generic bodies. The leg carries the product-motion tool names and the motion-system phrases, which name the work rather than the discipline.",
+      "weights": {
+        "product-motion": 10,
+        "product": 2,
+        "motion": 0
+      },
+      "weights_note": "Legs not named here take per_leg. Revised 2026-09-06. The product leg was one list doing two jobs, so a posting saying figma and a posting saying you will own our motion system scored the same intersection, and 39 of the 51 postings in W36 claimed the leg while none of them had motion or animation in the title. The motion leg is the longform vocabulary, after effects and compositing and premiere, so it names the work the second principle rejects and stops carrying points."
     },
     "title": {
       "max": 15,
@@ -573,6 +580,7 @@
             "generative",
             "software",
             "pipeline",
+            "product-motion",
             "product"
           ]
         },
@@ -609,6 +617,7 @@
           "generative",
           "software",
           "pipeline",
+          "product-motion",
           "product"
         ]
       },
@@ -1060,6 +1069,7 @@
       "3d",
       "motion",
       "generative",
+      "product-motion",
       "product"
     ],
     "relevance_title_terms": [
