@@ -66,6 +66,68 @@ def _term(term):
     return re.compile(r"(?<![a-z0-9])" + re.escape(term) + r"(?![a-z0-9])", re.IGNORECASE)
 
 
+def _strip_groups(p):
+    """Replace each group with its first alternative, dropping lookarounds and
+    optional groups. Scans rather than regexes, because these patterns nest."""
+    out, i = [], 0
+    while i < len(p):
+        c = p[i]
+        if c == "\\":
+            out.append(p[i:i + 2])
+            i += 2
+            continue
+        if c != "(":
+            out.append(c)
+            i += 1
+            continue
+        depth, j = 1, i + 1
+        while j < len(p) and depth:
+            if p[j] == "\\":
+                j += 2
+                continue
+            depth += (p[j] == "(") - (p[j] == ")")
+            j += 1
+        inner = p[i + 1:j - 1]
+        optional = j < len(p) and p[j] == "?"
+        if inner[:2] in ("?=", "?!") or inner[:3] in ("?<=", "?<!"):
+            i = j + (1 if optional else 0)
+            continue
+        if inner.startswith("?:"):
+            inner = inner[2:]
+        if optional:
+            i = j + 1
+            continue
+        depth, cut = 0, len(inner)
+        for k, ch in enumerate(inner):
+            if ch == "\\":
+                continue
+            depth += (ch == "(") - (ch == ")")
+            if ch == "|" and not depth:
+                cut = k
+                break
+        out.append(_strip_groups(inner[:cut]))
+        i = j
+    return "".join(out)
+
+
+def readable(term):
+    """A pattern as a person would write it. The ruleset is regexes so that
+    `llm` does not match llms-of-the-valley and `hybrid` only fires near an
+    office word, but a digest full of lookaheads is a digest nobody reads, and
+    the drop counts are the part Matt actually works from. Best effort: when
+    the result still looks like a regex the original is printed rather than
+    something untrue."""
+    t = _strip_groups(term)
+    t = re.sub(r"\[[^\]]*\][*+]", " ", t)
+    t = re.sub(r"\\b|\\B|[\^$]", "", t)
+    t = re.sub(r"[a-z0-9 -]\?", "", t)
+    t = re.sub(r"\\([^a-zA-Z0-9])", r"\1", t)
+    t = re.sub(r"\s+", " ", t).strip(" -,")
+    if not t or re.search(r"[\\\[\]{}()|*+?]", t):
+        return term
+    return t
+
+
 def _hits(terms, text):
     return [t for t in terms if _term(t).search(text)]
 
@@ -189,7 +251,16 @@ def gate_remote(p, rules):
         return "fail", [f"remote claim is {claim}"], False
     fails = _hits(r["fail_phrases"], body + "\n" + loc)
     if fails:
-        return "fail", [f"fake-remote phrase: {', '.join(fails[:3])}"], False
+        return "fail", [f"fake-remote phrase: {', '.join(readable(f) for f in fails[:3])}"], False
+    # A location field is short and structured rather than prose, so the
+    # lookahead that stops "hybrid" firing on body text is not needed here and
+    # its absence is a hole: "San Francisco Bay Area Hybrid" was scoring remote
+    # plus pacific and sitting second in the apply pile. A location that also
+    # says remote is offering both, so it still passes.
+    if "remote" not in loc:
+        here = _hits(r.get("fail_location_phrases", []), loc)
+        if here:
+            return "fail", [f"the location says {', '.join(readable(f) for f in here[:2])}"], False
     # A posting whose location names another country and no US marker is not a
     # US remote role, whatever its remote claim says. Checked against the
     # location only, never the body, because a US role can mention EMEA teams.
@@ -198,7 +269,7 @@ def gate_remote(p, rules):
 
     abroad = _hits(r.get("fail_location_patterns", []), loc)
     if abroad and not american(p.get("location") or "", loc):
-        return "fail", [f"location is outside the US: {', '.join(abroad[:2])}"], False
+        return "fail", [f"location is outside the US: {', '.join(readable(a) for a in abroad[:2])}"], False
     # A region in the title scopes the role itself, which is not the same as a
     # region in the body, where a US posting can name the EMEA team it works
     # with. "Deal Strategy Analyst - EMEA" and "Forward Deployed Creative
@@ -208,7 +279,7 @@ def gate_remote(p, rules):
     title = (p.get("title") or "").lower()
     scoped = _hits(r.get("fail_location_patterns", []), title)
     if scoped and not american(p.get("title") or "", title):
-        return "fail", [f"title is scoped to {', '.join(scoped[:2])}"], False
+        return "fail", [f"title is scoped to {', '.join(readable(a) for a in scoped[:2])}"], False
     states = parse_states(p.get("location") or "", rules, body=p.get("description") or "")
     if states and states != ["US"]:
         if any(s not in states for s in r["fail_if_state_list_excludes"]):
@@ -229,9 +300,9 @@ def gate_remote(p, rules):
         elif not is_tz and not nationwide and not states:
             shape_flags.append(f)
     if shape_flags:
-        reasons.append(f"payroll-default language: {', '.join(shape_flags[:2])}")
+        reasons.append(f"payroll-default language: {', '.join(readable(f) for f in shape_flags[:2])}")
     if tz_flags:
-        reasons.append(f"timezone language: {', '.join(tz_flags[:2])}")
+        reasons.append(f"timezone language: {', '.join(readable(f) for f in tz_flags[:2])}")
     pacific = is_pacific(p, states, rules)
     if claim in r["require_claim"]:
         result = "flag" if reasons else "pass"
@@ -249,7 +320,7 @@ def gate_comp(p, rules, company):
     body = (p.get("description") or "").lower()
     fails = _hits(c["fail_phrases"], body)
     if fails:
-        return "fail", [f"unpaid work: {fails[0]}"], None
+        return "fail", [f"unpaid work: {readable(fails[0])}"], None
     lo, hi = p.get("comp_min"), p.get("comp_max")
     tier = (company or {}).get("tier")
     size = (company or {}).get("size")
@@ -280,11 +351,11 @@ def disqualify(p, rules, now):
     tnorm = normalize_title(p.get("title"))
     for pat in d["title_patterns"]:
         if re.search(pat, tnorm, re.IGNORECASE):
-            return f"title: {pat}"
+            return f"title: {readable(pat)}"
     body = (p.get("description") or "").lower()
     hits = _hits(d["phrases"], body)
     if hits:
-        return f"disqualifier: {hits[0]}"
+        return f"disqualifier: {readable(hits[0])}"
     posted = _days_since(p.get("posted_at"), now)
     seen = _days_since(p.get("last_seen"), now)
     if posted is not None and posted > d["stale_after_days"] and seen is not None and seen > d["stale_unseen_days"]:
@@ -363,7 +434,7 @@ def evaluate(p, rules, company=None, now=None):
         if fr and tt not in fr.get("skip_if_title_tier_in", []):
             hits = _hits(fr["phrases"], body)
             if hits:
-                out["flags"].append(f"{fr['reason']}: {', '.join(hits[:3])}")
+                out["flags"].append(f"{fr['reason']}: {', '.join(readable(h) for h in hits[:3])}")
     comp_points = 0
     if comp_result == "flag" and mid is not None:
         comp_points = s["comp"]["flagged"]

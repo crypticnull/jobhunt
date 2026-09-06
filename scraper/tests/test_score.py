@@ -143,8 +143,8 @@ class Gates(unittest.TestCase):
 
 class Disqualifiers(unittest.TestCase):
     def test_title_patterns(self):
-        self.assertEqual(score(row(title="Video Editor"), rules(), NOW, TIER2)["drop_reason"], "title: ^video editor$")
-        self.assertEqual(score(row(title="Junior Motion Designer"), rules(), NOW, TIER2)["drop_reason"], "title: ^(junior|jr)\\b")
+        self.assertEqual(score(row(title="Video Editor"), rules(), NOW, TIER2)["drop_reason"], "title: video editor")
+        self.assertEqual(score(row(title="Junior Motion Designer"), rules(), NOW, TIER2)["drop_reason"], "title: junior")
         self.assertIsNone(score(row(title="Senior Video Editor and Motion Designer"), rules(), NOW, TIER2)["drop_reason"])
 
     def test_phrases_and_staleness(self):
@@ -795,6 +795,57 @@ class TitlesAfterTheReview(unittest.TestCase):
         r = self.product("Product Designer", "Lottie and Rive animation for the app.")
         self.assertEqual(r["title_tier"], "B")
         self.assertIn("product", r["legs_hit"])
+
+
+class ReadableReasons(unittest.TestCase):
+    """The drop counts are the part Matt works from every Monday, and the
+    2026-09-06 digest printed eighty-character lookaheads in that column."""
+
+    def test_the_shapes_that_were_unreadable(self):
+        from scraper.score import readable
+        cases = {
+            r"\bhybrid\b(?=[^.\n]{0,80}\b(office|on-?site|in[- ]person|days|week|commute)\b)": "hybrid",
+            r"\bbased in the (?!(the )?(us\b|u\.s\.|united states))": "based in the",
+            r"(electrical|mechanical|civil)[a-z ]* design engineer": "electrical design engineer",
+            r"^(senior |staff |principal |lead )?(research scientist|ml researcher)": "research scientist",
+            r"\bintern(ship)?s?\b": "intern",
+            r"\bonsite\b(?! interview)": "onsite",
+            r"must (live|be living) (in|within) (?!(the )?(us\b))": "must live in",
+            r"\bcanada\b": "canada",
+            r"on-?site": "onsite",
+        }
+        for pattern, want in cases.items():
+            self.assertEqual(readable(pattern), want, pattern)
+
+    def test_it_prints_the_original_rather_than_something_untrue(self):
+        """Best effort. A pattern it cannot reduce cleanly comes back whole."""
+        from scraper.score import readable
+        odd = r"travel (up to )?(1[1-9]|[2-9]\d)%"
+        self.assertEqual(readable(odd), odd)
+
+
+class HybridInTheLocation(unittest.TestCase):
+    """A location field is short and structured, not prose, so the lookahead
+    that keeps `hybrid` from firing on body text leaves a hole there."""
+
+    def go(self, location):
+        r = row(title="Senior Product Designer", description="figma design systems prototyping",
+                location=location, comp_min=200000, comp_max=285000, comp_found=1)
+        return score(r, rules(), NOW, TIER1)
+
+    def test_a_bay_area_hybrid_listing_no_longer_reaches_the_pile(self):
+        """It was scoring remote plus pacific and sitting second in the apply
+        pile on 2026-09-06."""
+        for loc in ("San Francisco Bay Area Hybrid", "Hybrid - New York", "New York (Hybrid)"):
+            r = self.go(loc)
+            self.assertEqual(r["pile"], "logged", loc)
+            self.assertIn("the location says hybrid", r["drop_reason"], loc)
+
+    def test_a_location_offering_both_still_passes(self):
+        """Only hybrid needs the escape. A bare onsite in the location was
+        already failing on the body phrase list, wherever it appeared."""
+        for loc in ("Remote or Hybrid", "Remote - US"):
+            self.assertNotEqual(self.go(loc)["pile"], "logged", loc)
 
 
 class RegionAndInterns(unittest.TestCase):

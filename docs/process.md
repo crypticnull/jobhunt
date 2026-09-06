@@ -63,10 +63,20 @@ X:\_CLAUDE\26_09_01_Job_Hunt\jobhunt\run.cmd pull
 ```
 
 `pull` is the one thing the launcher does on its own rather than handing
-to the scraper. It rebases on main, and if the pull touched
-`data/scoring.json` or anything under `scraper/` it rescores before
-handing the shell back, so the next digest reads the piles the new rules
-produce. It refuses if the checkout is on some other branch.
+to the scraper. It rebases on main, then brings the store up to date, so
+the next digest reads the piles the new code produces. It refuses if the
+checkout is on some other branch.
+
+Which of the two it runs matters, and it is the trap worth knowing about.
+A rescore reads the stored row, so a change to `data/scoring.json` lands
+straight away. Location, remote class and pay are different: the adapters
+derive those when a posting is polled and the store keeps the result, so a
+rescore reads the old values back and reports success. On 2026-09-06 the
+remote classifier was fixed and 6,069 postings still read as onsite after
+a rescore, because a rescore was never going to touch them. So `pull`
+polls when the diff touched `scraper/adapters/` or `scraper/salary.py`,
+and only rescores when it did not. `python -m scraper score` says the same
+thing in one line under its own count.
 
 Every digest carries the commit it was built from in its opening line,
 next to the ruleset version. That is what makes a digest pasted into a

@@ -39,6 +39,16 @@ if "%BEFORE%"=="%AFTER%" (
     echo Already current, nothing to rescore.
     goto :eof
 )
+rem An adapter fix cannot be picked up by a rescore. Location, remote class and
+rem pay are derived when a posting is polled and then stored, so a rescore reads
+rem the old values back and reports success. Poll when the adapters moved,
+rem rescore when only the rules did.
+git diff --name-only %BEFORE% %AFTER% | findstr /i "scraper/adapters/ scraper/salary.py" >nul
+if not errorlevel 1 (
+    echo Adapters moved, so a rescore would read the old values back. Polling.
+    %PY% -m scraper poll
+    goto :eof
+)
 git diff --name-only %BEFORE% %AFTER% | findstr /i "data/scoring.json scraper/" >nul
 if errorlevel 1 (
     echo Code moved but the rules did not, so the piles still stand.

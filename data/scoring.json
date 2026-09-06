@@ -51,6 +51,16 @@
         "return to office",
         "\\brto\\b"
       ],
+      "fail_location_phrases": [
+        "hybrid",
+        "on-site",
+        "onsite",
+        "on site",
+        "in-office",
+        "in office",
+        "in the office"
+      ],
+      "fail_location_phrases_note": "Checked against the location only, and only when the location does not also say remote. A location field is short and structured rather than prose, so the 80-character lookahead that keeps 'hybrid' from firing on body text is not needed there and its absence is a hole. 'San Francisco Bay Area Hybrid' was scoring remote plus pacific and sitting second in the apply pile on 2026-09-06. 'Remote or Hybrid' still passes, because it says remote.",
       "fail_if_state_list_excludes": [
         "PA"
       ],
