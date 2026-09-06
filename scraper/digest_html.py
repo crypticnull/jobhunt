@@ -171,6 +171,30 @@ PAGE_CSS = """
   .act a { font-family: var(--display); font-size: var(--step-x); font-weight: 500; }
   .pick { display: flex; gap: .5rem; align-items: center; font-family: var(--mono); font-size: var(--step-x); color: var(--muted); cursor: pointer; }
   .pick input { accent-color: var(--marker); width: 1rem; height: 1rem; }
+  /* The console's own controls. A decision is a segmented control rather than
+     three loose buttons, because the three are one question and the answer he
+     already gave has to be visible without being read. */
+  .decide { display: flex; border: 1px solid var(--rule); }
+  .decide button + button { border-left: 1px solid var(--rule); }
+  .dec, .write {
+    font-family: var(--mono); font-size: var(--step-xx); letter-spacing: var(--label-tracking);
+    text-transform: uppercase; padding: .45rem .7rem; background: none; color: var(--muted);
+    border: 0; cursor: pointer; transition: color var(--respond) var(--ease-out), background var(--respond) var(--ease-out);
+  }
+  .dec:hover, .write:hover { color: var(--ink); background: var(--field); }
+  .dec[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .write { border: 1px solid var(--rule); }
+  .write[disabled] { opacity: .5; cursor: default; }
+  .said-state {
+    flex-basis: 100%; margin: 0; font-family: var(--mono); font-size: var(--step-xx);
+    color: var(--muted); min-height: 1em;
+  }
+  .brief { grid-column: 1 / -1; border-top: 1px solid var(--rule); padding-top: .8rem; }
+  .brief pre {
+    font-family: var(--mono); font-size: var(--step-xx); line-height: var(--leading-body);
+    white-space: pre-wrap; background: var(--field); padding: 1rem; margin: 0;
+    max-height: 32rem; overflow: auto;
+  }
   .empty { font-family: var(--mono); font-size: var(--step-x); color: var(--muted); padding: 3rem 0; text-align: center; grid-column: 1 / -1; }
 
   table { border-collapse: collapse; width: 100%; font-size: var(--step-x); }
@@ -259,10 +283,93 @@ FILTER_JS = """
 """
 
 
+
+LIVE_JS = """
+  // The console half. A decision goes to the store the moment it is made, and
+  // the brief is written for the posting he is reading, by the same generator
+  // the command line runs. Nothing here builds a card, so a posting's own words
+  // never reach a script: the server rendered them and this only toggles.
+  async function post(url, body) {
+    const r = await fetch(url, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(body),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || r.statusText);
+    return data;
+  }
+
+  for (const foot of document.querySelectorAll(".act.live")) {
+    const id = Number(foot.dataset.id);
+    const card = foot.closest(".card");
+    const say = foot.querySelector(".said-state");
+    const brief = card.querySelector(".brief");
+
+    foot.querySelector(".decide").addEventListener("click", async (e) => {
+      const b = e.target.closest("button.dec");
+      if (!b) return;
+      const was = [...foot.querySelectorAll("button.dec")].find(x => x.getAttribute("aria-pressed") === "true");
+      // Clicking the state it already has clears it back to new, so a wrong
+      // click costs one more click rather than a trip to the command line.
+      const next = b === was ? "new" : b.dataset.state;
+      for (const o of foot.querySelectorAll("button.dec")) o.setAttribute("aria-pressed", String(o === b && next !== "new"));
+      say.textContent = "saving";
+      try {
+        const out = await post("/api/mark", {id, state: next});
+        say.textContent = out.state === "new" ? "" : out.state;
+        card.dataset.state = out.state;
+      } catch (err) { say.textContent = "did not save, " + err.message; }
+    });
+
+    foot.querySelector(".write").addEventListener("click", async (e) => {
+      e.target.disabled = true;
+      say.textContent = "writing";
+      try {
+        const out = await post("/api/brief", {id});
+        brief.querySelector("pre").textContent = out.brief;
+        brief.hidden = false;
+        say.textContent = "written to " + out.path;
+      } catch (err) { say.textContent = "did not write, " + err.message; }
+      e.target.disabled = false;
+    });
+  }
+"""
+
+
 _esc = design.esc
 
 
-def _card(row, companies, pile):
+DECISIONS = (("applied", "Applied"), ("reviewed", "Worth a look"), ("skipped", "Not for me"))
+
+
+def _act(row, live, state):
+    """The card's footer. Written twice on purpose.
+
+    A saved file cannot change the store, so there it stays a checkbox and a
+    link and says nothing it cannot do. On the console the same row is one
+    click from a decision and from the brief for it, because that is the whole
+    reason the console exists.
+    """
+    open_it = f'<a href="{_esc(row["url"])}" target="_blank" rel="noreferrer noopener">Open the posting &rarr;</a>'
+    if not live:
+        return (f'<footer class="act">'
+                f'<label class="pick"><input type="checkbox" data-pick="{row["id"]}"> Pick for a letter</label>'
+                f'{open_it}</footer>')
+    buttons = "".join(
+        f'<button class="dec" data-state="{k}" aria-pressed="{"true" if state == k else "false"}">{_esc(label)}</button>'
+        for k, label in DECISIONS
+    )
+    return (f'<footer class="act live" data-id="{row["id"]}">'
+            f'<div class="decide">{buttons}</div>'
+            f'<button class="write">Write the brief</button>'
+            f'{open_it}'
+            f'<p class="said-state" role="status"></p>'
+            f'</footer>'
+            f'<section class="brief" hidden><h3>The brief</h3><pre></pre></section>')
+
+
+def _card(row, companies, pile, live=False, state=None):
     """One posting as a card. Everything the markdown entry prints reaches here,
     including the score parts, because both surfaces read SCORE_ORDER and
     neither gets to leave a rule out."""
@@ -364,10 +471,7 @@ def _card(row, companies, pile):
 <section class="scored"><h3>How it scored</h3><div class="rows">{rows}</div>{flags}{lead}</section>
 <section class="facts"><h3>The role</h3><dl class="factlist">{fact_html}</dl></section>
 {said}
-<footer class="act">
-<label class="pick"><input type="checkbox" data-pick="{row['id']}"> Pick for a letter</label>
-<a href="{_esc(row['url'])}" target="_blank" rel="noreferrer noopener">Open the posting &rarr;</a>
-</footer>
+{_act(row, live, state)}
 </div>
 </details>"""
 
@@ -381,7 +485,7 @@ def _table(rows, headers):
     return f'<div class="scroll"><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>'
 
 
-def render(store, rules, companies=None, now=None, tokens=None):
+def render(store, rules, companies=None, now=None, tokens=None, live=False):
     now = now or datetime.now(timezone.utc)
     week = digest_mod._week(now)
     since = digest_mod._since(now)
@@ -394,7 +498,10 @@ def render(store, rules, companies=None, now=None, tokens=None):
         d = json.loads(r["score_json"] or "{}")
         return {"legs": d.get("legs_hit") or [], "money": bool(r["comp_found"])}
     seen = [(r, "apply") for r in piles["apply"]] + [(r, "review") for r in review]
-    cards = [_card(r, companies, pile) for r, pile in seen]
+    # The console shows what he already decided about a row, so a decision made
+    # on Tuesday is still lit on Thursday rather than being asked again.
+    states = {r["id"]: store.state_of(r["id"]) for r, _ in seen} if live else {}
+    cards = [_card(r, companies, pile, live, states.get(r["id"])) for r, pile in seen]
     facts_all = [facts(r) for r, _ in seen]
     stamp = digest_mod.code_stamp()
 
@@ -441,7 +548,7 @@ def render(store, rules, companies=None, now=None, tokens=None):
              ('<ul class="quiet">' + "".join(f"<li>{_esc(p)}</li>" for p in health) + "</ul>") if health
              else '<p class="quiet">All sources answered.</p>']
 
-    script = FILTER_JS
+    script = FILTER_JS + (LIVE_JS if live else "")
 
     return f"""<!doctype html>
 <html lang="en">
