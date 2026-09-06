@@ -502,9 +502,12 @@ def render(store, rules, companies=None, now=None, tokens=None):
 
 def write(store, rules, path_dir, companies=None, now=None):
     """The dated page beside the dated markdown, so the week is a file rather
-    than a message that scrolls away."""
+    than a message that scrolls away. Returns (path, cards on it), because the
+    page and the markdown stopped counting the same thing the moment the page
+    started carrying the whole week."""
     now = now or datetime.now(timezone.utc)
     path = Path(path_dir) / f"{digest_mod._week(now)}.html"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(render(store, rules, companies, now), encoding="utf-8")
-    return path
+    html = render(store, rules, companies, now)
+    path.write_text(html, encoding="utf-8")
+    return path, html.count('<details class="card"')

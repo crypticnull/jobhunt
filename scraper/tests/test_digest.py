@@ -80,7 +80,7 @@ class Digest(unittest.TestCase):
 
     def test_write_marks_and_unchanged_stay_quiet(self):
         with tempfile.TemporaryDirectory() as d:
-            path, n, page = digest.write(self.s, self.r, Path(d), COMPANIES, NOW)
+            path, n, page, on_page = digest.write(self.s, self.r, Path(d), COMPANIES, NOW)
             self.assertTrue(page.exists(), "the page is written beside the markdown")
             self.assertEqual(page.suffix, ".html")
             self.assertTrue(path.name.endswith("W36.md"))
@@ -432,20 +432,24 @@ class PageSurvivesRerun(unittest.TestCase):
         self.s.set_score(pid, score(self.s.get(pid), self.r, NOW, COMPANIES["acme"]))
 
     def test_second_run_keeps_the_week_on_the_page(self):
-        first, n1, page = digest.write(self.s, self.r, self.dir, COMPANIES, NOW)
+        first, n1, page, on_page1 = digest.write(self.s, self.r, self.dir, COMPANIES, NOW)
         self.assertEqual(n1, 1)
         self.assertIn("<h3>What they wrote</h3>", page.read_text(encoding="utf-8"))
-        _, n2, page2 = digest.write(self.s, self.r, self.dir, COMPANIES, NOW)
+        _, n2, page2, on_page2 = digest.write(self.s, self.r, self.dir, COMPANIES, NOW)
         html = page2.read_text(encoding="utf-8")
         self.assertEqual(n2, 0, "the markdown still only records what is new")
         self.assertEqual(html.count('<details class="card"'), 1, "the page still carries the week")
         self.assertIn("Pipeline and product work", html)
+        # The two counts are what the command prints, one per file. Printing the
+        # markdown's beside the page's name read as an empty page on a run that
+        # had just rewritten every card on it.
+        self.assertEqual((on_page1, on_page2), (1, 1))
 
     def test_a_posting_surfaced_before_the_week_stays_off_the_page(self):
         """kept_since is a week, not forever, or the page grows without end."""
         digest.write(self.s, self.r, self.dir, COMPANIES, NOW)
         self.s.db.execute("UPDATE postings SET digested_at = ?", ("2026-08-01T00:00:00+00:00",))
         self.s.db.commit()
-        _, _, page = digest.write(self.s, self.r, self.dir, COMPANIES, NOW)
+        _, _, page, _on = digest.write(self.s, self.r, self.dir, COMPANIES, NOW)
         self.assertEqual(page.read_text(encoding="utf-8").count('<details class="card"'), 0)
 

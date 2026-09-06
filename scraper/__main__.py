@@ -252,13 +252,15 @@ def cmd_digest(args):
             md, _ = digest.build(store, rules, by_slug, heartbeat=HEARTBEAT)
             print(md)
             return 0
-        path, n, page = digest.write(store, rules, Path(args.out), by_slug, heartbeat=HEARTBEAT)
+        path, n, page, on_page = digest.write(store, rules, Path(args.out), by_slug, heartbeat=HEARTBEAT)
     finally:
         store.close()
-    # The page is the one he opens, so it is the one named first. Writing it
-    # without saying so meant a file nobody knew existed.
-    print(f"wrote {page}, {n} postings surfaced")
-    print(f"      {path}")
+    # The page is the one he opens, so it is the one named first. Two counts,
+    # because they stopped being the same number: the page carries the week and
+    # the markdown records what is new. Printing the markdown's count beside the
+    # page's name read as an empty page on a run that had rewritten forty cards.
+    print(f"wrote {page}, {on_page} postings on the page")
+    print(f"      {path}, {n} new since the last run")
     return 0
 
 
