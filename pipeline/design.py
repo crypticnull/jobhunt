@@ -36,6 +36,20 @@ def _vars(pairs, indent="  "):
     return "\n".join(f"{indent}--{k}: {v};" for k, v in pairs)
 
 
+def score_vars(score):
+    """One colour per rule, composed from the levers rather than written out.
+    Every stop shares --score-l and one of the two chromas, so the hue is the
+    only thing that differs and --score-c moves the whole set at once. A rule
+    the record calls loud takes the full chroma; the rest recede to ground."""
+    loud = set(score.get("loud") or [])
+    out = []
+    for key in score.get("hue", {}):
+        rule = key[len("score-h-"):]
+        c = "var(--score-c)" if rule in loud else "var(--score-c-quiet)"
+        out.append((f"score-{rule}", f"oklch(var(--score-l) {c} var(--{key}))"))
+    return out
+
+
 def token_css(t=None, *, dark=True, motion=True):
     """The custom properties, in the shape tools/tokens.mjs writes them. Light
     on bare :root so an unstamped document has a full palette, the dark blocks
@@ -50,7 +64,8 @@ def token_css(t=None, *, dark=True, motion=True):
     reduced = [(m["name"], m["reduced"]) for m in t["motion"]["tokens"] if m["default"] != m["reduced"]]
     score = t["colour"].get("score") or {}
     base = (list(t["colour"]["light"].items()) + list(t["colour"]["plate"].items())
-            + list(score.get("light", {}).items())
+            + list(score.get("light", {}).items()) + list(score.get("hue", {}).items())
+            + score_vars(score)
             + list(t["type"].items()) + list(t["grid"].items()) + (mot if motion else []))
     out = [":root {", _vars(base)]
     out.append("  color-scheme: light dark;" if dark else "  color-scheme: light;")
