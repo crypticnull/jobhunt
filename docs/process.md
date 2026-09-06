@@ -53,6 +53,22 @@ job that quietly stopped is visible in the repo rather than only in its
 silence. The digest says so at the top when the last poll is two days old
 or more.
 
+## What CI costs
+
+Two jobs. The Python one is seventeen seconds. The site one was three and a
+half minutes, and three of those were Lighthouse, because it was five pages
+times three runs on every push and every pull request.
+
+The three runs are there for the performance score, which is noisy on a
+shared runner and needs a median to mean anything. Layout shift and
+accessibility are not noisy, and on this site they are the two that actually
+catch a regression. So a pull request runs three pages once and asserts those
+two as errors with performance as a warning, which takes about forty seconds,
+and the push to main runs the full five pages three times with performance as
+an error, where nobody is waiting on the answer. A regression that only the
+full gate can see lands on main and is caught within three minutes of getting
+there.
+
 ## Working on the site
 
 `dev.cmd` at the repo root starts it from anywhere, installs on the first run

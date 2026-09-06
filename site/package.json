@@ -7,7 +7,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "lighthouse": "lhci autorun"
+    "lighthouse": "lhci autorun",
+    "lighthouse:pr": "lhci autorun --config=lighthouserc.pr.json"
   },
   "dependencies": {
     "astro": "7.2.10"
