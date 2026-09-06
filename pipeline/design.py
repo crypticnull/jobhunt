@@ -48,13 +48,15 @@ def token_css(t=None, *, dark=True, motion=True):
     t = t or tokens()
     mot = [(m["name"], m["default"]) for m in t["motion"]["tokens"]]
     reduced = [(m["name"], m["reduced"]) for m in t["motion"]["tokens"] if m["default"] != m["reduced"]]
+    score = t["colour"].get("score") or {}
     base = (list(t["colour"]["light"].items()) + list(t["colour"]["plate"].items())
+            + list(score.get("light", {}).items())
             + list(t["type"].items()) + list(t["grid"].items()) + (mot if motion else []))
     out = [":root {", _vars(base)]
     out.append("  color-scheme: light dark;" if dark else "  color-scheme: light;")
     out.append("}")
     if dark:
-        d = list(t["colour"]["dark"].items())
+        d = list(t["colour"]["dark"].items()) + list(score.get("dark", {}).items())
         out += ["@media (prefers-color-scheme: dark) {",
                 '  :root:not([data-theme="light"]) {', _vars(d, "    "), "  }", "}",
                 ':root[data-theme="dark"] {', _vars(d), "  color-scheme: dark;", "}"]

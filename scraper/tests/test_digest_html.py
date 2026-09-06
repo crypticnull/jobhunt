@@ -101,6 +101,29 @@ class Page(unittest.TestCase):
         self.assertNotIn("Week 36 Shortlist", self.html)
         self.assertIn("2026-W36", self.html, "the ISO week still identifies the file")
 
+    def test_every_scoring_rule_has_its_own_colour(self):
+        """The strip under a posting is the shape of its score, so a rule that
+        shares a colour with another rule is a rule you cannot read. The two
+        accents differ only in hue, so the ramp is that arc and every stop is a
+        colour the brand could have had."""
+        from pipeline import design
+        score = design.tokens()["colour"]["score"]
+        for theme in ("light", "dark"):
+            names = {f"score-{r}" for r in digest_html.RULES_ORDER}
+            self.assertEqual(set(score[theme]), names, theme)
+            self.assertEqual(len(set(score[theme].values())), len(names), f"{theme}: two rules share a colour")
+
+    def test_the_strip_and_the_breakdown_agree(self):
+        """Same encoding at two sizes. Learn the strip once and the detail
+        needs no legend of its own."""
+        for rule in ("remote", "comp", "intersection"):
+            self.assertIn(f"var(--score-{rule})", self.html)
+        self.assertNotIn('class="neg"', self.html, "sign is carried by the number, not a second colour")
+
+    def test_the_legend_names_every_stop(self):
+        for rule in digest_html.RULES_ORDER:
+            self.assertIn(f'<b><i style="background:var(--score-{rule})"></i>{rule}</b>', self.html)
+
     def test_nothing_is_fetched_from_anywhere(self):
         """It opens from disk, off a plane, in a year. No request leaves it."""
         for pattern in ("http://", "src=", "<link", "@import", "url("):

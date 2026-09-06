@@ -32,8 +32,6 @@ from . import digest as digest_mod
 # The order the score prints in, from the markdown, so the two read the same
 # and neither can quietly start leaving a rule out.
 RULES_ORDER = digest_mod.SCORE_ORDER
-# The two rules worth seeing in the strip without reading a number.
-HOT = {"intersection", "deductions"}
 
 
 def _dateline(now):
@@ -79,7 +77,8 @@ PAGE_CSS = """
 
   .key { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: .75rem; font-family: var(--mono); font-size: var(--step-xx); color: var(--muted); align-items: center; }
   .key b { font-weight: 400; display: inline-flex; align-items: center; gap: .35rem; }
-  .key i { width: 1.4rem; height: 4px; display: inline-block; }
+  .key i { width: 1.1rem; height: 5px; display: inline-block; }
+  .key { gap: .35rem .9rem; }
 
   .bar { display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: flex-end; margin: 2rem 0 .25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--rule); }
   .grp { display: flex; flex-direction: column; gap: .4rem; }
@@ -114,7 +113,7 @@ PAGE_CSS = """
   .pay { font-family: var(--mono); font-size: var(--step-x); font-variant-numeric: tabular-nums; }
   .pay.none { color: var(--muted); font-style: italic; font-family: var(--body); }
   /* The score as a strip, so a screenful of them compare without reading a number. */
-  .strip { display: flex; height: 4px; background: var(--rule); overflow: hidden; }
+  .strip { display: flex; gap: 1px; height: 5px; background: var(--rule); overflow: hidden; }
   .strip i { display: block; height: 100%; }
   .legs { display: flex; flex-wrap: wrap; gap: .25rem; }
   .leg { font-family: var(--mono); font-size: var(--step-xx); text-transform: uppercase; letter-spacing: .05em; padding: .12rem .35rem; border: 1px solid var(--rule); color: var(--muted); }
@@ -129,8 +128,7 @@ PAGE_CSS = """
   .rows { display: grid; gap: .3rem; }
   .row { display: grid; grid-template-columns: 6.5rem 1fr 2.4rem; gap: .6rem; align-items: center; font-family: var(--mono); font-size: var(--step-xx); }
   .row span:first-child { color: var(--muted); }
-  .row i { display: block; height: 6px; background: var(--blueprint); }
-  .row i.neg { background: var(--marker); }
+  .row i { display: block; height: 6px; }
   .row b { font-weight: 400; font-variant-numeric: tabular-nums; text-align: right; }
   .notes { display: grid; gap: .45rem; font-size: var(--step-x); max-width: 44ch; }
   .notes p { margin: 0; }
@@ -245,14 +243,13 @@ def _card(row, companies, pile):
 
     total = sum(v for v in parts.values() if v > 0) or 1
     strip = "".join(
-        f'<i style="width:{parts[k] / total * 100:.1f}%;background:'
-        f'{"var(--marker)" if k in HOT else "var(--blueprint)"}"></i>'
+        f'<i style="width:{parts[k] / total * 100:.1f}%;background:var(--score-{k})"></i>'
         for k in RULES_ORDER if parts.get(k, 0) > 0
     )
     widest = max([abs(v) for v in parts.values()] or [1]) or 1
     rows = "".join(
         f'<div class="row"><span>{_esc(k)}</span>'
-        f'<i class="{"neg" if parts[k] < 0 else ""}" style="width:{abs(parts[k]) / widest * 100:.0f}%"></i>'
+        f'<i style="width:{abs(parts[k]) / widest * 100:.0f}%;background:var(--score-{k})"></i>'
         f'<b>{parts[k]:+d}</b></div>'
         for k in RULES_ORDER if k in parts
     )
@@ -339,6 +336,7 @@ def render(store, rules, companies=None, now=None, tokens=None):
                 f'card are what the body actually asked for, so <b class="warn">product-motion</b> is the one to scan for. '
                 f'<b>None of the {n_apply} in Apply have it.</b>')
 
+    key = "".join(f'<b><i style="background:var(--score-{k})"></i>{_esc(k)}</b>' for k in RULES_ORDER)
     tabs = "".join(
         f'<button class="tab" data-f="{f}" aria-pressed="{"true" if f == "all" else "false"}">{label}<span class="c">{n}</span></button>'
         for f, label, n in [("all", "Everything", len(cards)), ("apply", "Apply", n_apply),
@@ -385,9 +383,8 @@ def render(store, rules, companies=None, now=None, tokens=None):
   <div><span class="n">{nocomp}</span><span class="k">no comp posted</span></div>
 </div>
 <div class="key">
-  <span>Score strip</span>
-  <b><i style="background:var(--blueprint)"></i>remote, pay, title, company, curriculum, freshness</b>
-  <b><i style="background:var(--marker)"></i>the intersection, and anything deducted</b>
+  <span>Score strip, left to right</span>
+  {key}
 </div>
 
 <div class="bar">
