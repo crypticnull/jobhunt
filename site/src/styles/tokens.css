@@ -18,16 +18,19 @@
      plate-marker  on plate     6.62 /   6.62
 
    Motion, default and reduced, a decision per movement:
-     --t-quick   120ms                        120ms    row hover tint, hover intent timer
-     --t-fade    380ms                        380ms    preview in, plate crossfade
-     --t-slide   230ms                        0ms      the chapter rail mark
-     --t-blink   500ms                        0ms      the record dot while a clip plays
-     --ease-out  cubic-bezier(0.2, 0, 0, 1)   linear   anything entering or moving
-     --ease-in   cubic-bezier(0.4, 0, 1, 1)   linear   anything leaving
-     --slip-x    0.34em                       0.34em   how far a misregistered word slips
-     --rise-y    0.5rem                       0.5rem   how far the hero rises on first paint
-     --press     0.985                        1        the scale a tile takes while pressed
-     --slip-band 13rem                        13rem    how far from the cursor a word still lifts
+     --respond       120ms                        120ms    link and row hover, focus, the press, the hover intent timer
+     --beat          120ms                        120ms    the gap between the hero sentence and the line under it
+     --enter-page    200ms                        200ms    the hero rise on first paint
+     --enter-overlay 480ms                        0ms      the still growing from its tile to full size
+     --move-mark     230ms                        0ms      the chapter rail mark sliding under its label
+     --slip          230ms                        0ms      the misregistration offset and the fringe tint that rides with it
+     --pulse         500ms                        0ms      the record dot while a clip plays
+     --ease-out      cubic-bezier(0.2, 0, 0, 1)   linear   anything entering or moving
+     --ease-in       cubic-bezier(0.4, 0, 1, 1)   linear   anything leaving
+     --slip-x        0.34em                       0.34em   how far a misregistered word slips
+     --rise-y        0.5rem                       0.5rem   how far the hero rises on first paint
+     --press         0.985                        1        the scale a tile takes while pressed
+     --slip-band     13rem                        13rem    how far from the cursor a word still lifts
      scroll      smooth                       auto
 */
 :root {
@@ -47,10 +50,13 @@
   --gutter: clamp(1rem, 4vw, 3rem);
   --grid-gap: 1.5rem;
   --measure: 66ch;
-  --t-quick: 120ms;
-  --t-fade: 380ms;
-  --t-slide: 230ms;
-  --t-blink: 500ms;
+  --respond: 120ms;
+  --beat: 120ms;
+  --enter-page: 200ms;
+  --enter-overlay: 480ms;
+  --move-mark: 230ms;
+  --slip: 230ms;
+  --pulse: 500ms;
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --slip-x: 0.34em;
@@ -85,16 +91,20 @@
 }
 @media (prefers-reduced-motion: reduce) {
   :root:not([data-motion="full"]) {
-    --t-slide: 0ms;
-    --t-blink: 0ms;
+    --enter-overlay: 0ms;
+    --move-mark: 0ms;
+    --slip: 0ms;
+    --pulse: 0ms;
     --ease-out: linear;
     --ease-in: linear;
     --press: 1;
   }
 }
 :root[data-motion="reduce"] {
-  --t-slide: 0ms;
-  --t-blink: 0ms;
+  --enter-overlay: 0ms;
+  --move-mark: 0ms;
+  --slip: 0ms;
+  --pulse: 0ms;
   --ease-out: linear;
   --ease-in: linear;
   --press: 1;

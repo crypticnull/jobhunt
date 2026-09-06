@@ -43,7 +43,7 @@ const ratio = `${video.width} / ${video.height}`;
 <script>
   // D1. The dot marks a clip that is running, and nothing else on the page
   // moves on its own, so it is the one thing that says "this is playing"
-  // without a chrome overlay. --t-blink is 0ms under reduce, which stops the
+  // without a chrome overlay. --pulse is 0ms under reduce, which stops the
   // blink and leaves the dot lit, which is still the right answer.
   for (const fig of document.querySelectorAll<HTMLElement>("figure.has-dot")) {
     const v = fig.querySelector("video");
@@ -67,7 +67,7 @@ const ratio = `${video.width} / ${video.height}`;
     height: 0.55rem;
     border-radius: 50%;
     background: var(--marker);
-    animation: rec-blink var(--t-blink) steps(2, jump-none) infinite;
+    animation: rec-blink var(--pulse) steps(2, jump-none) infinite;
     pointer-events: none;
   }
   @keyframes rec-blink {

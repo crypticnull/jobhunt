@@ -17,8 +17,8 @@ const decisions = [
     ask: "First paint. The sentence has four seconds to say what you are before a visitor files you as a motion designer. Motion can carry that or spend it.",
     options: [
       { id: "A0", name: "Cut", token: "none", note: "The sentence is there on the first frame. Fastest to read, and the most confident thing a page can do." },
-      { id: "A1", picked: true, name: "Fade up", token: "--t-fade", note: "Eight pixels and an opacity ramp. Costs 160ms of reading time and buys a sense that the page arrived rather than appeared." },
-      { id: "A2", name: "Rule, then text", token: "--t-slide then --t-fade", note: "A marker rule draws across, the sentence follows. Reads as drafting, which is the system's whole idea, but it is the slowest and it sequences." },
+      { id: "A1", picked: true, name: "Fade up", token: "--enter-page", note: "Eight pixels and an opacity ramp. Costs a fifth of a second of reading time and buys a sense that the page arrived rather than appeared." },
+      { id: "A2", name: "Rule, then text", token: "--enter-page, twice", note: "A marker rule draws across, the sentence follows. Reads as drafting, which is the system's whole idea, but it is the slowest and it sequences." },
     ],
   },
   {
@@ -28,8 +28,8 @@ const decisions = [
     ask: "The click from the index into a study. The still is the same image on both pages, which is the one fact an interaction here can use.",
     options: [
       { id: "B0", name: "Plain", token: "none", note: "A navigation. Nothing to maintain, nothing to go wrong on a slow connection." },
-      { id: "B1", picked: true, name: "Press", token: "--t-quick", note: "The tile acknowledges the press and nothing else. Cheap, and it is the part people actually notice." },
-      { id: "B2", name: "The still holds", token: "--t-fade", note: "The image persists across the navigation and the rest of the page changes around it. The strongest signal of craft here, and the only option with a real failure mode." },
+      { id: "B1", picked: true, name: "Press", token: "--respond", note: "The tile acknowledges the press and nothing else. Cheap, and it is the part people actually notice." },
+      { id: "B2", name: "The still holds", token: "--enter-overlay", note: "The image persists across the navigation and the rest of the page changes around it. The strongest signal of craft here, and the only option with a real failure mode." },
     ],
   },
   {
@@ -39,29 +39,29 @@ const decisions = [
     ask: "Boards and styleframes are the proof, and a 20rem grid tile is not where anyone judges a frame. This one matters more than it looks.",
     options: [
       { id: "C0", name: "Nothing", token: "none", note: "The grid is the whole experience. Honest, and it wastes the process material the studies are built around." },
-      { id: "C1", name: "Dialog", token: "--t-fade", note: "Native dialog, backdrop, escape closes it, focus returns. The accessible answer with the least code." },
-      { id: "C2", picked: true, name: "Grows from the tile", token: "--t-fade", note: "The frame scales up from where it sat. Better sense of place, more to get wrong on a phone." },
+      { id: "C1", name: "Dialog", token: "--enter-overlay", note: "Native dialog, backdrop, escape closes it, focus returns. The accessible answer with the least code." },
+      { id: "C2", picked: true, name: "Grows from the tile", token: "--enter-overlay", note: "The frame scales up from where it sat. Better sense of place, more to get wrong on a phone." },
     ],
   },
   {
     id: "register",
     n: "E",
     title: "Misregistration",
-    ask: "A press out of register prints the plates a hair apart and leaves a coloured fringe beside the type. Per word, on hover, so the page answers where the eye is rather than everywhere at once. The offset takes --t-slide, a cut under reduce, and the tint takes --t-fade.",
+    ask: "A press out of register prints the plates a hair apart and leaves a coloured fringe beside the type. Per word, on hover, so the page answers where the eye is rather than everywhere at once. Offset and tint both take --slip, because they are one event rather than two, and it is a cut under reduce.",
     options: [
-      { id: "E1", name: "One fringe", token: "--t-slide, --t-fade", note: "A marker ghost slides right off the true impression. Reads as a hover glow rather than as a press fault." },
-      { id: "E2", picked: true, name: "Full misregistration", token: "--t-slide, --t-fade", note: "Marker one way, blueprint the other, which is what a four colour press actually does when it slips. On the builds list now, and it spends the second accent colour, which otherwise does almost nothing here." },
-      { id: "E3", name: "The pair separates", token: "--t-slide, --t-fade", note: "The ghost goes one way and the word itself moves a hair the other. Reads as the sheet shifting rather than as ink smearing, and it is the only one that moves the text you are reading." },
+      { id: "E1", name: "One fringe", token: "--slip", note: "A marker ghost slides right off the true impression. Reads as a hover glow rather than as a press fault." },
+      { id: "E2", picked: true, name: "Full misregistration", token: "--slip", note: "Marker one way, blueprint the other, which is what a four colour press actually does when it slips. On the builds list now, and it spends the second accent colour, which otherwise does almost nothing here." },
+      { id: "E3", name: "The pair separates", token: "--slip", note: "The ghost goes one way and the word itself moves a hair the other. Reads as the sheet shifting rather than as ink smearing, and it is the only one that moves the text you are reading." },
     ],
   },
   {
     id: "dot",
     n: "D",
     title: "The recording dot",
-    ask: "The token record declares --t-blink for a dot that marks a clip playing. Nothing on the site performs it.",
+    ask: "The token record declares --pulse for a dot that marks a clip playing. Nothing on the site performs it.",
     options: [
-      { id: "D0", name: "Drop it", token: "removes --t-blink", note: "The record stops documenting a movement the product does not have." },
-      { id: "D1", picked: true, name: "Build it", token: "--t-blink", note: "A marker dot beside a playing clip. One more moving thing on a page whose job is to be read." },
+      { id: "D0", name: "Drop it", token: "removes --pulse", note: "The record stops documenting a movement the product does not have." },
+      { id: "D1", picked: true, name: "Build it", token: "--pulse", note: "A marker dot beside a playing clip. One more moving thing on a page whose job is to be read." },
     ],
   },
 ];
@@ -165,12 +165,20 @@ const HINTS = {
     <div class="dial-groups">
       {[
         {
-          legend: "duration",
+          legend: "responsive",
           rows: [
-            { v: "t-quick", label: "quick", min: 0, max: 600, step: 10, unit: "ms" },
-            { v: "t-fade", label: "fade", min: 0, max: 900, step: 10, unit: "ms" },
-            { v: "t-slide", label: "slide", min: 0, max: 900, step: 10, unit: "ms" },
-            { v: "t-blink", label: "blink", min: 100, max: 3000, step: 50, unit: "ms" },
+            { v: "respond", label: "respond", min: 0, max: 600, step: 10, unit: "ms" },
+            { v: "beat", label: "beat", min: 0, max: 600, step: 10, unit: "ms" },
+          ],
+        },
+        {
+          legend: "expressive",
+          rows: [
+            { v: "enter-page", label: "page", min: 0, max: 900, step: 10, unit: "ms" },
+            { v: "enter-overlay", label: "overlay", min: 0, max: 1200, step: 10, unit: "ms" },
+            { v: "move-mark", label: "mark", min: 0, max: 900, step: 10, unit: "ms" },
+            { v: "slip", label: "fringe", min: 0, max: 900, step: 10, unit: "ms" },
+            { v: "pulse", label: "pulse", min: 100, max: 3000, step: 50, unit: "ms" },
           ],
         },
         {
@@ -554,10 +562,10 @@ const HINTS = {
 
   [data-spec="A1"].run strong,
   [data-spec="A1"].run em {
-    animation: rise var(--t-fade) var(--ease-out) both;
+    animation: rise var(--enter-page) var(--ease-out) both;
   }
   [data-spec="A1"].run em {
-    animation-delay: var(--t-quick);
+    animation-delay: var(--beat);
   }
   [data-spec="A1"] .rule {
     visibility: hidden;
@@ -567,12 +575,12 @@ const HINTS = {
     transform: scaleX(0);
   }
   [data-spec="A2"].run .rule {
-    animation: draw var(--t-slide) var(--ease-out) both;
+    animation: draw var(--enter-page) var(--ease-out) both;
   }
   [data-spec="A2"].run strong,
   [data-spec="A2"].run em {
-    animation: rise var(--t-fade) var(--ease-out) both;
-    animation-delay: var(--t-slide);
+    animation: rise var(--enter-page) var(--ease-out) both;
+    animation-delay: var(--enter-page);
   }
 
   [data-spec="A0"] .rule {
@@ -582,7 +590,7 @@ const HINTS = {
   /* B1 is the press itself. Holding the mouse down holds the scale, which is
      the whole point and the one thing an autoplayer could never show. */
   [data-spec="B1"] .tile {
-    transition: transform var(--t-quick) var(--ease-out);
+    transition: transform var(--respond) var(--ease-out);
   }
   .stage:active [data-spec="B1"] .tile {
     transform: scale(var(--press));
@@ -590,10 +598,10 @@ const HINTS = {
   /* B2 is the still carrying across a navigation, so it latches rather than
      springing back. Click again to send it home. */
   [data-spec="B2"] .tile {
-    transition: transform var(--t-fade) var(--ease-out);
+    transition: transform var(--enter-overlay) var(--ease-out);
   }
   [data-spec="B2"] .tile-meta {
-    transition: opacity var(--t-fade) var(--ease-in);
+    transition: opacity var(--enter-overlay) var(--ease-in);
   }
   [data-spec="B2"].gone .tile {
     transform: scale(1.35);
@@ -604,8 +612,8 @@ const HINTS = {
 
   .specimen .sheet {
     transition:
-      opacity var(--t-fade) var(--ease-out),
-      transform var(--t-fade) var(--ease-out);
+      opacity var(--enter-overlay) var(--ease-out),
+      transform var(--enter-overlay) var(--ease-out);
   }
   [data-spec="C1"].open .sheet {
     opacity: 0.92;
@@ -628,7 +636,7 @@ const HINTS = {
     opacity: 1;
   }
   [data-spec="D1"].playing .dot {
-    animation: blink var(--t-blink) steps(2, jump-none) infinite alternate;
+    animation: blink var(--pulse) steps(2, jump-none) infinite alternate;
   }
   .specimen .tile-meta {
     opacity: 0.4;
@@ -690,7 +698,7 @@ const HINTS = {
     display: none;
   }
   .reg.E3 :global(.true) {
-    transition: transform var(--t-slide) var(--ease-out);
+    transition: transform var(--slip) var(--ease-out);
   }
   .reg.E3 :global(.slip.near .true) {
     transform: translateX(calc(var(--slip-x) * -0.4));
