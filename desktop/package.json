@@ -1,0 +1,28 @@
+{
+  "name": "jobhunt-desktop",
+  "private": true,
+  "version": "1.0.0",
+  "description": "The job hunt as one desktop window: the search console and the site sandbox.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "44.2.0"
+  },
+  "build": {
+    "appId": "com.mattrodenbeck.jobhunt",
+    "productName": "Job Hunt",
+    "files": [
+      "main.js",
+      "preload.js",
+      "shell.html",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  }
+}

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-src http://127.0.0.1:4319 http://127.0.0.1:4321 http://localhost:4321;">
+<title>Job Hunt</title>
+<style>
+  /* The shell is a frame around two views and nothing else, so it owns four
+     colours and gets out of the way. The views bring the design system with
+     them, and a second palette out here would be a second design system. */
+  :root { --plate: #0b0c0d; --ink: #e6e8e4; --muted: #9aa0a6; --rule: #1a1d20; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; background: var(--plate); color: var(--ink);
+    font: 400 13px/1.4 "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  body { display: grid; grid-template-rows: auto 1fr; }
+  .bar { display: flex; align-items: center; gap: .25rem; padding: .35rem .5rem;
+    border-bottom: 1px solid var(--rule); -webkit-app-region: drag; }
+  button { -webkit-app-region: no-drag; font: inherit; text-transform: uppercase;
+    letter-spacing: .06em; font-size: 11px; color: var(--muted); background: none;
+    border: 1px solid transparent; padding: .35rem .8rem; cursor: pointer; }
+  button:hover { color: var(--ink); }
+  button[aria-pressed="true"] { color: var(--plate); background: var(--ink); }
+  .state { margin-left: auto; color: var(--muted); font-size: 11px; padding-right: .5rem; }
+  .views { position: relative; }
+  iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--plate); }
+  [hidden] { display: none !important; }
+  .note { display: grid; place-content: center; height: 100%; color: var(--muted); text-align: center; padding: 2rem; }
+</style>
+</head>
+<body>
+  <nav class="bar">
+    <button id="b-search" data-view="search" aria-pressed="true">Search</button>
+    <button id="b-site" data-view="site" aria-pressed="false">Site</button>
+    <span class="state" id="state">starting the console</span>
+  </nav>
+  <div class="views">
+    <div class="note" id="note">Starting the console. It reads your own store, so this takes a second.</div>
+    <iframe id="search" hidden src="about:blank"></iframe>
+    <iframe id="site" hidden src="about:blank"></iframe>
+  </div>
+
+<script>
+  const els = {
+    search: document.getElementById("search"),
+    site: document.getElementById("site"),
+    note: document.getElementById("note"),
+    state: document.getElementById("state"),
+  };
+  const buttons = [...document.querySelectorAll("button[data-view]")];
+  let view = "search";
+  let siteStarted = false;
+
+  function paint() {
+    for (const b of buttons) b.setAttribute("aria-pressed", String(b.dataset.view === view));
+    els.search.hidden = view !== "search" || !els.search.dataset.loaded;
+    els.site.hidden = view !== "site" || !els.site.dataset.loaded;
+    els.note.hidden = (view === "search" && els.search.dataset.loaded)
+                   || (view === "site" && els.site.dataset.loaded);
+  }
+
+  async function show(next) {
+    view = next;
+    if (next === "site" && !siteStarted) {
+      siteStarted = true;
+      els.note.textContent = "Starting the site. The first run installs it, so give it a minute.";
+      els.state.textContent = "starting the site";
+      paint();
+      const ok = await window.jobhunt.startSite();
+      if (ok === "ready") {
+        els.site.src = "http://localhost:4321/";
+        els.site.dataset.loaded = "1";
+        els.state.textContent = "";
+      } else {
+        // Saying what to look at beats a spinner that never resolves.
+        siteStarted = false;
+        els.note.textContent = "The site did not start. The terminal that launched this has the reason.";
+        els.state.textContent = "site failed";
+      }
+    }
+    paint();
+  }
+
+  for (const b of buttons) b.addEventListener("click", () => show(b.dataset.view));
+
+  // Asked for on every load, so a reload rebuilds the window from what is
+  // actually running instead of waiting on a message that already went.
+  (async () => {
+    const state = await window.jobhunt.consoleState();
+    if (state === "ready") {
+      els.search.src = "http://127.0.0.1:4319/";
+      els.search.dataset.loaded = "1";
+      els.state.textContent = "";
+    } else {
+      els.note.textContent = "The console did not start. The terminal that launched this has the reason.";
+      els.state.textContent = "console failed";
+    }
+    paint();
+    // A site left running from before the reload is a site this window can show
+    // again without making him click Site and wait for a server that is up.
+    if (await window.jobhunt.siteUp()) {
+      siteStarted = true;
+      els.site.src = "http://localhost:4321/";
+      els.site.dataset.loaded = "1";
+      paint();
+    }
+  })();
+
+  window.jobhunt.onGo((where) => {
+    if (where === "reload") {
+      const f = view === "search" ? els.search : els.site;
+      if (f.dataset.loaded) f.contentWindow.location.reload();
+      return;
+    }
+    show(where);
+  });
+
+  paint();
+</script>
+</body>
+</html>
