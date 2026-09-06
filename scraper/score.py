@@ -365,10 +365,36 @@ def disqualify(p, rules, now):
     return None
 
 
-def legs_hit(p, rules):
+def proof_lead(legs, tier, rules):
+    """What to lead a letter with, decided by what the posting asked for. The
+    first entry in proof_lead_by_leg whose leg the body hit wins, so a posting
+    about motion systems leads with the panel and one about diffusion models
+    leads with the pipeline. Company tier is the fallback only, because tier is
+    a measure of how much he wants the company and says nothing about the job."""
+    by_leg = rules.get("proof_lead_by_leg") or {}
+    for leg in by_leg.get("order", []):
+        if leg in legs and by_leg.get("lead", {}).get(leg):
+            return by_leg["lead"][leg]
+    by_tier = rules["proof_lead_by_tier"]
+    return by_tier.get(str(tier), by_tier["unknown"])
+
+
+def legs_hit(p, rules, terms=None):
+    """The legs the body hit, and optionally the words that hit them. A leg
+    name is the scorer's vocabulary talking to itself: "asks for pipeline"
+    says nothing about the job, while "asset management, versioning" is what
+    the posting actually said. Pass a dict for `terms` and it is filled with
+    {leg: [term, ...]} using the readable form of each pattern."""
     text = f"{p.get('title') or ''}\n{p.get('description') or ''}".lower()
     legs = rules["score"]["intersection"]["legs"]
-    return [leg for leg, terms in legs.items() if _hits(terms, text)]
+    out = []
+    for leg, pats in legs.items():
+        got = _hits(pats, text)
+        if got:
+            out.append(leg)
+            if terms is not None:
+                terms[leg] = [readable(t) for t in got]
+    return out
 
 
 def intersection_points(legs, rules):
@@ -404,7 +430,8 @@ def evaluate(p, rules, company=None, now=None):
     now = now or datetime.now(timezone.utc)
     company = company or {}
     tier = company.get("tier")
-    out = {"version": rules["version"], "flags": [], "deduction_hits": [], "legs_hit": [], "title_tier": None, "proof_lead": rules["proof_lead_by_tier"].get(str(tier), rules["proof_lead_by_tier"]["unknown"])}
+    out = {"version": rules["version"], "flags": [], "deduction_hits": [], "legs_hit": [], "leg_terms": {}, "title_tier": None,
+           "proof_lead": rules["proof_lead_by_tier"].get(str(tier), rules["proof_lead_by_tier"]["unknown"])}
 
     remote_result, remote_reasons, pacific = gate_remote(p, rules)
     out["remote"] = {"result": remote_result, "reasons": remote_reasons, "pacific": pacific}
@@ -431,8 +458,11 @@ def evaluate(p, rules, company=None, now=None):
     flag_rules = rules["disqualifiers"]["flag"]
 
     s = rules["score"]
-    legs = legs_hit(p, rules)
+    leg_terms = {}
+    legs = legs_hit(p, rules, leg_terms)
     out["legs_hit"] = legs
+    out["leg_terms"] = leg_terms
+    out["proof_lead"] = proof_lead(legs, tier, rules)
     tt, title_points = title_tier(p, legs, rules)
     out["title_tier"] = tt
     # The curriculum points forward. A posting asking for what Matt is
@@ -566,6 +596,7 @@ def score(p, rules, now=None, company=None):
         "drop_reason": ev["drop_reason"],
         "proof_lead": ev["proof_lead"],
         "legs_hit": ev["legs_hit"],
+        "leg_terms": ev.get("leg_terms") or {},
         "curriculum": ev.get("curriculum") or [],
         "title_tier": ev["title_tier"],
         "remote": ev["remote"],

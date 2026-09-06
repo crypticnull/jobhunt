@@ -1112,6 +1112,27 @@
     ],
     "apply_title_tiers_note": "Tier C is a motion or 3D title with no generative, software, pipeline or product leg. It is review at most, because it is the work being left, and with posted comp at a tier 2 company it was reaching apply at 66."
   },
+  "proof_lead_by_leg": {
+    "note": "What to lead a letter with, decided by what the posting asked for rather than by company tier. Tier says how much he wants the company and nothing about the job, and choosing by it told him to lead with the Keynote extractor on twenty two of the forty postings of the week to 6 September while ae-llama came up once. First match in order wins; the tier map below is the fallback when a posting hits none of these.",
+    "order": [
+      "product-motion",
+      "generative",
+      "software",
+      "pipeline",
+      "3d",
+      "motion",
+      "product"
+    ],
+    "lead": {
+      "product-motion": "ae-llama",
+      "generative": "local-pipeline",
+      "software": "ae-llama",
+      "pipeline": "file-renamer",
+      "3d": "event-franchises",
+      "motion": "event-franchises",
+      "product": "jobhunt"
+    }
+  },
   "proof_lead_by_tier": {
     "1": "local-pipeline",
     "2": "ae-llama",
