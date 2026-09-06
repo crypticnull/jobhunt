@@ -385,7 +385,10 @@ def render(store, rules, companies=None, now=None, tokens=None):
     now = now or datetime.now(timezone.utc)
     week = digest_mod._week(now)
     since = digest_mod._since(now)
-    piles = digest_mod.select(store, rules, companies, now)
+    # The page carries the whole week, not only what is new since the last run.
+    # The markdown is the record of what arrived; this is the thing he opens and
+    # filters and picks from, and writing it twice in a day must not blank it.
+    piles = digest_mod.select(store, rules, companies, now, kept_since=since)
     review = piles["overflow"] + piles["review"]
     def facts(r):
         d = json.loads(r["score_json"] or "{}")

@@ -412,3 +412,40 @@ class DeadWeightReasons(unittest.TestCase):
             s.close()
         joined = "\n".join(lines)
         self.assertIn("Figma: 16 postings, 0 on target, 14 remote: remote claim is onsite, 2 no title fit", joined)
+
+
+class PageSurvivesRerun(unittest.TestCase):
+    """The markdown is the record of what arrived, the page is the surface he
+    works all week. Writing the digest twice in a day used to leave the page
+    with nothing on it, because select() drops a posting it has already
+    surfaced and the page was reading the same selection as the record."""
+
+    def setUp(self):
+        self.dir = Path(tempfile.mkdtemp())
+        self.s = Store(":memory:")
+        self.r = rules()
+        p = posting(source="greenhouse", source_id="1", company_slug="acme", url="https://x/1",
+                    title="Senior Creative Technologist", remote="remote", location="Remote - US",
+                    description="Pipeline and product work, comfyui, python tooling.",
+                    comp_min=180000, comp_max=220000)
+        pid, _ = self.s.upsert(p, SEEN)
+        self.s.set_score(pid, score(self.s.get(pid), self.r, NOW, COMPANIES["acme"]))
+
+    def test_second_run_keeps_the_week_on_the_page(self):
+        first, n1, page = digest.write(self.s, self.r, self.dir, COMPANIES, NOW)
+        self.assertEqual(n1, 1)
+        self.assertIn("<h3>What they wrote</h3>", page.read_text(encoding="utf-8"))
+        _, n2, page2 = digest.write(self.s, self.r, self.dir, COMPANIES, NOW)
+        html = page2.read_text(encoding="utf-8")
+        self.assertEqual(n2, 0, "the markdown still only records what is new")
+        self.assertEqual(html.count('<details class="card"'), 1, "the page still carries the week")
+        self.assertIn("Pipeline and product work", html)
+
+    def test_a_posting_surfaced_before_the_week_stays_off_the_page(self):
+        """kept_since is a week, not forever, or the page grows without end."""
+        digest.write(self.s, self.r, self.dir, COMPANIES, NOW)
+        self.s.db.execute("UPDATE postings SET digested_at = ?", ("2026-08-01T00:00:00+00:00",))
+        self.s.db.commit()
+        _, _, page = digest.write(self.s, self.r, self.dir, COMPANIES, NOW)
+        self.assertEqual(page.read_text(encoding="utf-8").count('<details class="card"'), 0)
+
