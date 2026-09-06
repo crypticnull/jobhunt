@@ -79,21 +79,31 @@ One number cannot be right for all four, so tuning it for any one of them
 breaks the others silently. That is a **token collision**, and the cure is
 never a compromise value. It is a split by role.
 
-A proposal, keeping every value that got dialled in and changing only the
-names and the wiring:
+Done on 2026-09-06, in ADR-0015. Every duration is named for its job now, the
+way the colours always were:
 
 ```
---respond        120ms   hover tint, focus, press, the slip fringe
+--respond        120ms   hover, focus, the press, the intent timer
+--beat           120ms   the gap between the hero line and its sub
 --enter-page     200ms   the hero rise, because it stands between a
                          reader and the sentence
 --enter-overlay  480ms   the still growing from its tile, the one place
                          the page is allowed to perform
 --move-mark      230ms   the chapter rail
+--slip           230ms   the misregistration offset and its tint
 --pulse          500ms   the record dot
 ```
 
-The slow fade and the quick entrance stop being in conflict, because they were
-never the same decision.
+Three values moved rather than carried over, which is the split doing its work.
+The hero came down from 380 to 200, the overlay went up from 380 to 480, and
+the tint came down from 380 to 230 and joined the offset it rides with, because
+they are one event and not two. The slow fade and the quick entrance stopped
+being in conflict, because they were never the same decision.
+
+A fourth thing fell out of it. `Lightbox.astro` had a comment promising that a
+visitor asking for less motion got the same travel at 0ms, and the record could
+not deliver that while the token was shared with a fade that has no business
+being cut. `--enter-overlay` reduces to 0ms and the comment is true now.
 
 ## 4. Duration is a function of distance
 

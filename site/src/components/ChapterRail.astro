@@ -44,7 +44,7 @@ const missing = CHAPTER_ORDER.filter((k) => !byKind.has(k));
   // The mark moves because the reader did. It is the only part of the rail
   // that changes, so it is the only part that needs watching. Without this
   // script the strip is a plain list of anchors, which is the same page minus
-  // one line. Motion: --t-slide on --ease-out, which is a cut under reduce.
+  // one line. Motion: --move-mark on --ease-out, which is a cut under reduce.
   const rail = document.querySelector<HTMLElement>("nav.rail");
   if (rail && "IntersectionObserver" in window) {
     const links = Array.from(rail.querySelectorAll<HTMLAnchorElement>('a[href^="#"]'));
@@ -88,7 +88,7 @@ const missing = CHAPTER_ORDER.filter((k) => !byKind.has(k));
     border-bottom: 1px solid var(--rule);
   }
   /* The active mark. One element, moved with a transform, so the transition
-     is a composite rather than a reflow. --t-slide is 0ms under reduce. */
+     is a composite rather than a reflow. --move-mark is 0ms under reduce. */
   .rail.has-mark::after {
     content: "";
     position: absolute;
@@ -99,8 +99,8 @@ const missing = CHAPTER_ORDER.filter((k) => !byKind.has(k));
     background: var(--marker);
     transform: translate(var(--mark-x, 0px), calc(var(--mark-y, 0px) - 1px));
     transition:
-      transform var(--t-slide) var(--ease-out),
-      width var(--t-slide) var(--ease-out);
+      transform var(--move-mark) var(--ease-out),
+      width var(--move-mark) var(--ease-out);
     pointer-events: none;
   }
   .rail a[aria-current="location"] {
@@ -127,7 +127,7 @@ const missing = CHAPTER_ORDER.filter((k) => !byKind.has(k));
   .rail a:hover {
     color: var(--marker);
     border-bottom-color: currentColor;
-    transition: color var(--t-quick) var(--ease-out);
+    transition: color var(--respond) var(--ease-out);
   }
   /* Muted, never the rule colour: rule on paper measures 1.3:1 and would fail
      contrast for anything carrying text. */

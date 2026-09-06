@@ -36,7 +36,7 @@
       const shifted = { transform: `translate(${dx}px, ${dy}px) scale(${s})`, opacity: back ? 1 : 0 };
       const settled = { transform: "none", opacity: 1 };
       return frame.animate(back ? [settled, shifted] : [shifted, settled], {
-        duration: ms("--t-fade"),
+        duration: ms("--enter-overlay"),
         easing: ease(),
         fill: "both",
       });
