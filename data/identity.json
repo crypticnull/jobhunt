@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "note": "Who he is, in one record, because the site, the letters and the resume were all going to need the same name and the same sentence and there is no version of that worth keeping in three files. site/src/site.config.mjs imports this, so the site and the documents cannot disagree about the hero line.",
+  "name": "Matt Rodenbeck",
+  "hero": "I realize visions, and build the pipelines that do the work.",
+  "sub": "Production 3D and generative video running locally, plus the tooling and automation that gets it into a real workflow.",
+  "title": "Creative technologist, product motion and motion systems",
+  "location": "Philadelphia today, Pacific Northwest next, remote either way.",
+  "email": "",
+  "github": "https://github.com/crypticnull",
+  "site": ""
+}

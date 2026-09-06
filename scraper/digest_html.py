@@ -22,59 +22,30 @@ breakdown, the flags, the curriculum hits and the command to mark it. It is a
 it works with the script blocked. The script only adds the filters.
 """
 
-import html
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from pipeline import design
 from . import digest as digest_mod
-
-TOKENS = Path(__file__).resolve().parent.parent / "data" / "design" / "tokens.json"
 
 # The order the score prints in, from the markdown, so the two read the same
 # and neither can quietly start leaving a rule out.
 RULES_ORDER = digest_mod.SCORE_ORDER
-# The two rules worth seeing in the strip without reading a number.
-HOT = {"intersection", "deductions"}
 
 
-def _tokens(path=None):
-    return json.loads(Path(path or TOKENS).read_text(encoding="utf-8"))
-
-
-def _vars(pairs, indent="  "):
-    return "\n".join(f"{indent}--{k}: {v};" for k, v in pairs)
-
-
-def token_css(t):
-    """The same custom properties tools/tokens.mjs writes, from the same record.
-    Light on bare :root so an unstamped document has a full palette, the dark
-    blocks only redefine, and the reduced column is a decision per movement
-    rather than a switch that zeroes everything."""
-    motion = [(m["name"], m["default"]) for m in t["motion"]["tokens"]]
-    typ = list(t.get("type", {}).items())
-    reduced = [(m["name"], m["reduced"]) for m in t["motion"]["tokens"] if m["default"] != m["reduced"]]
-    dark = list(t["colour"]["dark"].items())
-    return "\n".join([
-        ":root {",
-        _vars(list(t["colour"]["light"].items()) + list(t["colour"]["plate"].items()) + typ + list(t["grid"].items()) + motion),
-        "  color-scheme: light dark;",
-        "}",
-        "@media (prefers-color-scheme: dark) {",
-        '  :root:not([data-theme="light"]) {',
-        _vars(dark, "    "),
-        "  }",
-        "}",
-        ':root[data-theme="dark"] {',
-        _vars(dark),
-        "  color-scheme: dark;",
-        "}",
-        "@media (prefers-reduced-motion: reduce) {",
-        '  :root:not([data-motion="full"]) {',
-        _vars(reduced, "    "),
-        "  }",
-        "}",
-    ])
+def _dateline(now):
+    """The week said as dates rather than as a number. 2026-W36 is the thirty
+    sixth week of the calendar year, which is correct and is also the first
+    digest ever run, so a heading reading "Week 36" invites the reader to think
+    something is counting wrong. The ISO week stays in the stamp and the file
+    name, where it sorts and is unambiguous."""
+    monday = now - timedelta(days=now.isoweekday() - 1)
+    months = ("January", "February", "March", "April", "May", "June", "July",
+              "August", "September", "October", "November", "December")
+    start = f"{monday.day} {months[monday.month - 1]}"
+    end = f"{now.day} {months[now.month - 1]} {now.year}"
+    return f"{start} to {end}"
 
 
 PAGE_CSS = """
@@ -106,7 +77,8 @@ PAGE_CSS = """
 
   .key { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: .75rem; font-family: var(--mono); font-size: var(--step-xx); color: var(--muted); align-items: center; }
   .key b { font-weight: 400; display: inline-flex; align-items: center; gap: .35rem; }
-  .key i { width: 1.4rem; height: 4px; display: inline-block; }
+  .key i { width: 1.1rem; height: 5px; display: inline-block; }
+  .key { gap: .35rem .9rem; }
 
   .bar { display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: flex-end; margin: 2rem 0 .25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--rule); }
   .grp { display: flex; flex-direction: column; gap: .4rem; }
@@ -141,7 +113,7 @@ PAGE_CSS = """
   .pay { font-family: var(--mono); font-size: var(--step-x); font-variant-numeric: tabular-nums; }
   .pay.none { color: var(--muted); font-style: italic; font-family: var(--body); }
   /* The score as a strip, so a screenful of them compare without reading a number. */
-  .strip { display: flex; height: 4px; background: var(--rule); overflow: hidden; }
+  .strip { display: flex; gap: 1px; height: 5px; background: var(--rule); overflow: hidden; }
   .strip i { display: block; height: 100%; }
   .legs { display: flex; flex-wrap: wrap; gap: .25rem; }
   .leg { font-family: var(--mono); font-size: var(--step-xx); text-transform: uppercase; letter-spacing: .05em; padding: .12rem .35rem; border: 1px solid var(--rule); color: var(--muted); }
@@ -156,8 +128,7 @@ PAGE_CSS = """
   .rows { display: grid; gap: .3rem; }
   .row { display: grid; grid-template-columns: 6.5rem 1fr 2.4rem; gap: .6rem; align-items: center; font-family: var(--mono); font-size: var(--step-xx); }
   .row span:first-child { color: var(--muted); }
-  .row i { display: block; height: 6px; background: var(--blueprint); }
-  .row i.neg { background: var(--marker); }
+  .row i { display: block; height: 6px; }
   .row b { font-weight: 400; font-variant-numeric: tabular-nums; text-align: right; }
   .notes { display: grid; gap: .45rem; font-size: var(--step-x); max-width: 44ch; }
   .notes p { margin: 0; }
@@ -255,8 +226,7 @@ FILTER_JS = """
 """
 
 
-def _esc(v):
-    return html.escape(str(v if v is not None else ""), quote=True)
+_esc = design.esc
 
 
 def _card(row, companies, pile):
@@ -273,14 +243,13 @@ def _card(row, companies, pile):
 
     total = sum(v for v in parts.values() if v > 0) or 1
     strip = "".join(
-        f'<i style="width:{parts[k] / total * 100:.1f}%;background:'
-        f'{"var(--marker)" if k in HOT else "var(--blueprint)"}"></i>'
+        f'<i style="width:{parts[k] / total * 100:.1f}%;background:var(--score-{k})"></i>'
         for k in RULES_ORDER if parts.get(k, 0) > 0
     )
     widest = max([abs(v) for v in parts.values()] or [1]) or 1
     rows = "".join(
         f'<div class="row"><span>{_esc(k)}</span>'
-        f'<i class="{"neg" if parts[k] < 0 else ""}" style="width:{abs(parts[k]) / widest * 100:.0f}%"></i>'
+        f'<i style="width:{abs(parts[k]) / widest * 100:.0f}%;background:var(--score-{k})"></i>'
         f'<b>{parts[k]:+d}</b></div>'
         for k in RULES_ORDER if k in parts
     )
@@ -367,6 +336,7 @@ def render(store, rules, companies=None, now=None, tokens=None):
                 f'card are what the body actually asked for, so <b class="warn">product-motion</b> is the one to scan for. '
                 f'<b>None of the {n_apply} in Apply have it.</b>')
 
+    key = "".join(f'<b><i style="background:var(--score-{k})"></i>{_esc(k)}</b>' for k in RULES_ORDER)
     tabs = "".join(
         f'<button class="tab" data-f="{f}" aria-pressed="{"true" if f == "all" else "false"}">{label}<span class="c">{n}</span></button>'
         for f, label, n in [("all", "Everything", len(cards)), ("apply", "Apply", n_apply),
@@ -395,15 +365,15 @@ def render(store, rules, companies=None, now=None, tokens=None):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Week {week.split('-W')[-1]} Shortlist</title>
+<title>Shortlist, {_esc(_dateline(now).split(' to ')[1])}</title>
 <style>
-{token_css(tokens or _tokens())}
+{design.token_css(tokens)}
 {PAGE_CSS}</style>
 </head>
 <body data-week="{_esc(week)}">
 <main class="wrap">
-<p class="stamp">Jobhunt &middot; {_esc(week)} &middot; ruleset {_esc(rules['version'])}{f' &middot; built from {_esc(stamp)}' if stamp else ''}</p>
-<h1>Week {_esc(week.split('-W')[-1])} Shortlist</h1>
+<p class="stamp">{_esc(_dateline(now))} &middot; {_esc(week)} &middot; ruleset {_esc(rules['version'])}{f' &middot; built from {_esc(stamp)}' if stamp else ''}</p>
+<h1>Shortlist, the week to {_esc(_dateline(now).split(' to ')[1])}</h1>
 <p class="lede">{lede}</p>
 
 <div class="tally">
@@ -413,9 +383,8 @@ def render(store, rules, companies=None, now=None, tokens=None):
   <div><span class="n">{nocomp}</span><span class="k">no comp posted</span></div>
 </div>
 <div class="key">
-  <span>Score strip</span>
-  <b><i style="background:var(--blueprint)"></i>remote, pay, title, company, curriculum, freshness</b>
-  <b><i style="background:var(--marker)"></i>the intersection, and anything deducted</b>
+  <span>Score strip, left to right</span>
+  {key}
 </div>
 
 <div class="bar">

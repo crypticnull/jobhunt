@@ -113,6 +113,34 @@ def cmd_lint(args):
     return exit_code(findings)
 
 
+def cmd_page(args):
+    """A saved draft as a page, set in the same identity as the site. The words
+    are untouched: this only frames them."""
+    from . import page as page_mod
+    draft = Path(args.draft).read_text(encoding="utf-8")
+    out = Path(args.out) if args.out else Path(args.draft).with_suffix(".html")
+    out.write_text(page_mod.letter(draft), encoding="utf-8")
+    print(f"wrote {out}")
+    return 0
+
+
+def cmd_resume(args):
+    """The resume from data/resume.json, with the proof titles and the skill
+    terms pulled from their own records so it cannot disagree with the site."""
+    import json
+    from . import page as page_mod
+    record = json.loads((ROOT / "data" / "resume.json").read_text(encoding="utf-8"))
+    skills = json.loads((ROOT / "data" / "skills.json").read_text(encoding="utf-8"))["skills"]
+    out = Path(args.out) if args.out else ROOT / "data" / "local" / "resume.html"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(page_mod.resume(record, skills), encoding="utf-8")
+    thin = [k for k in ("summary", "experience", "education") if not record.get(k)]
+    print(f"wrote {out}")
+    if thin:
+        print("still yours to fill: " + ", ".join(thin), file=sys.stderr)
+    return 0
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="python -m letters", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--companies", default=str(DEFAULT_COMPANIES))
@@ -134,6 +162,15 @@ def main(argv=None):
     l = sub.add_parser("lint", help="lint a draft with the letter profile")
     l.add_argument("draft")
     l.set_defaults(fn=cmd_lint)
+
+    g = sub.add_parser("page", help="a saved draft as a page, print ready")
+    g.add_argument("draft")
+    g.add_argument("--out")
+    g.set_defaults(fn=cmd_page)
+
+    r = sub.add_parser("resume", help="the resume as a page, print ready")
+    r.add_argument("--out")
+    r.set_defaults(fn=cmd_resume)
 
     args = ap.parse_args(argv)
     return args.fn(args)

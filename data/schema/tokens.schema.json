@@ -24,7 +24,8 @@
         "light",
         "dark",
         "plate",
-        "pairs"
+        "pairs",
+        "score"
       ],
       "properties": {
         "light": {
@@ -57,6 +58,33 @@
               },
               "text": {
                 "type": "boolean"
+              }
+            }
+          }
+        },
+        "score": {
+          "type": "object",
+          "description": "One colour per scoring rule for the strip under a posting. Decorative, never text, so no contrast pair measures them.",
+          "required": [
+            "light",
+            "dark"
+          ],
+          "properties": {
+            "note": {
+              "type": "string"
+            },
+            "light": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^#[0-9a-f]{6}$"
+              }
+            },
+            "dark": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^#[0-9a-f]{6}$"
               }
             }
           }

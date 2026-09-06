@@ -57,7 +57,8 @@ class Page(unittest.TestCase):
         """A var() naming a token that is not in the record does nothing and
         says nothing, which is how a design change is lost in silence."""
         declared = set()
-        t = digest_html._tokens()
+        from pipeline import design
+        t = design.tokens()
         for group in (t["colour"]["light"], t["colour"]["dark"], t["colour"]["plate"], t["grid"], t["type"]):
             declared |= set(group)
         declared |= {m["name"] for m in t["motion"]["tokens"]}
@@ -90,6 +91,38 @@ class Page(unittest.TestCase):
         </script>, so a title could close the tag and run."""
         script = self.html.split("<script>")[1]
         self.assertNotIn("Creative Technologist", script, "no posting content in the script at all")
+
+    def test_the_heading_says_dates_not_a_week_number(self):
+        """2026-W36 is the thirty sixth week of the calendar year and also the
+        first digest ever run, so a heading reading "Week 36" reads as a
+        counter that is wrong. The ISO week stays where it sorts."""
+        self.assertIn("Shortlist, the week to 6 September 2026", self.html)
+        self.assertIn("31 August to 6 September 2026", self.html)
+        self.assertNotIn("Week 36 Shortlist", self.html)
+        self.assertIn("2026-W36", self.html, "the ISO week still identifies the file")
+
+    def test_every_scoring_rule_has_its_own_colour(self):
+        """The strip under a posting is the shape of its score, so a rule that
+        shares a colour with another rule is a rule you cannot read. The two
+        accents differ only in hue, so the ramp is that arc and every stop is a
+        colour the brand could have had."""
+        from pipeline import design
+        score = design.tokens()["colour"]["score"]
+        for theme in ("light", "dark"):
+            names = {f"score-{r}" for r in digest_html.RULES_ORDER}
+            self.assertEqual(set(score[theme]), names, theme)
+            self.assertEqual(len(set(score[theme].values())), len(names), f"{theme}: two rules share a colour")
+
+    def test_the_strip_and_the_breakdown_agree(self):
+        """Same encoding at two sizes. Learn the strip once and the detail
+        needs no legend of its own."""
+        for rule in ("remote", "comp", "intersection"):
+            self.assertIn(f"var(--score-{rule})", self.html)
+        self.assertNotIn('class="neg"', self.html, "sign is carried by the number, not a second colour")
+
+    def test_the_legend_names_every_stop(self):
+        for rule in digest_html.RULES_ORDER:
+            self.assertIn(f'<b><i style="background:var(--score-{rule})"></i>{rule}</b>', self.html)
 
     def test_nothing_is_fetched_from_anywhere(self):
         """It opens from disk, off a plane, in a year. No request leaves it."""
