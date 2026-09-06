@@ -151,9 +151,19 @@ def _status_lines(path, now, days=7):
         return []
 
 
-def source_health(store, since, status_log=None, now=None):
+def source_health(store, since, status_log=None, now=None, companies=None):
+    # Health is about the sources being polled now. A company that has left the
+    # list cannot recover, because recovery means a later poll that succeeds and
+    # nothing polls it any more, so its last error and its last two empty polls
+    # would sit in the footer for good. Twelve studios came off the list on the
+    # 5th under the second principle and workable/pixomondo went on reporting a
+    # 429 from the day it was removed, which is a line nobody can act on.
+    live = None if companies is None else {slug for slug, c in companies.items() if not c.get("dropped")}
+    on_list = lambda slug: live is None or slug in live
     counted = {}
     for r in store.poll_errors_since(since):
+        if not on_list(r["company_slug"]):
+            continue
         key = (r["source"], r["company_slug"], r["error"])
         counted.setdefault(key, []).append(r["ran_at"][:10])
     dead = store.never_answered(since)
@@ -172,7 +182,13 @@ def source_health(store, since, status_log=None, now=None):
         if len(days) > 1 and (source, slug) in dead:
             line += ". It has not answered once this week, so it is on the list without being polled. Check the slug or drop it."
         problems.append(line)
-    problems += [f"{source}/{slug}: zero postings on the last two polls" for slug, source in store.zero_twice_running()]
+    # An empty board is not a broken one. zero_twice_running only reads polls
+    # that succeeded, so the endpoint answered and returned nothing, which means
+    # the company has nothing open rather than that the slug is wrong. Saying so
+    # keeps it out of the same sentence as a 429, because the two ask for
+    # different things and only one of them is urgent.
+    problems += [f"{source}/{slug}: answers, and has had nothing open for two polls. Not an outage, so check it is the right board before dropping it."
+                 for slug, source in store.zero_twice_running() if on_list(slug)]
     problems += _status_lines(status_log or STATUS_LOG, now or datetime.now(timezone.utc))
     return problems
 
@@ -265,7 +281,7 @@ def build(store, rules, companies=None, now=None, since=None, heartbeat=None):
     out += curriculum_mod.report(store.study_rows(), rules)
     out += dead_weight(store, rules, companies)
     out += ["", "## Source health", ""]
-    problems = source_health(store, since)
+    problems = source_health(store, since, companies=companies)
     out += [f"- {p}" for p in problems] or ["All sources answered."]
     out.append("")
     ids = [r["id"] for r in piles["apply"] + review]  # held-back rows are deliberately not marked
