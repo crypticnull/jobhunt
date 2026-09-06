@@ -95,6 +95,13 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
       for (const line of document.querySelectorAll<HTMLElement>("[data-slip]")) {
         const words = Array.from(line.querySelectorAll<HTMLElement>(".w"));
         if (!words.length) continue;
+        // The zone is the thing you are pointing at, which is the row or the
+        // panel, not the glyphs. A line of type is a few pixels tall inside a
+        // box many times its height, so requiring the cursor to land on the
+        // letters made most of the box do nothing at all. Distance already
+        // decides how much anything lifts, so a wide zone costs nothing and
+        // the line answers as you approach it.
+        const zone = line.closest<HTMLElement>("[data-slip-zone], a, li") ?? line;
         let queued = false;
         let px = 0;
         let py = 0;
@@ -105,25 +112,32 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
             parseFloat(getComputedStyle(document.documentElement).fontSize);
           for (const w of words) {
             const r = w.getBoundingClientRect();
-            // Both axes, because a title can wrap and a word sitting directly
-            // under the cursor on the next line is not near it. Vertical
-            // distance counts eightfold so one line away is out of the band entirely
-            // rather than glowing along with the row you are reading.
+            // Round, and the same in both axes, because the thing being
+            // described is a soft brush and a brush does not care which way
+            // you came at it. An earlier version weighted the vertical eight
+            // to one so a wrapped word would not glow with the row above it,
+            // which was solving a problem nobody had and created a real one:
+            // a line of type is a few pixels tall, so approaching from above
+            // or below left every word at zero and the whole thing read as
+            // broken. A word on the next row lighting up is what a brush
+            // does.
             const dx = px - (r.left + r.width / 2);
-            const dy = (py - (r.top + r.height / 2)) * 8;
+            const dy = py - (r.top + r.height / 2);
             const t = Math.max(0, 1 - Math.hypot(dx, dy) / (band || 1));
             w.style.setProperty("--lift", String(t * t * (3 - 2 * t)));
           }
         };
-        line.addEventListener("pointermove", (e) => {
+        zone.addEventListener("pointermove", (e) => {
           px = e.clientX;
           py = e.clientY;
+          line.classList.add("near");
           if (!queued) {
             queued = true;
             requestAnimationFrame(paint);
           }
         });
-        line.addEventListener("pointerleave", () => {
+        zone.addEventListener("pointerleave", () => {
+          line.classList.remove("near");
           for (const w of words) w.style.removeProperty("--lift");
         });
       }
@@ -760,11 +774,11 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
      the same distance at the same moment, because a press does not slip one
      word at a time. Per-word hover was legible as eleven separate effects,
      which is noise rather than a printing fault. */
-  .slip:hover .ghost.m,
+  .slip.near .ghost.m,
   a:focus-visible .slip .ghost.m {
     transform: translateX(var(--slip-x));
   }
-  .slip:hover .ghost.b,
+  .slip.near .ghost.b,
   a:focus-visible .slip .ghost.b {
     transform: translateX(calc(var(--slip-x) * -1));
   }

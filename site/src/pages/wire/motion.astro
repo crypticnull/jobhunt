@@ -101,7 +101,7 @@ const HINTS = {
         <ul class="opts">
           {d.options.map((o) => (
             <li>
-              <div class:list={["stage", d.id !== "register" && "tappable"]} data-stage={o.id} data-kind={d.id} role={d.id === "register" ? undefined : "button"} tabindex={d.id === "register" ? undefined : 0}>
+              <div class:list={["stage", d.id !== "register" && "tappable"]} data-stage={o.id} data-kind={d.id} data-slip-zone role={d.id === "register" ? undefined : "button"} tabindex={d.id === "register" ? undefined : 0}>
                 <div class="specimen" data-spec={o.id}>
                   {d.id === "hero" && (
                     <>
@@ -676,19 +676,23 @@ const HINTS = {
     font-size: 0.95rem;
     line-height: 1.5;
   }
+  /* :global, because the ghost is rendered by Slip and this file's scope does
+     not reach into another component's markup. Without it all three variants
+     were the shipped one and the radios chose between three identical
+     things. */
   /* E1, one fringe. The blueprint plate never prints. */
-  .reg.E1 .ghost.b {
+  .reg.E1 :global(.ghost.b) {
     display: none;
   }
   /* E2 is the component as it ships and needs no rule at all. */
   /* E3, the sheet shifts, so the true word moves against its own ghost. */
-  .reg.E3 .ghost.b {
+  .reg.E3 :global(.ghost.b) {
     display: none;
   }
-  .reg.E3 .true {
+  .reg.E3 :global(.true) {
     transition: transform var(--t-slide) var(--ease-out);
   }
-  .reg.E3:hover .true {
+  .reg.E3 :global(.slip.near .true) {
     transform: translateX(calc(var(--slip-x) * -0.4));
   }
 
