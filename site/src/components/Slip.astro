@@ -3,8 +3,11 @@
 //
 // When a press runs out of register the plates print a hair apart and you get
 // a coloured fringe beside the type. This is that, on purpose and on hover:
-// each word carries a ghost of itself in marker, and pointing at the word
-// slides the ghost off the true impression.
+// each word carries two ghosts of itself, marker and blueprint, and pointing
+// at the word slides them off the true impression in opposite directions,
+// which is what a four colour press actually does when it slips. One fringe
+// reads as a hover glow. Two read as a printing fault, and they spend the
+// second accent colour, which otherwise does almost nothing on the site.
 //
 // The unit is the word rather than the line, so the page responds exactly
 // where you are looking rather than everywhere at once. It is split at build
@@ -24,5 +27,17 @@ const words = text.split(/(\s+)/);
 ---
 
 <Tag class="slip">
-  {words.map((w) => (w.trim() === "" ? w : <span class="w"><span class="ghost" aria-hidden="true">{w}</span>{w}</span>))}
+  {
+    words.map((w) =>
+      w.trim() === "" ? (
+        w
+      ) : (
+        <span class="w">
+          <span class="ghost b" aria-hidden="true">{w}</span>
+          <span class="ghost m" aria-hidden="true">{w}</span>
+          {w}
+        </span>
+      ),
+    )
+  }
 </Tag>
