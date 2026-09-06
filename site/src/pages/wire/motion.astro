@@ -160,6 +160,11 @@ const decisions = [
           <output data-out={d.v} />
         </label>
       ))}
+      <label class="dial lab">
+        <span class="dial-name">hold</span>
+        <input type="range" id="hold" min="0" max="2000" step="50" value="400" />
+        <output id="hold-out">400ms</output>
+      </label>
       <label class="dial ease">
         <span class="dial-name">ease out</span>
         <span class="bez">
@@ -170,6 +175,11 @@ const decisions = [
         <output data-out="ease-out" />
       </label>
     </div>
+    <p class="patch-note">
+      Hold is marked apart because it is not one of these. It is the pause between cycles so a movement can be watched
+      at rest, and it exists only here. Putting it in the record would mean the system page documenting a duration the
+      site never performs, which is the thing the record was just cleaned of.
+    </p>
     <p class="patch-note">The record patch, for <code>data/design/tokens.json</code>. Paste it back and it becomes the site.</p>
     <pre class="patch" id="patch">Nothing changed yet.</pre>
   </aside>
@@ -188,15 +198,44 @@ const decisions = [
   // motion actually receives.
   // Loop rather than one shot, because the point is to turn a dial while the
   // movement is running and watch it change. Press again to stop.
+  // A cycle is out, back, hold, again. The movement runs at exactly the token
+  // duration and the hold is the gap after it, driven from here because a CSS
+  // animation has no delay between iterations. Every animation in a specimen
+  // ends within a frame of the others, so one debounced timer per specimen is
+  // enough and the restart happens once rather than once per element.
+  const holdInput = document.querySelector<HTMLInputElement>("#hold");
+  const holdMs = () => (holdInput ? parseFloat(holdInput.value) || 0 : 0);
+  const timers = new WeakMap<HTMLElement, number>();
+
+  const cycle = (spec: HTMLElement) => {
+    spec.classList.remove("run");
+    void spec.offsetWidth;
+    spec.classList.add("run");
+  };
+
   for (const b of document.querySelectorAll<HTMLButtonElement>("button[data-play]")) {
+    const spec = document.querySelector<HTMLElement>(`[data-spec="${b.dataset.play}"]`);
+    if (!spec) continue;
     b.disabled = false;
+    spec.addEventListener("animationend", () => {
+      if (!spec.classList.contains("loop")) return;
+      clearTimeout(timers.get(spec));
+      timers.set(
+        spec,
+        window.setTimeout(() => {
+          if (spec.classList.contains("loop")) cycle(spec);
+        }, holdMs()),
+      );
+    });
     b.addEventListener("click", () => {
-      const spec = document.querySelector<HTMLElement>(`[data-spec="${b.dataset.play}"]`);
-      if (!spec) return;
       const on = spec.classList.toggle("loop");
-      spec.classList.toggle("run", on);
       b.textContent = on ? "Stop" : "Loop";
       b.classList.toggle("on", on);
+      if (on) cycle(spec);
+      else {
+        clearTimeout(timers.get(spec));
+        spec.classList.remove("run");
+      }
     });
   }
 
@@ -257,6 +296,11 @@ const decisions = [
   });
   const easeOut = document.querySelector<HTMLOutputElement>('output[data-out="ease-out"]');
   if (easeOut) easeOut.textContent = base["ease-out"];
+
+  holdInput?.addEventListener("input", () => {
+    const out = document.getElementById("hold-out");
+    if (out) out.textContent = `${holdInput.value}ms`;
+  });
 
   document.getElementById("dial-reset")?.addEventListener("click", () => {
     for (const k of Object.keys(now)) {
@@ -481,8 +525,8 @@ const decisions = [
      alternative is repeating the override once per option, which is the same
      override written eleven times and one more thing to forget when a
      twelfth option lands. */
-  .specimen.loop * {
-    animation-iteration-count: infinite !important;
+  .specimen.run * {
+    animation-iteration-count: 2 !important;
     animation-direction: alternate !important;
   }
 
@@ -548,20 +592,20 @@ const decisions = [
   }
 
   /* Looped, the same movement without a pointer on it. */
-  .loop .reg .ghost {
+  .run .reg .ghost {
     opacity: 1;
   }
-  .loop .reg.E1 .ghost.m,
-  .loop .reg.E2 .ghost.m {
+  .run .reg.E1 .ghost.m,
+  .run .reg.E2 .ghost.m {
     animation: slip-m var(--t-slide) var(--ease-out) infinite alternate;
   }
-  .loop .reg.E2 .ghost.b {
+  .run .reg.E2 .ghost.b {
     animation: slip-b var(--t-slide) var(--ease-out) infinite alternate;
   }
-  .loop .reg.E3 .ghost.m {
+  .run .reg.E3 .ghost.m {
     animation: slip-far var(--t-slide) var(--ease-out) infinite alternate;
   }
-  .loop .reg.E3 .w {
+  .run .reg.E3 .w {
     animation: slip-back var(--t-slide) var(--ease-out) infinite alternate;
   }
   @keyframes slip-m {
@@ -704,6 +748,14 @@ const decisions = [
   .dial input[type="range"] {
     width: 100%;
     accent-color: var(--marker);
+  }
+  /* Hold is not a token, so it does not look like one. */
+  .dial.lab .dial-name,
+  .dial.lab output {
+    color: var(--blueprint);
+  }
+  .dial.lab input[type="range"] {
+    accent-color: var(--blueprint);
   }
   .dial.ease {
     grid-column: 1 / -1;
