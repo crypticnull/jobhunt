@@ -31,8 +31,9 @@ from . import digest as digest_mod
 
 TOKENS = Path(__file__).resolve().parent.parent / "data" / "design" / "tokens.json"
 
-# The order the score prints in, matching the markdown so the two read the same.
-RULES_ORDER = ("remote", "comp", "intersection", "title", "company", "curriculum", "freshness", "human", "deductions")
+# The order the score prints in, from the markdown, so the two read the same
+# and neither can quietly start leaving a rule out.
+RULES_ORDER = digest_mod.SCORE_ORDER
 
 
 def _tokens(path=None):
