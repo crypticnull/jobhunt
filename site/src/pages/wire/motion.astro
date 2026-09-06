@@ -438,11 +438,11 @@ const decisions = [
   }
 
   [data-spec="D1"].run .dot {
-    animation: blink var(--t-blink) steps(2, jump-none) 3;
+    animation: blink var(--t-blink) steps(2, jump-none) infinite;
   }
 
   @keyframes rise {
-    from { opacity: 0; transform: translateY(0.5rem); }
+    from { opacity: 0; transform: translateY(var(--rise-y)); }
     to { opacity: 1; transform: none; }
   }
   @keyframes draw {
@@ -450,7 +450,7 @@ const decisions = [
     to { transform: scaleX(1); }
   }
   @keyframes press {
-    50% { transform: scale(0.985); }
+    50% { transform: scale(var(--press)); }
   }
   @keyframes hold {
     from { transform: scale(1); }
@@ -472,10 +472,18 @@ const decisions = [
     to { opacity: 0.15; }
   }
 
-  /* Loop turns a one shot into something a dial can be turned against. */
+  /* Loop turns a one shot into something a dial can be turned against.
+
+     !important, and it earns it. Every option sets its movement with the
+     animation shorthand, which resets iteration-count and direction as a side
+     effect, and those selectors carry an attribute plus a class plus an
+     element, so they outrank anything this rule can say without it. The
+     alternative is repeating the override once per option, which is the same
+     override written eleven times and one more thing to forget when a
+     twelfth option lands. */
   .specimen.loop * {
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
+    animation-iteration-count: infinite !important;
+    animation-direction: alternate !important;
   }
 
   /* Hover a word to run the variant by hand, or press Loop and it runs on its

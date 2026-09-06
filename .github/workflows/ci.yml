@@ -35,5 +35,17 @@ jobs:
         working-directory: site
       - run: node tools/check_drift.mjs
       - run: node tools/check_tokens.mjs
+      # Lighthouse is three minutes of a three and a half minute run, because
+      # it is five pages times three runs. The three runs exist for the
+      # performance score, which is noisy on a shared runner and needs a
+      # median. Layout shift and accessibility are not noisy, and they are the
+      # two that actually catch a regression here, so a pull request checks
+      # those on three pages in one pass and gets an answer in well under a
+      # minute. The full gate, five pages and three runs with performance as
+      # an error, runs on the push to main, where nobody is waiting on it.
+      - run: npm run lighthouse:pr
+        if: github.event_name == 'pull_request'
+        working-directory: site
       - run: npm run lighthouse
+        if: github.event_name == 'push'
         working-directory: site
