@@ -201,7 +201,12 @@
         "\\bmanila\\b",
         "\\bcairo\\b",
         "\\blagos\\b",
-        "nairobi"
+        "nairobi",
+        "\\bksa\\b",
+        "saudi arabia",
+        "\\buae\\b",
+        "abu dhabi",
+        "\\bdubai\\b"
       ],
       "fail_phrases_note": "Revised 2026-09-05. The residency phrases fail only when the place named is not the US, because 'you must be based in the United States' is the standard payroll sentence on a US-remote role and was dropping genuine remote postings by the hundred. 'hybrid' needs office or schedule words in the same sentence so hybrid search and hybrid cloud stop failing the gate, and 'on-site' spares a final on-site interview. Everything else is a hard fail as before."
     },
@@ -236,7 +241,7 @@
         "^video editor$",
         "^(junior|jr)\\b",
         "^associate(?! (creative|design|art) director)",
-        "^intern(ship)?\\b",
+        "\\bintern(ship)?s?\\b",
         "^editor$",
         "^coordinator",
         "(electrical|mechanical|civil|structural|precast|controls|hvac|plumbing|piping|thermal|process|manufacturing|packaging|hardware|firmware|asic|pcb|rtl|silicon|chip|analog|actuator|robotics|validation|verification|layout|\\brf\\b)[a-z ]* design engineer",
@@ -312,7 +317,8 @@
           "B"
         ]
       }
-    }
+    },
+    "note_2026_09_06": "'^intern' only caught a title that opened with it, so 'Data Engineer Intern' scored 45 and sat in review. Anchored on a word boundary instead, which still leaves International and Internal alone."
   },
   "deductions": {
     "per_hit": 3,

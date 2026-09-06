@@ -767,3 +767,45 @@ class TitlesAfterTheReview(unittest.TestCase):
         r = self.product("Product Designer", "Lottie and Rive animation for the app.")
         self.assertEqual(r["title_tier"], "B")
         self.assertIn("product", r["legs_hit"])
+
+
+class RegionAndInterns(unittest.TestCase):
+    """Three misses found in the review pile Matt read on 2026-09-06."""
+
+    def setUp(self):
+        self.r = rules()
+
+    def go(self, title, location="Remote - US", description="design systems figma prototyping"):
+        r = row(title=title, description=description, location=location, comp_min=170000, comp_max=220000)
+        return score(r, self.r, NOW, {"tier": 3, "size": None})
+
+    def test_a_region_in_the_title_scopes_the_role(self):
+        """A region in the body can be a team this role works with, but a
+        region in the title is the role. Deal Strategy Analyst - EMEA sat in
+        review for a week on a blank location."""
+        self.assertEqual(self.go("Deal Strategy Analyst - EMEA")["pile"], "logged")
+        self.assertEqual(self.go("Forward Deployed Creative [KSA]")["pile"], "logged")
+        self.assertIn("title is scoped to", self.go("Product Designer, LATAM")["drop_reason"])
+
+    def test_a_title_naming_the_us_as_well_still_passes(self):
+        self.assertNotEqual(self.go("Product Designer, US & Canada")["pile"], "logged")
+
+    def test_intern_anywhere_in_the_title(self):
+        self.assertEqual(self.go("Data Engineer Intern")["pile"], "logged")
+        self.assertEqual(self.go("Design Internship")["pile"], "logged")
+
+    def test_international_and_internal_are_left_alone(self):
+        self.assertNotEqual(self.go("International Brand Designer")["pile"], "logged")
+        self.assertNotEqual(self.go("Senior Engineer, Internal Tooling")["pile"], "logged")
+
+    def test_an_american_city_that_shares_a_foreign_name(self):
+        """Vancouver WA is in one of the two states he is moving to. Dublin OH
+        and Paris TX are the same shape. One state code is enough to say a
+        city is American, even though two are needed to call something a
+        residency list."""
+        for loc in ("Vancouver, WA", "Dublin, OH", "Paris, TX", "Berlin, NH"):
+            self.assertNotEqual(self.go("Senior Product Designer", loc)["pile"], "logged", loc)
+
+    def test_the_foreign_originals_are_still_foreign(self):
+        for loc in ("Vancouver, BC", "Dublin, Ireland", "Paris, France", "Berlin, DE", "Toronto, ON"):
+            self.assertEqual(self.go("Senior Product Designer", loc)["pile"], "logged", loc)

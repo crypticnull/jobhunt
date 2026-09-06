@@ -112,6 +112,8 @@ How the state list is read, revised the same day. Nationwide tokens are read fro
 - State list exists and does not include PA. He starts the job from Pennsylvania, so this is not negotiable for v1.
 - A single named city or metro with no state list and language like "based in", "located in", "must reside".
 - The location names another country and no US marker. Checked against the location only, never the body, because a US role can perfectly well mention EMEA teams. "Remote - US, Canada" passes; "Remote - LATAM" and "Electrical Design Engineer (Estonia)" do not. Added 2026-09-05 after those turned up inside the remote target set.
+- The same list is read against the title, which is not the same test. A region in a body is often a team this role works with, but a region in a title is the role. "Deal Strategy Analyst - EMEA" and "Forward Deployed Creative [KSA]" both cleared the gate on a blank location and sat in review for a week. Added 2026-09-06.
+- A single US state saves a city that shares its name with a foreign one. Two states are needed before a list counts as a residency rule, which is right for deciding where a role lets you live and wrong for deciding whether a city is American, so Vancouver WA, Dublin OH, Paris TX and Berlin NH were all being dropped as foreign. Only a state code that is not also a country code counts, so Berlin DE stays foreign and London KY stays dropped. Added 2026-09-06.
 
 **Flag** (pass at half marks, reason attached) on:
 - State list includes PA but neither WA nor OR. State lists change and it can be asked on the first call.
@@ -147,7 +149,8 @@ Each match subtracts 3 from the final score. Cap the total deduction at 15. The 
 - "content creator", "social media videos", "short-form content", "10+ videos a week", or any per-week output quota: volume shop.
 - "wear many hats", "fast-paced environment", "scrappy", "startup mentality" without a posted band: underpaid by design.
 - "rockstar", "ninja", "guru", "wizard": tells you who wrote the listing.
-- "junior", "jr", "mid-level", "associate", "coordinator", "intern" at the start of the title: wrong level. Revised 2026-09-05 so that Associate Creative Director, Associate Design Director, International Brand Designer and Internal Tools Designer stop being dropped by their first letters.
+- "junior", "jr", "mid-level", "associate", "coordinator" at the start of the title: wrong level. Revised 2026-09-05 so that Associate Creative Director, Associate Design Director, International Brand Designer and Internal Tools Designer stop being dropped by their first letters.
+- "intern" or "internship" anywhere in the title. Revised 2026-09-06: the start-of-title anchor missed "Data Engineer Intern", which scored 45 and sat in review. A word boundary still leaves International and Internal alone.
 - "unlimited PTO" or "competitive salary" standing in where a number should be.
 - Agency vocabulary: "account", "client deliverables", "billable", "utilization".
 - "AI video editor", "AI content", "generate content at scale": churn framing, the opposite of the intersection.
