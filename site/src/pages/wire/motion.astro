@@ -64,6 +64,18 @@ const decisions = [
     ],
   },
 ];
+
+// Each specimen answers the trigger the real interaction answers, so the hint
+// says which one. There is no play button: a movement you watch and a movement
+// you caused do not feel the same, and only one of them is the thing being
+// decided here.
+const HINTS = {
+  hero: "press to replay",
+  tile: "press and hold",
+  still: "click to open",
+  dot: "click to play",
+  register: "hover the words",
+};
 ---
 
 <Layout title="Motion lab" description="The four open interaction decisions, running, so the choice is made by feel." noindex>
@@ -74,7 +86,9 @@ const decisions = [
     works rather than a page that lost something.
   </p>
   <p class="prose">
-    Pick one per decision and the line at the bottom is the answer to hand back. <a href="/wire">The slot inventory</a>
+    Nothing plays on its own. Each specimen answers the trigger the real interaction answers, because a movement you
+    watch and a movement you caused do not feel the same and only one of them is the thing being decided. Pick one per
+    decision and the line at the bottom is the answer to hand back. <a href="/wire">The slot inventory</a>
     is next door, and <a href="/system">the token record</a> holds the durations themselves.
   </p>
 
@@ -86,7 +100,7 @@ const decisions = [
         <ul class="opts">
           {d.options.map((o) => (
             <li>
-              <div class="stage" data-stage={o.id}>
+              <div class:list={["stage", d.id !== "register" && "tappable"]} data-stage={o.id} data-kind={d.id} role={d.id === "register" ? undefined : "button"} tabindex={d.id === "register" ? undefined : 0}>
                 <div class="specimen" data-spec={o.id}>
                   {d.id === "hero" && (
                     <>
@@ -127,7 +141,7 @@ const decisions = [
                   <span class="opt-id">{o.id}</span> {o.name}
                   {o.picked && <span class="shipped">shipped</span>}
                 </label>
-                <button type="button" data-play={o.id} disabled>Loop</button>
+                <span class="hint">{HINTS[d.id]}</span>
               </div>
               <p class="token">{o.token}</p>
               <p class="note">{o.note}</p>
@@ -160,11 +174,6 @@ const decisions = [
           <output data-out={d.v} />
         </label>
       ))}
-      <label class="dial lab">
-        <span class="dial-name">hold</span>
-        <input type="range" id="hold" min="0" max="2000" step="50" value="400" />
-        <output id="hold-out">400ms</output>
-      </label>
       <label class="dial ease">
         <span class="dial-name">ease out</span>
         <span class="bez">
@@ -175,11 +184,6 @@ const decisions = [
         <output data-out="ease-out" />
       </label>
     </div>
-    <p class="patch-note">
-      Hold is marked apart because it is not one of these. It is the pause between cycles so a movement can be watched
-      at rest, and it exists only here. Putting it in the record would mean the system page documenting a duration the
-      site never performs, which is the thing the record was just cleaned of.
-    </p>
     <p class="patch-note">The record patch, for <code>data/design/tokens.json</code>. Paste it back and it becomes the site.</p>
     <pre class="patch" id="patch">Nothing changed yet.</pre>
   </aside>
@@ -198,43 +202,33 @@ const decisions = [
   // motion actually receives.
   // Loop rather than one shot, because the point is to turn a dial while the
   // movement is running and watch it change. Press again to stop.
-  // A cycle is out, back, hold, again. The movement runs at exactly the token
-  // duration and the hold is the gap after it, driven from here because a CSS
-  // animation has no delay between iterations. Every animation in a specimen
-  // ends within a frame of the others, so one debounced timer per specimen is
-  // enough and the restart happens once rather than once per element.
-  const holdInput = document.querySelector<HTMLInputElement>("#hold");
-  const holdMs = () => (holdInput ? parseFloat(holdInput.value) || 0 : 0);
-  const timers = new WeakMap<HTMLElement, number>();
-
-  const cycle = (spec: HTMLElement) => {
-    spec.classList.remove("run");
-    void spec.offsetWidth;
-    spec.classList.add("run");
-  };
-
-  for (const b of document.querySelectorAll<HTMLButtonElement>("button[data-play]")) {
-    const spec = document.querySelector<HTMLElement>(`[data-spec="${b.dataset.play}"]`);
+  // The specimen is the control. Nothing plays on its own, because a movement
+  // you watch and a movement you caused do not feel the same and only one of
+  // them is the thing being decided. Press replays what loads, press and hold
+  // is the press, click opens and closes what opens and closes, click starts
+  // and stops what plays. Hover needs nothing at all.
+  for (const stage of document.querySelectorAll<HTMLElement>(".stage.tappable")) {
+    const kind = stage.dataset.kind;
+    const spec = stage.querySelector<HTMLElement>("[data-spec]");
     if (!spec) continue;
-    b.disabled = false;
-    spec.addEventListener("animationend", () => {
-      if (!spec.classList.contains("loop")) return;
-      clearTimeout(timers.get(spec));
-      timers.set(
-        spec,
-        window.setTimeout(() => {
-          if (spec.classList.contains("loop")) cycle(spec);
-        }, holdMs()),
-      );
-    });
-    b.addEventListener("click", () => {
-      const on = spec.classList.toggle("loop");
-      b.textContent = on ? "Stop" : "Loop";
-      b.classList.toggle("on", on);
-      if (on) cycle(spec);
-      else {
-        clearTimeout(timers.get(spec));
+    const fire = () => {
+      if (kind === "hero") {
         spec.classList.remove("run");
+        void spec.offsetWidth;
+        spec.classList.add("run");
+      } else if (kind === "still") {
+        spec.classList.toggle("open");
+      } else if (kind === "dot") {
+        spec.classList.toggle("playing");
+      } else if (kind === "tile") {
+        spec.classList.toggle("gone");
+      }
+    };
+    stage.addEventListener("click", fire);
+    stage.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        fire();
       }
     });
   }
@@ -296,11 +290,6 @@ const decisions = [
   });
   const easeOut = document.querySelector<HTMLOutputElement>('output[data-out="ease-out"]');
   if (easeOut) easeOut.textContent = base["ease-out"];
-
-  holdInput?.addEventListener("input", () => {
-    const out = document.getElementById("hold-out");
-    if (out) out.textContent = `${holdInput.value}ms`;
-  });
 
   document.getElementById("dial-reset")?.addEventListener("click", () => {
     for (const k of Object.keys(now)) {
@@ -460,29 +449,62 @@ const decisions = [
     visibility: hidden;
   }
 
-  [data-spec="B1"].run .tile {
-    animation: press var(--t-quick) var(--ease-out) both;
+  /* B1 is the press itself. Holding the mouse down holds the scale, which is
+     the whole point and the one thing an autoplayer could never show. */
+  [data-spec="B1"] .tile {
+    transition: transform var(--t-quick) var(--ease-out);
+  }
+  .stage:active [data-spec="B1"] .tile {
+    transform: scale(var(--press));
+  }
+  /* B2 is the still carrying across a navigation, so it latches rather than
+     springing back. Click again to send it home. */
+  [data-spec="B2"] .tile {
+    transition: transform var(--t-fade) var(--ease-out);
+  }
+  [data-spec="B2"] .tile-meta {
+    transition: opacity var(--t-fade) var(--ease-in);
+  }
+  [data-spec="B2"].gone .tile {
+    transform: scale(1.35);
+  }
+  [data-spec="B2"].gone .tile-meta {
+    opacity: 0;
   }
 
-  [data-spec="B2"].run .tile {
-    animation: hold var(--t-fade) var(--ease-out) both;
+  .specimen .sheet {
+    transition:
+      opacity var(--t-fade) var(--ease-out),
+      transform var(--t-fade) var(--ease-out);
   }
-  [data-spec="B2"].run .tile-meta {
-    animation: fadeout var(--t-fade) var(--ease-in) both;
+  [data-spec="C1"].open .sheet {
+    opacity: 0.92;
   }
-
-  [data-spec="C1"].run .sheet {
-    animation: sheetin var(--t-fade) var(--ease-out) both;
-  }
+  /* C2 grows from where the thumbnail sits, which is why the origin is the
+     corner it started in rather than the middle of the sheet. */
   [data-spec="C2"] .sheet {
-    transform-origin: center;
+    transform-origin: 20% 50%;
+    transform: scale(0.2);
   }
-  [data-spec="C2"].run .sheet {
-    animation: grow var(--t-fade) var(--ease-out) both;
+  [data-spec="C2"].open .sheet {
+    opacity: 0.92;
+    transform: scale(1);
   }
 
-  [data-spec="D1"].run .dot {
-    animation: blink var(--t-blink) steps(2, jump-none) infinite;
+  .specimen .dot {
+    opacity: 0.15;
+  }
+  .specimen.playing .dot {
+    opacity: 1;
+  }
+  [data-spec="D1"].playing .dot {
+    animation: blink var(--t-blink) steps(2, jump-none) infinite alternate;
+  }
+  .specimen .tile-meta {
+    opacity: 0.4;
+  }
+  .specimen.playing .tile-meta {
+    opacity: 1;
   }
 
   @keyframes rise {
@@ -493,23 +515,8 @@ const decisions = [
     from { transform: scaleX(0); }
     to { transform: scaleX(1); }
   }
-  @keyframes press {
-    50% { transform: scale(var(--press)); }
   }
-  @keyframes hold {
-    from { transform: scale(1); }
-    to { transform: scale(1.35); }
   }
-  @keyframes fadeout {
-    to { opacity: 0; }
-  }
-  @keyframes sheetin {
-    from { opacity: 0; }
-    to { opacity: 0.92; }
-  }
-  @keyframes grow {
-    from { opacity: 0; transform: scale(0.35); }
-    to { opacity: 0.92; transform: scale(1); }
   }
   @keyframes blink {
     from { opacity: 1; }
@@ -525,9 +532,14 @@ const decisions = [
      alternative is repeating the override once per option, which is the same
      override written eleven times and one more thing to forget when a
      twelfth option lands. */
-  .specimen.run * {
-    animation-iteration-count: 2 !important;
-    animation-direction: alternate !important;
+  /* The stage is the control, so it has to say so. */
+  .stage.tappable {
+    cursor: pointer;
+    user-select: none;
+  }
+  .stage.tappable:focus-visible {
+    outline: 2px solid var(--marker);
+    outline-offset: 2px;
   }
 
   /* Hover a word to run the variant by hand, or press Loop and it runs on its
@@ -591,35 +603,8 @@ const decisions = [
     transform: translateX(calc(var(--slip-x) * -0.4));
   }
 
-  /* Looped, the same movement without a pointer on it. */
-  .run .reg .ghost {
-    opacity: 1;
-  }
-  .run .reg.E1 .ghost.m,
-  .run .reg.E2 .ghost.m {
-    animation: slip-m var(--t-slide) var(--ease-out) infinite alternate;
-  }
-  .run .reg.E2 .ghost.b {
-    animation: slip-b var(--t-slide) var(--ease-out) infinite alternate;
-  }
-  .run .reg.E3 .ghost.m {
-    animation: slip-far var(--t-slide) var(--ease-out) infinite alternate;
-  }
-  .run .reg.E3 .w {
-    animation: slip-back var(--t-slide) var(--ease-out) infinite alternate;
-  }
-  @keyframes slip-m {
-    to { transform: translateX(var(--slip-x)); }
-  }
-  @keyframes slip-b {
-    to { transform: translateX(calc(var(--slip-x) * -1)); }
-  }
-  @keyframes slip-far {
-    to { transform: translateX(calc(var(--slip-x) * 1.4)); }
-  }
-  @keyframes slip-back {
-    to { transform: translateX(calc(var(--slip-x) * -0.4)); }
-  }
+  /* Hover is the whole interaction here, so there is nothing to add. The
+     keyframes the loop needed are gone with it. */
 
   .shipped {
     font-family: var(--mono);
@@ -748,14 +733,6 @@ const decisions = [
   .dial input[type="range"] {
     width: 100%;
     accent-color: var(--marker);
-  }
-  /* Hold is not a token, so it does not look like one. */
-  .dial.lab .dial-name,
-  .dial.lab output {
-    color: var(--blueprint);
-  }
-  .dial.lab input[type="range"] {
-    accent-color: var(--blueprint);
   }
   .dial.ease {
     grid-column: 1 / -1;
