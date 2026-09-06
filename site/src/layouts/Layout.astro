@@ -670,4 +670,82 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
   .wirebar a {
     color: var(--marker);
   }
+
+  /* ---- Misregistration ----------------------------------------------------
+     A press out of register prints the plates a hair apart and leaves a
+     coloured fringe beside the type. Pointing at a word slides its ghost off
+     the true impression, one word at a time, so the page answers where the
+     eye is rather than everywhere at once.
+
+     The ghost sits under the word rather than over it, so the reading copy
+     stays crisp and the fringe reads as a printing fault rather than as a
+     second label. The offset takes --t-slide, a cut under reduce, and the
+     tint takes --t-fade, because opacity is not the part that makes anyone
+     ill. */
+  .slip .w {
+    position: relative;
+    display: inline-block;
+  }
+  .slip .ghost {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    color: var(--marker);
+    opacity: 0;
+    transform: translateX(0);
+    pointer-events: none;
+    user-select: none;
+    transition:
+      transform var(--t-slide) var(--ease-out),
+      opacity var(--t-fade) var(--ease-out);
+  }
+  .slip .w:hover .ghost {
+    opacity: 1;
+    transform: translateX(0.16em);
+  }
+  /* A keyboard visitor never hovers, so the whole row registers off at once
+     when the link that holds it takes focus. */
+  a:focus-visible .slip .ghost {
+    opacity: 1;
+    transform: translateX(0.16em);
+  }
+
+  /* ---- A1, the hero arrives ----------------------------------------------
+     Eight pixels and an opacity ramp on first paint, the sub a beat behind.
+     It runs once, on load, never on scroll, and --t-fade is 160ms in both
+     columns because a fade is not the movement reduce is protecting against.
+     The h1 is the largest paint on the page, so this is the one animation
+     allowed to touch it. */
+  .hero h1,
+  .hero .sub {
+    animation: hero-rise var(--t-fade) var(--ease-out) both;
+  }
+  .hero .sub {
+    animation-delay: var(--t-quick);
+  }
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ---- B1, the press ------------------------------------------------------
+     The tile acknowledges the press and nothing else. It is the part people
+     actually notice and it costs one transform on a composited layer. */
+  a.card:active {
+    transform: scale(0.995);
+  }
+  .card.work img,
+  .card.work .mask {
+    transition: transform var(--t-quick) var(--ease-out);
+  }
+  a.card.work:active img,
+  a.card.work:active .mask {
+    transform: scale(0.99);
+  }
 </style>

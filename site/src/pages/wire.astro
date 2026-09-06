@@ -60,10 +60,11 @@ const interactions = [
   { name: "Anchor jump", trigger: "Nav or rail link", response: "Smooth scroll, auto under reduce", token: "scroll-behavior", state: "built" },
   { name: "Preferences", trigger: "Theme or motion radio", response: "Repaint, no transition, stamped before paint on the next load", token: "none, deliberately", state: "built" },
   { name: "Film", trigger: "Play on the poster", response: "Native controls in a ratio-locked box, preload none, no shift", token: "none", state: "built" },
-  { name: "Hero entry", trigger: "First paint", response: "Open. The sentence has four seconds to land and motion could help or cost", token: "--t-fade would fit", state: "proposed" },
-  { name: "Tile to study", trigger: "Work tile click", response: "Open. A plain navigation, or the still holds while the page changes", token: "--t-fade would fit", state: "proposed" },
-  { name: "Still to full size", trigger: "Click a still or a board", response: "Open. A lightbox, a native dialog, or nothing at all", token: "--t-fade would fit", state: "proposed" },
-  { name: "Recording dot", trigger: "A clip is playing", response: "Open. The token exists for it and nothing uses it yet", token: "--t-blink", state: "proposed" },
+  { name: "Hero entry", trigger: "First paint", response: "The sentence rises eight pixels, the sub a beat behind, once and never on scroll", token: "--t-fade, --t-quick delay", state: "built" },
+  { name: "Tile press", trigger: "Pointer down on a work tile", response: "The tile and its still take a hair of scale", token: "--t-quick, --ease-out", state: "built" },
+  { name: "Still to full size", trigger: "Click a still or a board", response: "A native dialog whose frame grows from the tile it came from and returns there", token: "--t-fade, read at click time", state: "built" },
+  { name: "Recording dot", trigger: "A clip starts playing", response: "A marker dot blinks in the corner, lit and still under reduce", token: "--t-blink", state: "built" },
+  { name: "Misregistration", trigger: "Pointer over a word in a title", response: "The word's ghost slides off the true impression, one word at a time", token: "--t-slide, --t-fade", state: "built" },
 ];
 const built = interactions.filter((i) => i.state === "built").length;
 ---
@@ -136,13 +137,12 @@ const built = interactions.filter((i) => i.state === "built").length;
     </tbody>
   </table>
 
-  <h2>Two durations with nothing behind them</h2>
+  <h2>Every duration is spent</h2>
   <p class="prose">
-    The record declares four durations and the system page gives each one a play button, but only <code>--t-quick</code>
-    and <code>--t-slide</code> appear anywhere in the site. <code>--t-fade</code> and <code>--t-blink</code> are
-    documented movements that nothing performs. Either the three proposed interactions above get built and claim them,
-    or they come out of the record. A design system that documents motion the product does not have is a brochure, and
-    this one is meant to be the opposite of that.
+    On 2026-09-06 two of the four durations were documented on the system page with a play button each and performed
+    nowhere. <code>--t-fade</code> now carries the hero, the frame that grows from its tile, and the tint on a
+    misregistered word. <code>--t-blink</code> carries the recording dot. Nothing in the record is a movement the
+    product does not have, which is the only state worth keeping it in.
   </p>
 
   <p class="prose"><a href="/system">The token record and the motion table</a> carry the durations themselves.</p>

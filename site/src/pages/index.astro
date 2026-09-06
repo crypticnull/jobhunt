@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import Still from "../components/Still.astro";
 import Mask from "../components/Mask.astro";
+import Slip from "../components/Slip.astro";
 import { site } from "../site.config.mjs";
 
 const byOrder = (a: { data: { order: number } }, b: { data: { order: number } }) => a.data.order - b.data.order;
@@ -79,13 +80,13 @@ const ratio = (p) => `${p.data.hero.width} / ${p.data.hero.height}`;
           <li>
             {b.href ? (
               <a class="card" href={b.href}>
-                <h3>{b.title}</h3>
+                <Slip tag="h3" text={b.title} />
                 <p>{b.summary}</p>
                 <span class="meta">{b.meta}</span>
               </a>
             ) : (
               <div class="card">
-                <h3>{b.title}</h3>
+                <Slip tag="h3" text={b.title} />
                 <p>{b.summary}</p>
                 <span class="meta">{b.meta}</span>
               </div>
@@ -118,7 +119,7 @@ const ratio = (p) => `${p.data.hero.width} / ${p.data.hero.height}`;
             <a class="card work" href={`/work/${p.id}`}>
               <Mask label={p.data.title} need="Hero still" ratio={ratio(p)} />
               <div class="body">
-                <h3>{p.data.title}</h3>
+                <Slip tag="h3" text={p.data.title} />
                 <Mask label="Card summary" lines={2} />
                 <span class="meta">
                   {p.data.year}
@@ -136,7 +137,7 @@ const ratio = (p) => `${p.data.hero.width} / ${p.data.hero.height}`;
             <a class="card work" href={`/work/${p.id}`}>
               <Still still={p.data.hero} sizes="(min-width: 60rem) 22rem, 100vw" />
               <div class="body">
-                <h3>{p.data.title}</h3>
+                <Slip tag="h3" text={p.data.title} />
                 <p>{p.data.summary}</p>
                 <span class="meta">
                   {p.data.year}
@@ -160,7 +161,7 @@ const ratio = (p) => `${p.data.hero.width} / ${p.data.hero.height}`;
           {writing.map((post) => (
             <li>
               <a class="card" href={`/writing/${post.id}`}>
-                <h3>{post.data.title}</h3>
+                <Slip tag="h3" text={post.data.title} />
                 <p>{post.data.summary}</p>
                 <span class="meta">{post.data.date}</span>
               </a>
