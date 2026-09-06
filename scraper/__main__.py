@@ -252,10 +252,13 @@ def cmd_digest(args):
             md, _ = digest.build(store, rules, by_slug, heartbeat=HEARTBEAT)
             print(md)
             return 0
-        path, n = digest.write(store, rules, Path(args.out), by_slug, heartbeat=HEARTBEAT)
+        path, n, page = digest.write(store, rules, Path(args.out), by_slug, heartbeat=HEARTBEAT)
     finally:
         store.close()
-    print(f"wrote {path}, {n} postings surfaced")
+    # The page is the one he opens, so it is the one named first. Writing it
+    # without saying so meant a file nobody knew existed.
+    print(f"wrote {page}, {n} postings surfaced")
+    print(f"      {path}")
     return 0
 
 

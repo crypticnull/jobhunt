@@ -315,6 +315,6 @@ def write(store, rules, path_dir, companies=None, now=None, heartbeat=None):
     # The page goes out with the markdown rather than on request, so the week
     # is a dated file either way and the two can never be out of step by a run.
     from . import digest_html
-    digest_html.write(store, rules, path_dir, companies, now)
+    page = digest_html.write(store, rules, path_dir, companies, now)
     store.mark_digested(ids, utcnow(), digest_hash)
-    return path, len(ids)
+    return path, len(ids), page
