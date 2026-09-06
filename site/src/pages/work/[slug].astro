@@ -5,6 +5,7 @@ import Still from "../../components/Still.astro";
 import Video from "../../components/Video.astro";
 import ChapterRail from "../../components/ChapterRail.astro";
 import Mask from "../../components/Mask.astro";
+import Lightbox from "../../components/Lightbox.astro";
 import { CHAPTER_ORDER } from "../../schemas.mjs";
 
 export async function getStaticPaths() {
@@ -135,7 +136,9 @@ const videoRatio = d.video ? `${d.video.width} / ${d.video.height}` : "16 / 9";
         <ul class="grid">
           {d.stills.map((s) => (
             <li>
-              <Still still={s} sizes="(min-width: 60rem) 20rem, 100vw" />
+              <button type="button" data-zoom>
+                <Still still={s} sizes="(min-width: 60rem) 20rem, 100vw" />
+              </button>
             </li>
           ))}
         </ul>
@@ -178,7 +181,9 @@ const videoRatio = d.video ? `${d.video.width} / ${d.video.height}` : "16 / 9";
               {items.map((p) => (
                 <li>
                   <figure>
-                    <Still still={p} sizes="(min-width: 60rem) 20rem, 100vw" />
+                    <button type="button" data-zoom>
+                      <Still still={p} sizes="(min-width: 60rem) 20rem, 100vw" />
+                    </button>
                     {p.caption && <figcaption>{p.caption}</figcaption>}
                   </figure>
                 </li>
@@ -189,4 +194,6 @@ const videoRatio = d.video ? `${d.video.width} / ${d.video.height}` : "16 / 9";
       );
     })
   }
+
+  <Lightbox />
 </Layout>

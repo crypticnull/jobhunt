@@ -1,0 +1,134 @@
+---
+// C2: a still opens by growing from where it sat.
+//
+// One dialog per page, bound to every button marked data-zoom. The frame
+// starts at the thumbnail's own rectangle and travels to its place, so the
+// image never appears from nowhere and a reader keeps their place in the
+// grid. Native <dialog>, so escape closes it, the backdrop is free, focus is
+// trapped and returned, and none of that is code anyone has to maintain.
+//
+// Durations are read from the custom properties at the moment of the click
+// rather than written here, which means a visitor who asked for less motion
+// gets the same travel at 0ms, and the record stays the only place a duration
+// is decided.
+---
+
+<dialog class="zoom" aria-label="Full size">
+  <img alt="" />
+  <button class="zoom-close" type="button" aria-label="Close">Close</button>
+</dialog>
+
+<script>
+  const dlg = document.querySelector<HTMLDialogElement>("dialog.zoom");
+  const frame = dlg?.querySelector("img");
+  if (dlg && frame) {
+    const ms = (name: string) => {
+      const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return v.endsWith("ms") ? parseFloat(v) : parseFloat(v) * 1000 || 0;
+    };
+    const ease = () => getComputedStyle(document.documentElement).getPropertyValue("--ease-out").trim() || "linear";
+    let origin: HTMLElement | null = null;
+
+    const flip = (from: DOMRect, to: DOMRect, back: boolean) => {
+      const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+      const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+      const s = from.width / to.width;
+      const shifted = { transform: `translate(${dx}px, ${dy}px) scale(${s})`, opacity: back ? 1 : 0 };
+      const settled = { transform: "none", opacity: 1 };
+      return frame.animate(back ? [settled, shifted] : [shifted, settled], {
+        duration: ms("--t-fade"),
+        easing: ease(),
+        fill: "both",
+      });
+    };
+
+    const open = (btn: HTMLElement) => {
+      const img = btn.querySelector("img");
+      if (!img) return;
+      origin = btn;
+      frame.src = img.currentSrc || img.src;
+      frame.alt = img.alt;
+      dlg.showModal();
+      flip(img.getBoundingClientRect(), frame.getBoundingClientRect(), false);
+    };
+
+    const shut = () => {
+      const img = origin?.querySelector("img");
+      if (!img) return dlg.close();
+      const a = flip(img.getBoundingClientRect(), frame.getBoundingClientRect(), true);
+      a.finished.then(() => dlg.close()).catch(() => dlg.close());
+    };
+
+    for (const b of document.querySelectorAll<HTMLElement>("[data-zoom]")) {
+      b.addEventListener("click", () => open(b));
+    }
+    dlg.querySelector(".zoom-close")?.addEventListener("click", shut);
+    // The backdrop is the dialog itself: a click that lands outside the frame
+    // is a click on the element, so no overlay div is needed for it.
+    dlg.addEventListener("click", (e) => {
+      if (e.target === dlg) shut();
+    });
+    dlg.addEventListener("cancel", (e) => {
+      e.preventDefault();
+      shut();
+    });
+    dlg.addEventListener("close", () => {
+      origin?.focus();
+      origin = null;
+    });
+  }
+</script>
+
+<style is:global>
+  dialog.zoom {
+    border: 0;
+    padding: 0;
+    max-width: min(92vw, 90rem);
+    max-height: 92vh;
+    background: transparent;
+    color: var(--ink);
+    overflow: visible;
+  }
+  dialog.zoom::backdrop {
+    background: var(--plate);
+    opacity: 0.9;
+  }
+  dialog.zoom img {
+    display: block;
+    max-width: 92vw;
+    max-height: 84vh;
+    width: auto;
+    height: auto;
+    background: var(--field);
+  }
+  .zoom-close {
+    display: block;
+    margin: 0.75rem 0 0 auto;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--plate-ink);
+    background: transparent;
+    border: 1px solid var(--plate-rule);
+    padding: 0.35rem 0.75rem;
+    cursor: pointer;
+  }
+  .zoom-close:hover {
+    color: var(--plate-marker);
+    border-color: currentColor;
+  }
+  /* The grid tile becomes a button, and a button has to look like nothing at
+     all here or the grid stops being a grid. */
+  button[data-zoom] {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+  }
+</style>

@@ -16,7 +16,7 @@ const decisions = [
     ask: "First paint. The sentence has four seconds to say what you are before a visitor files you as a motion designer. Motion can carry that or spend it.",
     options: [
       { id: "A0", name: "Cut", token: "none", note: "The sentence is there on the first frame. Fastest to read, and the most confident thing a page can do." },
-      { id: "A1", name: "Fade up", token: "--t-fade", note: "Eight pixels and an opacity ramp. Costs 160ms of reading time and buys a sense that the page arrived rather than appeared." },
+      { id: "A1", picked: true, name: "Fade up", token: "--t-fade", note: "Eight pixels and an opacity ramp. Costs 160ms of reading time and buys a sense that the page arrived rather than appeared." },
       { id: "A2", name: "Rule, then text", token: "--t-slide then --t-fade", note: "A marker rule draws across, the sentence follows. Reads as drafting, which is the system's whole idea, but it is the slowest and it sequences." },
     ],
   },
@@ -27,7 +27,7 @@ const decisions = [
     ask: "The click from the index into a study. The still is the same image on both pages, which is the one fact an interaction here can use.",
     options: [
       { id: "B0", name: "Plain", token: "none", note: "A navigation. Nothing to maintain, nothing to go wrong on a slow connection." },
-      { id: "B1", name: "Press", token: "--t-quick", note: "The tile acknowledges the press and nothing else. Cheap, and it is the part people actually notice." },
+      { id: "B1", picked: true, name: "Press", token: "--t-quick", note: "The tile acknowledges the press and nothing else. Cheap, and it is the part people actually notice." },
       { id: "B2", name: "The still holds", token: "--t-fade", note: "The image persists across the navigation and the rest of the page changes around it. The strongest signal of craft here, and the only option with a real failure mode." },
     ],
   },
@@ -39,7 +39,18 @@ const decisions = [
     options: [
       { id: "C0", name: "Nothing", token: "none", note: "The grid is the whole experience. Honest, and it wastes the process material the studies are built around." },
       { id: "C1", name: "Dialog", token: "--t-fade", note: "Native dialog, backdrop, escape closes it, focus returns. The accessible answer with the least code." },
-      { id: "C2", name: "Grows from the tile", token: "--t-fade", note: "The frame scales up from where it sat. Better sense of place, more to get wrong on a phone." },
+      { id: "C2", picked: true, name: "Grows from the tile", token: "--t-fade", note: "The frame scales up from where it sat. Better sense of place, more to get wrong on a phone." },
+    ],
+  },
+  {
+    id: "register",
+    n: "E",
+    title: "Misregistration",
+    ask: "A press out of register prints the plates a hair apart and leaves a coloured fringe beside the type. Per word, on hover, so the page answers where the eye is rather than everywhere at once. The offset takes --t-slide, a cut under reduce, and the tint takes --t-fade.",
+    options: [
+      { id: "E1", picked: true, name: "One fringe", token: "--t-slide, --t-fade", note: "A marker ghost slides right off the true impression. What is on the builds list now." },
+      { id: "E2", name: "Full misregistration", token: "--t-slide, --t-fade", note: "Marker one way, blueprint the other, which is what a four colour press actually does when it slips. Louder, and it spends the second accent colour." },
+      { id: "E3", name: "The pair separates", token: "--t-slide, --t-fade", note: "The ghost goes one way and the word itself moves a hair the other. Reads as the sheet shifting rather than as ink smearing, and it is the only one that moves the text you are reading." },
     ],
   },
   {
@@ -49,7 +60,7 @@ const decisions = [
     ask: "The token record declares --t-blink for a dot that marks a clip playing. Nothing on the site performs it.",
     options: [
       { id: "D0", name: "Drop it", token: "removes --t-blink", note: "The record stops documenting a movement the product does not have." },
-      { id: "D1", name: "Build it", token: "--t-blink", note: "A marker dot beside a playing clip. One more moving thing on a page whose job is to be read." },
+      { id: "D1", picked: true, name: "Build it", token: "--t-blink", note: "A marker dot beside a playing clip. One more moving thing on a page whose job is to be read." },
     ],
   },
 ];
@@ -96,6 +107,12 @@ const decisions = [
                       <span class="sheet" />
                     </>
                   )}
+                  {d.id === "register" && (
+                    <span class={`reg ${o.id}`}>
+                      <span class="w"><span class="ghost b" aria-hidden="true">Keynote</span><span class="ghost m" aria-hidden="true">Keynote</span>Keynote</span>{" "}
+                      <span class="w"><span class="ghost b" aria-hidden="true">extractor</span><span class="ghost m" aria-hidden="true">extractor</span>extractor</span>
+                    </span>
+                  )}
                   {d.id === "dot" && (
                     <>
                       <span class="dot" />
@@ -108,8 +125,9 @@ const decisions = [
                 <label>
                   <input type="radio" name={d.id} value={o.id} />
                   <span class="opt-id">{o.id}</span> {o.name}
+                  {o.picked && <span class="shipped">shipped</span>}
                 </label>
-                <button type="button" data-play={o.id} disabled>Play</button>
+                {d.id === "register" ? <span class="hint">hover the words</span> : <button type="button" data-play={o.id} disabled>Play</button>}
               </div>
               <p class="token">{o.token}</p>
               <p class="note">{o.note}</p>
@@ -150,7 +168,7 @@ const decisions = [
   const picks: Record<string, string> = (() => {
     try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; }
   })();
-  const order = ["hero", "tile", "still", "dot"];
+  const order = ["hero", "tile", "still", "register", "dot"];
   const paint = () => {
     const line = order.map((k) => picks[k]).filter(Boolean);
     if (out) out.textContent = line.length ? line.join(" ") : "Nothing picked yet.";
@@ -346,6 +364,75 @@ const decisions = [
     to { opacity: 0.15; }
   }
 
+  /* Hover the words in a specimen and the variant runs. No play button:
+     the movement is the hover, so a button would be answering a question
+     nobody asked. */
+  .reg {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+  .reg .w {
+    position: relative;
+    display: inline-block;
+  }
+  .reg .ghost {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0;
+    transform: translateX(0);
+    pointer-events: none;
+    transition:
+      transform var(--t-slide) var(--ease-out),
+      opacity var(--t-fade) var(--ease-out);
+  }
+  .reg .ghost.m {
+    color: var(--marker);
+  }
+  .reg .ghost.b {
+    color: var(--blueprint);
+  }
+  .reg .w {
+    transition: transform var(--t-slide) var(--ease-out);
+  }
+  /* E1, one fringe. The blueprint plate never prints. */
+  .reg.E1 .ghost.b {
+    display: none;
+  }
+  .reg.E1 .w:hover .ghost.m {
+    opacity: 1;
+    transform: translateX(0.16em);
+  }
+  /* E2, both plates slip, opposite ways. */
+  .reg.E2 .w:hover .ghost.m {
+    opacity: 1;
+    transform: translateX(0.12em);
+  }
+  .reg.E2 .w:hover .ghost.b {
+    opacity: 1;
+    transform: translateX(-0.12em);
+  }
+  /* E3, the sheet shifts: the word moves too. */
+  .reg.E3 .ghost.b {
+    display: none;
+  }
+  .reg.E3 .w:hover .ghost.m {
+    opacity: 1;
+    transform: translateX(0.2em);
+  }
+  .reg.E3 .w:hover {
+    transform: translateX(-0.06em);
+  }
+
+  .shipped {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blueprint);
+    margin-left: 0.4rem;
+  }
   .opt-head {
     display: flex;
     align-items: baseline;
@@ -381,6 +468,13 @@ const decisions = [
   .opt-head button[disabled] {
     opacity: 0.4;
     cursor: default;
+  }
+  .hint {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
   .token {
     font-family: var(--mono);
