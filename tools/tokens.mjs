@@ -79,6 +79,7 @@ export function render(t = load()) {
     block(":root", [
       ...Object.entries(t.colour.light),
       ...Object.entries(t.colour.plate),
+      ...Object.entries(t.type),
       ...Object.entries(t.grid),
       ...motionDefault,
       ["_", null],

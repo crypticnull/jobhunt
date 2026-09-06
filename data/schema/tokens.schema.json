@@ -8,7 +8,8 @@
     "version",
     "colour",
     "grid",
-    "motion"
+    "motion",
+    "type"
   ],
   "properties": {
     "version": {
@@ -60,6 +61,13 @@
             }
           }
         }
+      }
+    },
+    "type": {
+      "type": "object",
+      "description": "How the vendored families are set: the scale, the weights, the tracking and the leading. The families themselves are woff2 files declared in site/astro.config.mjs, per ADR-0011, because a family is a file rather than a value.",
+      "additionalProperties": {
+        "type": "string"
       }
     },
     "grid": {

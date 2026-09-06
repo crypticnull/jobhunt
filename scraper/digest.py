@@ -26,6 +26,9 @@ def _week(now):
     return f"{y}-W{w:02d}"
 
 
+SCORE_ORDER = ("remote", "comp", "intersection", "title", "company", "curriculum", "freshness", "human", "deductions")
+
+
 def _since(now, days=7):
     return (now - timedelta(days=days)).isoformat()
 
@@ -75,7 +78,10 @@ def _comp(row):
 def _entry(row, companies):
     detail = json.loads(row["score_json"] or "{}")
     sc = {r["rule"]: r for r in detail.get("rules", [])}
-    parts = [f"{k} {sc[k]['value']:+d}" for k in ("remote", "comp", "intersection", "title", "company", "freshness", "human", "deductions") if k in sc]
+    # Curriculum was missing from this list, so every breakdown in every digest
+    # printed three short, or five where two areas hit, and none of them added
+    # up to the score beside them. Anything the score counts prints here.
+    parts = [f"{k} {sc[k]['value']:+d}" for k in SCORE_ORDER if k in sc]
     company = (companies or {}).get(row["company_slug"]) or {}
     name = company.get("name", row["company_slug"])
     tier = company.get("tier")

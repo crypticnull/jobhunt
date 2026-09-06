@@ -261,6 +261,24 @@ class Digest(unittest.TestCase):
         rows = digest.dead_weight(self.s, self.r, {"kept": {"slug": "kept"}})
         self.assertEqual([ln for ln in rows if "gone" in ln], [])
 
+    def test_the_breakdown_adds_up_to_the_score_beside_it(self):
+        """Curriculum was missing from the printed list, so every entry in
+        every digest was three short, or five where two areas hit, and the
+        parts never summed to the total printed on the line above them."""
+        import re
+        md, _ = digest.build(self.s, self.r, COMPANIES, NOW)
+        entries = [b for b in md.split("### ")[1:]]
+        checked = 0
+        for e in entries:
+            head = re.search(r"score (\d+)", e)
+            line = re.search(r"^Score: (.+)$", e, re.M)
+            if not head or not line:
+                continue
+            total = sum(int(v) for v in re.findall(r"([+-]\d+)", line.group(1)))
+            self.assertEqual(total, int(head.group(1)), e.splitlines()[0])
+            checked += 1
+        self.assertGreater(checked, 0, "no entries to check")
+
     def test_all_sources_answered(self):
         md, _ = digest.build(self.s, self.r, now=NOW)
         self.assertIn("All sources answered.", md)
