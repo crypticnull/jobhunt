@@ -6,6 +6,8 @@
   check          probe every company's endpoint, report dead ones
   stale          companies not reviewed in N days
   poll           read the discovery feeds, add what they give away, then fetch every pollable company
+  console        the one page: the shortlist live off the store, decisions and briefs.
+                 This is the default, so `run.cmd` on its own opens it.
   digest         write this week's digest to data/digests (public, pushed on Sundays), or --stdout
   score          rescore every open posting with the current ruleset
   mark ID STATE  new | reviewed | applied | screen | loop | offer | rejected | skipped
@@ -295,6 +297,14 @@ def cmd_mark(args):
     return 0
 
 
+def cmd_console(args):
+    """The one surface. Everything else in here writes a file and hopes he
+    finds it; this reads the store he already has and answers on the click."""
+    from . import serve
+    return serve.serve(args.db, args.companies, args.letters,
+                       port=args.port, open_browser=not args.no_open)
+
+
 def cmd_stats(args):
     store = Store(args.db)
     try:
@@ -392,6 +402,12 @@ def main(argv=None):
     ap.add_argument("--db", default=str(DEFAULT_DB), help="postings database (default data/local/postings.db)")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
+    co = sub.add_parser("console", help="the one page: the shortlist, live off the store")
+    co.add_argument("--port", type=int, default=4319)
+    co.add_argument("--no-open", action="store_true", help="do not open a browser")
+    co.add_argument("--letters", default=str(ROOT / "data" / "local" / "letters"))
+    co.set_defaults(fn=cmd_console)
+
     a = sub.add_parser("add", help="detect the ATS behind a careers URL and add the company")
     a.add_argument("url")
     a.add_argument("--category", required=True, choices=companies.CATEGORIES)
@@ -477,7 +493,10 @@ def main(argv=None):
     fx.add_argument("--out", default=str(ROOT / "scraper" / "tests" / "fixtures"))
     fx.set_defaults(fn=cmd_fixture)
 
-    args = ap.parse_args(argv)
+    # No command means the console. It is the surface, and the others are
+    # maintenance, so the shortest thing he can type opens the thing he wants.
+    argv = sys.argv[1:] if argv is None else argv
+    args = ap.parse_args(argv or ["console"])
     return args.fn(args)
 
 

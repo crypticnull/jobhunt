@@ -1,6 +1,12 @@
 @echo off
 rem Run any scraper command from anywhere, with no cd and no PYTHONPATH.
 rem
+rem On its own it opens the console, which is the whole job hunt on one page:
+rem the shortlist live off the store, the postings' own words, a decision per
+rem posting that goes straight back to the database, and the letter brief
+rem written for whichever one is open. Everything else here is maintenance.
+rem
+rem     X:\_CLAUDE\26_09_01_Job_Hunt\jobhunt\run.cmd
 rem     X:\_CLAUDE\26_09_01_Job_Hunt\jobhunt\run.cmd pull
 rem     X:\_CLAUDE\26_09_01_Job_Hunt\jobhunt\run.cmd score
 rem     X:\_CLAUDE\26_09_01_Job_Hunt\jobhunt\run.cmd digest --stdout
