@@ -290,17 +290,19 @@ def gate_remote(p, rules):
     tz_ok = any(_term(t).search(body + "\n" + loc) for t in r["ok_timezone_phrases"])
     # A time zone phrase is excused by an ok phrase and flags even on a
     # nationwide posting, since Eastern-only on "Remote - US" is still a
-    # constraint. A payroll-default shape like "Remote (…)" is excused by a
-    # real state list or a nationwide location.
-    tz_flags, shape_flags = [], []
-    for f in _hits(r["flag_phrases"], loc + "\n" + body):
-        is_tz = "time" in f or "hours" in f
-        if is_tz and not tz_ok:
-            tz_flags.append(f)
-        elif not is_tz and not nationwide and not states:
-            shape_flags.append(f)
+    # constraint. A payroll-default shape is a different thing and lives in a
+    # different list: it is a shape in the location field, "Remote (Berlin)",
+    # so it is matched there and nowhere else. The two used to share one list
+    # and be told apart by looking for "time" in the pattern, which meant the
+    # shapes were matched against the body too, where "we are fully remote,
+    # and" hit every time. A real state list or a nationwide location still
+    # excuses a shape.
+    tz_flags = [] if tz_ok else _hits(r["flag_phrases"], loc + "\n" + body)
+    shape_flags = [] if (nationwide or states) else _hits(r.get("flag_location_shapes", []), loc)
     if shape_flags:
-        reasons.append(f"payroll-default language: {', '.join(readable(f) for f in shape_flags[:2])}")
+        # One pattern, and it is a shape rather than a phrase, so the reason
+        # says what was found instead of trying to render a character class.
+        reasons.append("payroll-default shape in the location")
     if tz_flags:
         reasons.append(f"timezone language: {', '.join(readable(f) for f in tz_flags[:2])}")
     pacific = is_pacific(p, states, rules)

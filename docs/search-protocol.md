@@ -118,7 +118,7 @@ How the state list is read, revised the same day. Nationwide tokens are read fro
 
 **Flag** (pass at half marks, reason attached) on:
 - State list includes PA but neither WA nor OR. State lists change and it can be asked on the first call.
-- Location reads like "Remote (San Francisco)" or "Remote - New York" with no state list and no residency language. Usually a payroll default, not a requirement. This flag is soft: it halves the remote marks and prints on the row but does not hold a tiered title in review, because once the "us" bug was fixed it fires on real matches and the point was to surface them.
+- Location reads like "Remote (San Francisco)" or "Remote - New York" with no state list and no residency language. Usually a payroll default, not a requirement. This flag is soft: it halves the remote marks and prints on the row but does not hold a tiered title in review, because once the "us" bug was fixed it fires on real matches and the point was to surface them. Matched against the location only and anchored to the front, revised 2026-09-06. It shared a list with the time zone phrases before and was matched against the body too, where "we are a fully remote, distributed team" hit every time, so Buffer, Recraft, RevenueCat and Supabase all lost ten remote marks for being all-remote companies that say so.
 - `remote_claim` is `unclear` but the body says remote and no fail phrase is present.
 - Time zone requirements tighter than "US time zones". Pacific-only is fine for someone moving to the Northwest and earns the full remote marks, Eastern-only is a flag, not a fail, and it flags on a nationwide posting too.
 
