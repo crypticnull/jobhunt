@@ -139,9 +139,26 @@ class Page(unittest.TestCase):
             self.assertIn(f"var(--score-{rule})", self.html)
         self.assertNotIn('class="neg"', self.html, "sign is carried by the number, not a second colour")
 
-    def test_the_legend_names_every_stop(self):
-        for rule in digest_html.RULES_ORDER:
+    def test_the_legend_names_only_what_is_drawn(self):
+        """A stop for a rule nobody can find on the page is a colour with
+        nothing to point at. human has never scored on a posting."""
+        for rule in ("comp", "intersection"):
             self.assertIn(f'<b><i style="background:var(--score-{rule})"></i>{rule}</b>', self.html)
+        for rule in ("remote", "human"):
+            self.assertNotIn(f'</i>{rule}</b>', self.html, rule)
+
+    def test_remote_is_out_of_the_strip_and_still_in_the_breakdown(self):
+        """It was +22 on thirty nine of the forty postings of the week to
+        6 September, so it spent a third of every bar saying the same thing,
+        and the location already prints at the foot of the card. The breakdown
+        keeps it, because that is the audit and it has to sum to the score."""
+        self.assertNotIn("remote", digest_html.STRIP_ORDER)
+        self.assertIn("remote", digest_html.RULES_ORDER)
+        strip = self.html.split('<div class="strip">')[1].split("</div>")[0]
+        self.assertNotIn("--score-remote", strip)
+        rows = self.html.split('<div class="rows">')[1].split("</div></div>")[0]
+        self.assertIn("--score-remote", rows)
+        self.assertIn("<b>+22</b>", rows)
 
     def test_nothing_is_fetched_from_anywhere(self):
         """It opens from disk, off a plane, in a year. No request leaves it."""

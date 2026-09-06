@@ -32,6 +32,15 @@ from . import digest as digest_mod
 # The order the score prints in, from the markdown, so the two read the same
 # and neither can quietly start leaving a rule out.
 RULES_ORDER = digest_mod.SCORE_ORDER
+# Kept out of the strip, kept in the breakdown. The strip is for comparing one
+# posting against another, and remote was +22 on thirty nine of the forty
+# postings of the week to 6 September, so it spent a third of every bar saying
+# the same thing. It is binary in practice, everything that clears the gates is
+# remote, and the location already prints at the foot of the card. The
+# breakdown still carries it, because that is the audit and it has to sum to
+# the score printed beside it.
+STRIP_SKIP = {"remote"}
+STRIP_ORDER = [r for r in RULES_ORDER if r not in STRIP_SKIP]
 
 
 def _dateline(now):
@@ -241,10 +250,10 @@ def _card(row, companies, pile):
     parts = {r["rule"]: r["value"] for r in detail.get("rules", []) if r["rule"] in RULES_ORDER}
     money = digest_mod._comp(row) if row["comp_found"] else None
 
-    total = sum(v for v in parts.values() if v > 0) or 1
+    total = sum(parts[k] for k in STRIP_ORDER if parts.get(k, 0) > 0) or 1
     strip = "".join(
         f'<i style="width:{parts[k] / total * 100:.1f}%;background:var(--score-{k})"></i>'
-        for k in RULES_ORDER if parts.get(k, 0) > 0
+        for k in STRIP_ORDER if parts.get(k, 0) > 0
     )
     widest = max([abs(v) for v in parts.values()] or [1]) or 1
     rows = "".join(
@@ -336,7 +345,11 @@ def render(store, rules, companies=None, now=None, tokens=None):
                 f'card are what the body actually asked for, so <b class="warn">product-motion</b> is the one to scan for. '
                 f'<b>None of the {n_apply} in Apply have it.</b>')
 
-    key = "".join(f'<b><i style="background:var(--score-{k})"></i>{_esc(k)}</b>' for k in RULES_ORDER)
+    drawn = {k for r, _ in seen for k, v in
+             {x["rule"]: x["value"] for x in json.loads(r["score_json"] or "{}").get("rules", [])}.items()
+             if k in STRIP_ORDER and v > 0}
+    key = "".join(f'<b><i style="background:var(--score-{k})"></i>{_esc(k)}</b>'
+                  for k in STRIP_ORDER if k in drawn)
     tabs = "".join(
         f'<button class="tab" data-f="{f}" aria-pressed="{"true" if f == "all" else "false"}">{label}<span class="c">{n}</span></button>'
         for f, label, n in [("all", "Everything", len(cards)), ("apply", "Apply", n_apply),
@@ -383,7 +396,7 @@ def render(store, rules, companies=None, now=None, tokens=None):
   <div><span class="n">{nocomp}</span><span class="k">no comp posted</span></div>
 </div>
 <div class="key">
-  <span>Score strip, left to right</span>
+  <span>What differs, left to right</span>
   {key}
 </div>
 
