@@ -158,45 +158,73 @@ const HINTS = {
       <span class="hint">live, this browser only</span>
       <button type="button" id="dial-reset">Reset</button>
     </div>
-    <div class="dial-grid">
+    {/* Three groups rather than one flow. Sliders and curve editors are
+        different heights and different jobs, and putting them in the same
+        auto-fit grid left a hole the size of a curve wherever a slider
+        landed next to one. */}
+    <div class="dial-groups">
       {[
-        { v: "t-quick", label: "quick", min: 0, max: 600, step: 10, unit: "ms" },
-        { v: "t-fade", label: "fade", min: 0, max: 600, step: 10, unit: "ms" },
-        { v: "t-slide", label: "slide", min: 0, max: 900, step: 10, unit: "ms" },
-        { v: "t-blink", label: "blink", min: 200, max: 3000, step: 50, unit: "ms" },
-        { v: "slip-x", label: "slip", min: 0, max: 0.6, step: 0.01, unit: "em" },
-        { v: "rise-y", label: "rise", min: 0, max: 2, step: 0.05, unit: "rem" },
-        { v: "press", label: "press", min: 0.9, max: 1, step: 0.005, unit: "" },
-      ].map((d) => (
-        <label class="dial">
-          <span class="dial-name">{d.label}</span>
-          <input type="range" data-var={d.v} data-unit={d.unit} min={d.min} max={d.max} step={d.step} />
-          <output data-out={d.v} />
-        </label>
-      ))}
-      {["ease-out", "ease-in"].map((name) => (
-        <div class="curve" data-curve={name}>
-          <span class="dial-name">{name.replace("-", " ")}</span>
-          <svg viewBox="0 0 100 100" width="120" height="120" aria-hidden="true">
-            <rect x="0" y="0" width="100" height="100" class="c-field" />
-            <line x1="0" y1="100" x2="100" y2="0" class="c-diag" />
-            <path class="c-path" />
-            <line class="c-h1" />
-            <line class="c-h2" />
-            <circle class="c-p1" r="6" data-p="1" />
-            <circle class="c-p2" r="6" data-p="2" />
-          </svg>
-          <output data-out={name} />
-          <span class="c-nums">
-            {["x1", "y1", "x2", "y2"].map((k) => (
-              <input type="number" data-bez={`${name}:${k}`} min="-1" max="2" step="0.01" />
-            ))}
-          </span>
+        {
+          legend: "duration",
+          rows: [
+            { v: "t-quick", label: "quick", min: 0, max: 600, step: 10, unit: "ms" },
+            { v: "t-fade", label: "fade", min: 0, max: 900, step: 10, unit: "ms" },
+            { v: "t-slide", label: "slide", min: 0, max: 900, step: 10, unit: "ms" },
+            { v: "t-blink", label: "blink", min: 100, max: 3000, step: 50, unit: "ms" },
+          ],
+        },
+        {
+          legend: "distance",
+          rows: [
+            { v: "slip-x", label: "slip", min: 0, max: 0.6, step: 0.01, unit: "em" },
+            { v: "slip-band", label: "band", min: 1, max: 40, step: 0.5, unit: "rem" },
+            { v: "rise-y", label: "rise", min: 0, max: 2, step: 0.05, unit: "rem" },
+            { v: "press", label: "press", min: 0.9, max: 1, step: 0.005, unit: "" },
+          ],
+        },
+      ].map((g) => (
+        <div class="dial-group">
+          <h3>{g.legend}</h3>
+          {g.rows.map((d) => (
+            <label class="dial">
+              <span class="dial-name">{d.label}</span>
+              <input type="range" data-var={d.v} data-unit={d.unit} min={d.min} max={d.max} step={d.step} />
+              <output data-out={d.v} />
+            </label>
+          ))}
         </div>
       ))}
+      <div class="dial-group curves">
+        <h3>easing</h3>
+        <div class="curve-pair">
+          {["ease-out", "ease-in"].map((name) => (
+            <div class="curve" data-curve={name}>
+              <span class="dial-name">{name.replace("-", " ")}</span>
+              <svg viewBox="-8 -8 116 116" width="104" height="104" aria-hidden="true">
+                <rect x="0" y="0" width="100" height="100" class="c-field" />
+                <line x1="0" y1="100" x2="100" y2="0" class="c-diag" />
+                <line class="c-h1" />
+                <line class="c-h2" />
+                <path class="c-path" />
+                <circle class="c-p1" r="5" data-p="1" />
+                <circle class="c-p2" r="5" data-p="2" />
+              </svg>
+              <span class="c-nums">
+                {["x1", "y1", "x2", "y2"].map((k) => (
+                  <input type="number" data-bez={`${name}:${k}`} min="-1" max="2" step="0.01" />
+                ))}
+              </span>
+              <output data-out={name} />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div class="dial-group patch-wrap">
+        <h3>the record patch</h3>
+        <p class="patch-note">For <code>data/design/tokens.json</code>. Paste it back and it becomes the site.</p>
+        <pre class="patch" id="patch">Nothing changed yet.</pre>
+      </div>
     </div>
-    <p class="patch-note">The record patch, for <code>data/design/tokens.json</code>. Paste it back and it becomes the site.</p>
-    <pre class="patch" id="patch">Nothing changed yet.</pre>
   </aside>
 
   <section class="dec" id="answer">
@@ -274,12 +302,24 @@ const HINTS = {
     paintPatch();
   };
 
+  // The build minifies 120ms to .12s, so the value a slider reads back is not
+  // the value the record was written with. Reading it as a bare number put
+  // every duration thumb at zero and printed .12s where 120ms belonged.
+  const toNumber = (raw: string, unit: string) => {
+    const n = parseFloat(raw);
+    if (Number.isNaN(n)) return 0;
+    if (unit !== "ms") return n;
+    return /(^|[^m])s\s*$/.test(raw) ? n * 1000 : n;
+  };
   for (const r of document.querySelectorAll<HTMLInputElement>("input[data-var]")) {
     const v = r.dataset.var!;
     const unit = r.dataset.unit ?? "";
-    base[v] = readBase(v);
+    const raw = readBase(v);
+    // Normalised, so the record patch always prints the unit the record uses
+    // rather than whatever the minifier happened to choose.
+    base[v] = `${toNumber(raw, unit)}${unit}`;
     now[v] = base[v];
-    r.value = String(parseFloat(base[v]));
+    r.value = String(toNumber(raw, unit));
     const out = document.querySelector<HTMLOutputElement>(`output[data-out="${v}"]`);
     if (out) out.textContent = base[v];
     r.addEventListener("input", () => setVar(v, `${r.value}${unit}`));
@@ -338,6 +378,8 @@ const HINTS = {
     now[name] = base[name];
     const nums = (base[name].match(/-?[\d.]+/g) || ["0.25", "0.1", "0.25", "1"]).map(Number);
     state[name] = nums.length === 4 ? nums : [0.25, 0.1, 0.25, 1];
+    base[name] = `cubic-bezier(${state[name].map((n) => Math.round(n * 100) / 100).join(", ")})`;
+    now[name] = base[name];
     const svg = el.querySelector("svg")!;
     let dragging: 1 | 2 | null = null;
     const at = (e: PointerEvent) => {
@@ -717,13 +759,15 @@ const HINTS = {
     max-width: none;
   }
   /* The panel follows, because a dial you have to scroll back to is a dial
-     nobody turns. */
+     nobody turns. Three groups on one row: two stacks of sliders and the pair
+     of curves, each sized to its own content, so nothing waits on the tallest
+     thing beside it. */
   .dials {
     position: sticky;
     bottom: 0;
     z-index: 2;
     margin: 4rem 0 0;
-    padding: 1rem var(--gutter) 1.25rem;
+    padding: 0.9rem var(--gutter) 1rem;
     background: var(--field);
     border-top: 1px solid var(--rule);
   }
@@ -731,46 +775,63 @@ const HINTS = {
     display: flex;
     align-items: baseline;
     gap: 1rem;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.75rem;
   }
-  .dial-head strong {
+  .dial-head strong,
+  .dial-group h3 {
     font-family: var(--mono);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+    margin: 0;
+    font-weight: 500;
+  }
+  .dial-group h3 {
+    color: var(--muted);
+    margin-bottom: 0.5rem;
   }
   #dial-reset {
     margin-left: auto;
     font-family: var(--mono);
-    font-size: 0.66rem;
+    font-size: 0.64rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     background: transparent;
     border: 1px solid var(--rule);
     color: var(--ink);
-    padding: 0.25rem 0.6rem;
+    padding: 0.2rem 0.55rem;
     cursor: pointer;
   }
   #dial-reset:hover {
     border-color: var(--marker);
     color: var(--marker);
   }
-  .dial-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
-    gap: 0.6rem var(--grid-gap);
+  .dial-groups {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    gap: 1rem 2rem;
   }
+  .dial-group {
+    flex: 0 1 auto;
+    margin: 0;
+    padding: 0;
+  }
+  /* A slider row is three fixed things: what it is, the track, the value.
+     Letting the value column stretch put the number half a screen from the
+     label it belonged to. */
   .dial {
     display: grid;
-    grid-template-columns: 3.5rem 1fr 4.5rem;
+    grid-template-columns: 3rem 9rem 4rem;
     align-items: center;
     gap: 0.5rem;
+    margin-bottom: 0.3rem;
   }
   .dial-name,
   .dial output {
     font-family: var(--mono);
     font-size: 0.66rem;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     color: var(--muted);
   }
   .dial output {
@@ -780,18 +841,26 @@ const HINTS = {
   .dial input[type="range"] {
     width: 100%;
     accent-color: var(--marker);
+    margin: 0;
+  }
+  .curve-pair {
+    display: flex;
+    gap: 1.25rem;
   }
   .curve {
     display: grid;
     justify-items: start;
     gap: 0.3rem;
   }
+  .curve .dial-name {
+    display: block;
+  }
   .curve svg {
     background: var(--paper);
     border: 1px solid var(--rule);
     touch-action: none;
     cursor: crosshair;
-    overflow: visible;
+    display: block;
   }
   .c-field {
     fill: none;
@@ -817,44 +886,59 @@ const HINTS = {
     cursor: grab;
   }
   .c-nums {
-    display: flex;
-    gap: 0.25rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.2rem;
+    width: 104px;
   }
   .c-nums input {
-    width: 3.1rem;
+    width: 100%;
+    min-width: 0;
     font-family: var(--mono);
-    font-size: 0.68rem;
+    font-size: 0.62rem;
     background: var(--paper);
     color: var(--ink);
     border: 1px solid var(--rule);
-    padding: 0.1rem 0.25rem;
+    padding: 0.1rem 0.15rem;
+    text-align: center;
   }
   .curve output {
     font-family: var(--mono);
-    font-size: 0.62rem;
+    font-size: 0.58rem;
     color: var(--marker);
+    max-width: 104px;
+    overflow-wrap: anywhere;
+  }
+  /* The two slider columns are shorter than the curves, so the patch takes
+     the space they leave rather than adding a row under everything. */
+  .patch-wrap {
+    flex: 1 1 11rem;
+    min-width: 0;
   }
   .patch-note {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
+    line-height: 1.4;
     color: var(--muted);
-    margin: 0.9rem 0 0.35rem;
+    margin: 0 0 0.4rem;
     max-width: none;
   }
   .patch {
     font-family: var(--mono);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     color: var(--ink);
     background: var(--paper);
     border: 1px solid var(--rule);
-    padding: 0.6rem 0.75rem;
+    padding: 0.5rem 0.65rem;
     margin: 0;
-    overflow-x: auto;
+    max-height: 8.5rem;
+    overflow: auto;
     white-space: pre;
   }
   button.on {
     border-color: var(--marker);
     color: var(--marker);
   }
+
   .picked {
     font-family: var(--mono);
     font-size: 1rem;
