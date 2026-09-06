@@ -10,6 +10,8 @@ Matt Rodenbeck. Senior motion and 3D designer who ships software, going to marke
 
 He is technical. He built a commercial After Effects CEP panel driven by a local llama.cpp model across roughly 77 tools, with a 533-step self-test and a VRAM tier system. Do not explain basics. Do not over-scaffold.
 
+**Time.** He is in Philadelphia, US Eastern, UTC-4 on daylight time and UTC-5 in winter. Say times in his clock, not UTC, and never make him do the arithmetic. This matters more than it sounds after 8pm his time, when the repo has already rolled to tomorrow: a commit, an ADR or a log entry dated by UTC reads a day ahead of the evening he actually did the work. The scheduled tasks are Windows Task Scheduler jobs and already fire in his local time, so the nightly at 4am and the Sunday digest at 7am mean 4am and 7am to him.
+
 ## The positioning thesis — it constrains the build
 
 The market prices "motion designer" low. It prices the **intersection** high: senior craft, plus a local generative AI pipeline, plus the ability to ship real software, plus pipeline and asset-management literacy.
