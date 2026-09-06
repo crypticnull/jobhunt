@@ -19,9 +19,9 @@
 
    Motion, default and reduced, a decision per movement:
      --t-quick   120ms                        120ms    row hover tint, hover intent timer
-     --t-fade    480ms                        480ms    preview in, plate crossfade
-     --t-slide   300ms                        0ms      the chapter rail mark
-     --t-blink   400ms                        0ms      the record dot while a clip plays
+     --t-fade    380ms                        380ms    preview in, plate crossfade
+     --t-slide   230ms                        0ms      the chapter rail mark
+     --t-blink   500ms                        0ms      the record dot while a clip plays
      --ease-out  cubic-bezier(0.2, 0, 0, 1)   linear   anything entering or moving
      --ease-in   cubic-bezier(0.4, 0, 1, 1)   linear   anything leaving
      --slip-x    0.34em                       0.34em   how far a misregistered word slips
@@ -48,9 +48,9 @@
   --grid-gap: 1.5rem;
   --measure: 66ch;
   --t-quick: 120ms;
-  --t-fade: 480ms;
-  --t-slide: 300ms;
-  --t-blink: 400ms;
+  --t-fade: 380ms;
+  --t-slide: 230ms;
+  --t-blink: 500ms;
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --slip-x: 0.34em;
