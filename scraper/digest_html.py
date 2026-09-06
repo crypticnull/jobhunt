@@ -24,7 +24,7 @@ it works with the script blocked. The script only adds the filters.
 
 import html
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from . import digest as digest_mod
@@ -36,6 +36,20 @@ TOKENS = Path(__file__).resolve().parent.parent / "data" / "design" / "tokens.js
 RULES_ORDER = digest_mod.SCORE_ORDER
 # The two rules worth seeing in the strip without reading a number.
 HOT = {"intersection", "deductions"}
+
+
+def _dateline(now):
+    """The week said as dates rather than as a number. 2026-W36 is the thirty
+    sixth week of the calendar year, which is correct and is also the first
+    digest ever run, so a heading reading "Week 36" invites the reader to think
+    something is counting wrong. The ISO week stays in the stamp and the file
+    name, where it sorts and is unambiguous."""
+    monday = now - timedelta(days=now.isoweekday() - 1)
+    months = ("January", "February", "March", "April", "May", "June", "July",
+              "August", "September", "October", "November", "December")
+    start = f"{monday.day} {months[monday.month - 1]}"
+    end = f"{now.day} {months[now.month - 1]} {now.year}"
+    return f"{start} to {end}"
 
 
 def _tokens(path=None):
@@ -395,15 +409,15 @@ def render(store, rules, companies=None, now=None, tokens=None):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Week {week.split('-W')[-1]} Shortlist</title>
+<title>Shortlist, {_esc(_dateline(now).split(' to ')[1])}</title>
 <style>
 {token_css(tokens or _tokens())}
 {PAGE_CSS}</style>
 </head>
 <body data-week="{_esc(week)}">
 <main class="wrap">
-<p class="stamp">Jobhunt &middot; {_esc(week)} &middot; ruleset {_esc(rules['version'])}{f' &middot; built from {_esc(stamp)}' if stamp else ''}</p>
-<h1>Week {_esc(week.split('-W')[-1])} Shortlist</h1>
+<p class="stamp">{_esc(_dateline(now))} &middot; {_esc(week)} &middot; ruleset {_esc(rules['version'])}{f' &middot; built from {_esc(stamp)}' if stamp else ''}</p>
+<h1>Shortlist, the week to {_esc(_dateline(now).split(' to ')[1])}</h1>
 <p class="lede">{lede}</p>
 
 <div class="tally">

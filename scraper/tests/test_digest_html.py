@@ -91,6 +91,15 @@ class Page(unittest.TestCase):
         script = self.html.split("<script>")[1]
         self.assertNotIn("Creative Technologist", script, "no posting content in the script at all")
 
+    def test_the_heading_says_dates_not_a_week_number(self):
+        """2026-W36 is the thirty sixth week of the calendar year and also the
+        first digest ever run, so a heading reading "Week 36" reads as a
+        counter that is wrong. The ISO week stays where it sorts."""
+        self.assertIn("Shortlist, the week to 6 September 2026", self.html)
+        self.assertIn("31 August to 6 September 2026", self.html)
+        self.assertNotIn("Week 36 Shortlist", self.html)
+        self.assertIn("2026-W36", self.html, "the ISO week still identifies the file")
+
     def test_nothing_is_fetched_from_anywhere(self):
         """It opens from disk, off a plane, in a year. No request leaves it."""
         for pattern in ("http://", "src=", "<link", "@import", "url("):
