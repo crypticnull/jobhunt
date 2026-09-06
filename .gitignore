@@ -16,3 +16,7 @@ setup.log
 # root by mistake must not be one commit away from public.
 *.db
 postings-*.db
+
+# Electron and Astro both install a tree here. The lockfiles are committed,
+# the trees never are.
+node_modules/
