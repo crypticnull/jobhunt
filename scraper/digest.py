@@ -38,10 +38,16 @@ def _tier(row, companies):
     return c.get("tier") or 9
 
 
-def select(store, rules, companies=None, now=None):
+def select(store, rules, companies=None, now=None, kept_since=None):
     """{"apply": rows, "review": rows, "overflow": rows} plus the ids surfaced.
     Apply is sorted by tier then score and capped at the weekly cap; the rest
-    of it becomes overflow and prints under review."""
+    of it becomes overflow and prints under review.
+
+    A posting already surfaced unchanged is dropped, so the markdown is a record
+    of what was new. `kept_since` keeps the ones surfaced on or after that
+    timestamp, which is what the page wants: the page is the surface he works
+    all week, and a second run of the command that writes it must not empty it.
+    """
     piles = {"apply": [], "review": []}
     for row in store.open_postings():
         if row["score"] is None or row.get("pile") in (None, "logged"):
@@ -49,7 +55,8 @@ def select(store, rules, companies=None, now=None):
         if store.state_of(row["id"]) in TERMINAL:
             continue
         if row["digested_at"] and row["digest_hash"] == digest_hash(row):
-            continue
+            if not (kept_since and row["digested_at"] >= kept_since):
+                continue
         piles[row["pile"]].append(row)
     piles["apply"].sort(key=lambda r: (_tier(r, companies), -(r["score"] or 0), r["first_seen"]))
     piles["review"].sort(key=lambda r: (-(r["score"] or 0), r["first_seen"]))
