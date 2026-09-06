@@ -58,7 +58,7 @@ class Page(unittest.TestCase):
         says nothing, which is how a design change is lost in silence."""
         declared = set()
         t = digest_html._tokens()
-        for group in (t["colour"]["light"], t["colour"]["dark"], t["colour"]["plate"], t["grid"]):
+        for group in (t["colour"]["light"], t["colour"]["dark"], t["colour"]["plate"], t["grid"], t["type"]):
             declared |= set(group)
         declared |= {m["name"] for m in t["motion"]["tokens"]}
         used = set(re.findall(r"var\(--([a-z0-9-]+)\)", digest_html.PAGE_CSS))
@@ -72,7 +72,7 @@ class Page(unittest.TestCase):
     def test_a_card_a_posting_and_the_legs_on_it(self):
         self.assertEqual(self.html.count('<details class="card"'), 2)
         self.assertIn("Creative Technologist", self.html)
-        self.assertIn('<span class="leg product-motion">product-motion</span>', self.html)
+        self.assertIn('<span class="leg pm">product-motion</span>', self.html)
         self.assertIn("USD 145,000-205,000", self.html)
 
     def test_the_page_is_complete_without_the_script(self):
@@ -80,7 +80,16 @@ class Page(unittest.TestCase):
         and nothing else, so a blocked script costs the filters and not the week."""
         body = self.html.split("<script>")[0]
         self.assertEqual(body.count('<details class="card"'), 2)
-        self.assertNotIn("hidden", body.split('<div class="grid">')[1])
+        cards = body.split('<div class="grid" id="grid">')[1].split("</div>\n<p class=")[0]
+        self.assertNotIn("hidden", cards, "no card is hidden before the script runs")
+        self.assertIn("Creative Technologist", cards, "the cards are markup, not data for a script")
+
+    def test_a_posting_title_cannot_reach_the_script(self):
+        """Titles come from strangers. An earlier draft handed the rows to the
+        page as JSON inside a script tag, and json.dumps does not escape
+        </script>, so a title could close the tag and run."""
+        script = self.html.split("<script>")[1]
+        self.assertNotIn("Creative Technologist", script, "no posting content in the script at all")
 
     def test_nothing_is_fetched_from_anywhere(self):
         """It opens from disk, off a plane, in a year. No request leaves it."""
