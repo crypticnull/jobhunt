@@ -270,6 +270,12 @@ def cmd_score(args):
     finally:
         store.close()
     print(f"rescored {len(rows)} open postings with ruleset {rules['version']}")
+    # The trap this line exists to close. A rescore reads the stored row, so a
+    # rules change lands immediately, but location, remote class and pay are
+    # derived by the adapters when a posting is polled and are stored. An
+    # adapter fix reaches the store on the next poll and not before, which is
+    # why 6,069 postings still read as onsite after the classifier was fixed.
+    print("Rules only. Location, remote class and pay are read by the adapters at poll time, so an adapter fix needs a poll.")
     return 0
 
 
