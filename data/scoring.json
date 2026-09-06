@@ -201,7 +201,12 @@
         "\\bmanila\\b",
         "\\bcairo\\b",
         "\\blagos\\b",
-        "nairobi"
+        "nairobi",
+        "\\bksa\\b",
+        "saudi arabia",
+        "\\buae\\b",
+        "abu dhabi",
+        "\\bdubai\\b"
       ],
       "fail_phrases_note": "Revised 2026-09-05. The residency phrases fail only when the place named is not the US, because 'you must be based in the United States' is the standard payroll sentence on a US-remote role and was dropping genuine remote postings by the hundred. 'hybrid' needs office or schedule words in the same sentence so hybrid search and hybrid cloud stop failing the gate, and 'on-site' spares a final on-site interview. Everything else is a hard fail as before."
     },
@@ -236,7 +241,7 @@
         "^video editor$",
         "^(junior|jr)\\b",
         "^associate(?! (creative|design|art) director)",
-        "^intern(ship)?\\b",
+        "\\bintern(ship)?s?\\b",
         "^editor$",
         "^coordinator",
         "(electrical|mechanical|civil|structural|precast|controls|hvac|plumbing|piping|thermal|process|manufacturing|packaging|hardware|firmware|asic|pcb|rtl|silicon|chip|analog|actuator|robotics|validation|verification|layout|\\brf\\b)[a-z ]* design engineer",
@@ -312,7 +317,8 @@
           "B"
         ]
       }
-    }
+    },
+    "note_2026_09_06": "'^intern' only caught a title that opened with it, so 'Data Engineer Intern' scored 45 and sat in review. Anchored on a word boundary instead, which still leaves International and Internal alone."
   },
   "deductions": {
     "per_hit": 3,
@@ -1044,6 +1050,34 @@
       "generative",
       "product"
     ],
+    "relevance_title_terms": [
+      "creative",
+      "creatives",
+      "design",
+      "designer",
+      "designs",
+      "motion",
+      "brand",
+      "branding",
+      "visual",
+      "visuals",
+      "art",
+      "artist",
+      "animation",
+      "animator",
+      "technologist",
+      "interaction",
+      "ux",
+      "ui",
+      "prototyper",
+      "illustrator",
+      "illustration",
+      "3d",
+      "graphics",
+      "graphic",
+      "typography"
+    ],
+    "relevance_title_note": "A craft leg only rescues a posting whose title says what the work is. At an AI company every posting's body says generative and product, because the About Us block says it, so an Economist, a Workday Engineer, a Commercial Counsel and a Revenue Accounting Manager all collected the intersection and reached review. Thirty-five of the eighty-three rows in the 2026-09-06 pile were that. A tiered title still passes on its own, so this only governs the rescue.",
     "relevance_note": "A posting is relevant when the title tiers, or the body hits a craft leg. Software and pipeline are deliberately excluded: they support a creative role rather than define one, and every backend job in the corpus hits them, which is how 894 postings reached a pile on the first real run.",
     "apply_requires_title_tier": true,
     "soft_flag_prefixes": [

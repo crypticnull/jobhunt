@@ -107,6 +107,28 @@ def _state_list(text):
     return found
 
 
+# Two-letter codes that are not also ISO country codes. Berlin, DE has to stay
+# foreign, but Vancouver, WA has to come back, so the escape below only trusts
+# a code that cannot be read as a country.
+_UNAMBIGUOUS_CODES = frozenset(
+    "AK AZ CT DC FL HI IA KS MI NC ND NH NJ NM NV NY OH OK OR RI TX UT WA WI WV WY".split()
+)
+
+
+def us_state_marker(text):
+    """True when a location names a US state at all, by full name or by a code
+    that cannot be a country. `_state_list` needs two states before it will
+    call something a residency list, which is right for deciding where a role
+    lets you live but wrong for deciding whether a city is American. Dublin,
+    OH and Vancouver, WA were both being dropped as outside the US, because
+    Dublin and Vancouver are on the abroad list and one state code did not
+    count for anything."""
+    low = (text or "").lower()
+    if any(re.search(r"\b" + n + r"\b", low) for n in STATE_NAMES):
+        return True
+    return any(c in _UNAMBIGUOUS_CODES for c in re.findall(r"\b[A-Z]{2}\b", text or ""))
+
+
 def parse_states(text, rules, body=""):
     """A list of two-letter codes, ["US"] for nationwide, or None when the text names no list.
     Two or more codes or state names in one run count as a list; a single mention does not.
@@ -171,9 +193,22 @@ def gate_remote(p, rules):
     # A posting whose location names another country and no US marker is not a
     # US remote role, whatever its remote claim says. Checked against the
     # location only, never the body, because a US role can mention EMEA teams.
+    def american(text, low):
+        return bool(_hits(r["nationwide_tokens"], low)) or bool(parse_states(low, rules)) or us_state_marker(text)
+
     abroad = _hits(r.get("fail_location_patterns", []), loc)
-    if abroad and not _hits(r["nationwide_tokens"], loc) and not parse_states(loc, rules):
+    if abroad and not american(p.get("location") or "", loc):
         return "fail", [f"location is outside the US: {', '.join(abroad[:2])}"], False
+    # A region in the title scopes the role itself, which is not the same as a
+    # region in the body, where a US posting can name the EMEA team it works
+    # with. "Deal Strategy Analyst - EMEA" and "Forward Deployed Creative
+    # [KSA]" both came through on a blank location and sat in the review pile
+    # for a week. Same two escapes as the location, so "Designer, US & Canada"
+    # and a title naming a US city in a state still pass.
+    title = (p.get("title") or "").lower()
+    scoped = _hits(r.get("fail_location_patterns", []), title)
+    if scoped and not american(p.get("title") or "", title):
+        return "fail", [f"title is scoped to {', '.join(scoped[:2])}"], False
     states = parse_states(p.get("location") or "", rules, body=p.get("description") or "")
     if states and states != ["US"]:
         if any(s not in states for s in r["fail_if_state_list_excludes"]):
@@ -372,10 +407,19 @@ def evaluate(p, rules, company=None, now=None):
     # how the pile fills with work Matt would never take. A posting has to be
     # about something he does before comp and prestige can carry it.
     craft = piles.get("relevance_legs") or []
-    relevant = out["title_tier"] is not None or any(l in craft for l in legs) if craft else (out["title_tier"] is not None or bool(legs))
+    leg_hit = any(l in craft for l in legs) if craft else bool(legs)
+    # And the leg has to be corroborated by the title. At an AI company the
+    # About Us block says generative and product in every posting, so the legs
+    # fire on an Economist and a Revenue Accounting Manager the same as on a
+    # designer. A tiered title still passes on its own; this governs the
+    # rescue only, and the two halves get separate drop reasons so the digest
+    # shows which one is doing the work.
+    craft_titles = piles.get("relevance_title_terms") or []
+    title_craft = not craft_titles or bool(_hits(craft_titles, normalize_title(p.get("title"))))
+    relevant = out["title_tier"] is not None or (leg_hit and title_craft)
     if not relevant:
         out["pile"] = "logged"
-        out["drop_reason"] = "no title fit and no intersection"
+        out["drop_reason"] = "no title fit and no intersection" if not leg_hit else "intersection but the title names no craft"
         return out
     # The apply pile is what the letter generator reads. A posting whose title
     # does not fit is not one Matt can write a credible letter for, whatever the

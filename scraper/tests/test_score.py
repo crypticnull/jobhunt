@@ -389,13 +389,36 @@ class RelevanceFloor(unittest.TestCase):
         self.assertEqual(r["pile"], "logged")
         self.assertEqual(r["drop_reason"], "no title fit and no intersection")
 
-    def test_one_leg_is_enough_to_be_looked_at(self):
+    def test_a_leg_alone_no_longer_rescues_a_title_that_names_no_craft(self):
+        """The cost of the 2026-09-06 rule, stated rather than hidden. This
+        body is the intersection and the rule cannot tell it apart from the
+        About Us block that says the same words in every posting at the same
+        company. Matt chose the craft-title requirement knowing it drops this
+        shape, because thirty-five of eighty-three review rows were the other
+        kind."""
         r = score(
             row(title="Software Engineer", description="Build our ComfyUI generative video pipeline.",
                 comp_min=180000, comp_max=220000),
             rules(), NOW, TIER1,
         )
+        self.assertEqual(r["pile"], "logged")
+        self.assertEqual(r["drop_reason"], "intersection but the title names no craft")
+
+    def test_the_same_body_under_a_craft_title_still_clears(self):
+        r = score(
+            row(title="Creative Engineer", description="Build our ComfyUI generative video pipeline.",
+                comp_min=180000, comp_max=220000),
+            rules(), NOW, TIER1,
+        )
         self.assertNotEqual(r["pile"], "logged")
+
+    def test_the_boilerplate_rows_the_rule_was_written_for(self):
+        """All four sat in the 2026-09-06 review pile, carried by legs the
+        company blurb fired."""
+        body = "OpenAI builds generative models and the product and pipeline behind them."
+        for title in ("Economist", "Workday Engineer", "Commercial Counsel", "Revenue Accounting Manager"):
+            r = score(row(title=title, description=body, comp_min=266000, comp_max=385000), rules(), NOW, TIER1)
+            self.assertEqual(r["pile"], "logged", title)
 
     def test_a_tiered_title_alone_is_enough(self):
         r = score(row(title="Creative Technologist", description="", comp_min=180000, comp_max=220000), rules(), NOW, TIER1)
@@ -494,10 +517,15 @@ class CraftFloor(unittest.TestCase):
         )
         self.assertEqual(r["pile"], "logged")
 
-    def test_a_craft_leg_clears_it(self):
+    def test_a_craft_leg_clears_it_under_a_craft_title(self):
+        for desc in ("After Effects and Cinema 4D.", "ComfyUI and diffusion work.", "Figma and design systems."):
+            r = score(row(title="Creative Lead", description=desc), rules(), NOW, TIER2)
+            self.assertNotEqual(r["pile"], "logged", desc)
+
+    def test_the_same_legs_under_a_title_that_names_no_craft_do_not(self):
         for desc in ("After Effects and Cinema 4D.", "ComfyUI and diffusion work.", "Figma and design systems."):
             r = score(row(title="Nondescript Role", description=desc), rules(), NOW, TIER2)
-            self.assertNotEqual(r["pile"], "logged", desc)
+            self.assertEqual(r["pile"], "logged", desc)
 
     def test_a_tiered_title_still_clears_without_any_leg(self):
         r = score(row(title="Creative Technologist", description="Nothing else to say."), rules(), NOW, TIER2)
@@ -767,3 +795,47 @@ class TitlesAfterTheReview(unittest.TestCase):
         r = self.product("Product Designer", "Lottie and Rive animation for the app.")
         self.assertEqual(r["title_tier"], "B")
         self.assertIn("product", r["legs_hit"])
+
+
+class RegionAndInterns(unittest.TestCase):
+    """Three misses found in the review pile Matt read on 2026-09-06."""
+
+    def setUp(self):
+        self.r = rules()
+
+    def go(self, title, location="Remote - US", description="design systems figma prototyping"):
+        r = row(title=title, description=description, location=location, comp_min=170000, comp_max=220000)
+        return score(r, self.r, NOW, {"tier": 3, "size": None})
+
+    def test_a_region_in_the_title_scopes_the_role(self):
+        """A region in the body can be a team this role works with, but a
+        region in the title is the role. Deal Strategy Analyst - EMEA sat in
+        review for a week on a blank location."""
+        self.assertEqual(self.go("Deal Strategy Analyst - EMEA")["pile"], "logged")
+        self.assertEqual(self.go("Forward Deployed Creative [KSA]")["pile"], "logged")
+        self.assertIn("title is scoped to", self.go("Product Designer, LATAM")["drop_reason"])
+
+    def test_a_title_naming_the_us_as_well_still_passes(self):
+        self.assertNotEqual(self.go("Product Designer, US & Canada")["pile"], "logged")
+
+    def test_intern_anywhere_in_the_title(self):
+        self.assertEqual(self.go("Data Engineer Intern")["pile"], "logged")
+        self.assertEqual(self.go("Design Internship")["pile"], "logged")
+
+    def test_international_and_internal_are_left_alone(self):
+        self.assertNotEqual(self.go("International Brand Designer")["pile"], "logged")
+        # Internal Tooling has no craft word, so it is logged either way. What
+        # matters is that the intern rule is not what logs it.
+        self.assertNotIn("intern", self.go("Senior Engineer, Internal Tooling")["drop_reason"])
+
+    def test_an_american_city_that_shares_a_foreign_name(self):
+        """Vancouver WA is in one of the two states he is moving to. Dublin OH
+        and Paris TX are the same shape. One state code is enough to say a
+        city is American, even though two are needed to call something a
+        residency list."""
+        for loc in ("Vancouver, WA", "Dublin, OH", "Paris, TX", "Berlin, NH"):
+            self.assertNotEqual(self.go("Senior Product Designer", loc)["pile"], "logged", loc)
+
+    def test_the_foreign_originals_are_still_foreign(self):
+        for loc in ("Vancouver, BC", "Dublin, Ireland", "Paris, France", "Berlin, DE", "Toronto, ON"):
+            self.assertEqual(self.go("Senior Product Designer", loc)["pile"], "logged", loc)
