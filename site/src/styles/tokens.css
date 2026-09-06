@@ -19,14 +19,15 @@
 
    Motion, default and reduced, a decision per movement:
      --t-quick   120ms                        120ms    row hover tint, hover intent timer
-     --t-fade    160ms                        160ms    preview in, plate crossfade
-     --t-slide   200ms                        0ms      the chapter rail mark
-     --t-blink   1000ms                       0ms      the record dot while a clip plays
+     --t-fade    480ms                        480ms    preview in, plate crossfade
+     --t-slide   300ms                        0ms      the chapter rail mark
+     --t-blink   400ms                        0ms      the record dot while a clip plays
      --ease-out  cubic-bezier(0.2, 0, 0, 1)   linear   anything entering or moving
      --ease-in   cubic-bezier(0.4, 0, 1, 1)   linear   anything leaving
-     --slip-x    0.14em                       0.14em   how far a misregistered word slips
+     --slip-x    0.34em                       0.34em   how far a misregistered word slips
      --rise-y    0.5rem                       0.5rem   how far the hero rises on first paint
-     --press     0.99                         1        the scale a tile takes while pressed
+     --press     0.985                        1        the scale a tile takes while pressed
+     --slip-band 13rem                        13rem    how far from the cursor a word still lifts
      scroll      smooth                       auto
 */
 :root {
@@ -47,14 +48,15 @@
   --grid-gap: 1.5rem;
   --measure: 66ch;
   --t-quick: 120ms;
-  --t-fade: 160ms;
-  --t-slide: 200ms;
-  --t-blink: 1000ms;
+  --t-fade: 480ms;
+  --t-slide: 300ms;
+  --t-blink: 400ms;
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
-  --slip-x: 0.14em;
+  --slip-x: 0.34em;
   --rise-y: 0.5rem;
-  --press: 0.99;
+  --press: 0.985;
+  --slip-band: 13rem;
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {

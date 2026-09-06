@@ -1,5 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import Slip from "../../components/Slip.astro";
 
 // The four interactions the wireframe left open, each one running for real so
 // the choice is made by feel rather than by description. Every option names
@@ -123,8 +124,7 @@ const HINTS = {
                   )}
                   {d.id === "register" && (
                     <span class={`reg ${o.id}`}>
-                      <span class="w"><span class="ghost b" aria-hidden="true">Keynote</span><span class="ghost m" aria-hidden="true">Keynote</span>Keynote</span>{" "}
-                      <span class="w"><span class="ghost b" aria-hidden="true">extractor</span><span class="ghost m" aria-hidden="true">extractor</span>extractor</span>
+                      <Slip text="The Keynote extractor pulls every frame and caption" />
                     </span>
                   )}
                   {d.id === "dot" && (
@@ -174,15 +174,26 @@ const HINTS = {
           <output data-out={d.v} />
         </label>
       ))}
-      <label class="dial ease">
-        <span class="dial-name">ease out</span>
-        <span class="bez">
-          {["x1", "y1", "x2", "y2"].map((k) => (
-            <input type="number" data-bez={k} min="-1" max="2" step="0.05" />
-          ))}
-        </span>
-        <output data-out="ease-out" />
-      </label>
+      {["ease-out", "ease-in"].map((name) => (
+        <div class="curve" data-curve={name}>
+          <span class="dial-name">{name.replace("-", " ")}</span>
+          <svg viewBox="0 0 100 100" width="120" height="120" aria-hidden="true">
+            <rect x="0" y="0" width="100" height="100" class="c-field" />
+            <line x1="0" y1="100" x2="100" y2="0" class="c-diag" />
+            <path class="c-path" />
+            <line class="c-h1" />
+            <line class="c-h2" />
+            <circle class="c-p1" r="6" data-p="1" />
+            <circle class="c-p2" r="6" data-p="2" />
+          </svg>
+          <output data-out={name} />
+          <span class="c-nums">
+            {["x1", "y1", "x2", "y2"].map((k) => (
+              <input type="number" data-bez={`${name}:${k}`} min="-1" max="2" step="0.01" />
+            ))}
+          </span>
+        </div>
+      ))}
     </div>
     <p class="patch-note">The record patch, for <code>data/design/tokens.json</code>. Paste it back and it becomes the site.</p>
     <pre class="patch" id="patch">Nothing changed yet.</pre>
@@ -274,22 +285,96 @@ const HINTS = {
     r.addEventListener("input", () => setVar(v, `${r.value}${unit}`));
   }
 
-  // check-tokens-allow: easing curve, because this panel authors a curve from
-  // four numbers a person is turning rather than consuming one, and a lab that
+  // check-tokens-allow: easing curve, because this panel authors a curve by
+  // dragging its control points rather than consuming one, and a lab that
   // cannot write the thing it is for is not a lab. Nothing here reaches the
   // record: the panel prints a patch and Matt decides.
-  base["ease-out"] = readBase("ease-out");
-  now["ease-out"] = base["ease-out"];
-  const nums = base["ease-out"].match(/-?[\d.]+/g) || ["0.2", "0", "0", "1"];
-  bez.forEach((input, i) => {
-    input.value = nums[i] ?? "0";
-    input.addEventListener("input", () => {
-      const v = `cubic-bezier(${bez.map((b) => b.value || "0").join(", ")})`;
-      setVar("ease-out", v);
+  //
+  // Two handles on a unit square, which is the only honest picture of a cubic
+  // bezier: the curve is the ease and the diagonal is no ease at all, so how
+  // far the line leaves the diagonal is how much easing there is. Y runs past
+  // the box on purpose, because a control point above 1 or below 0 is what
+  // makes a curve overshoot and that is a thing worth being able to draw.
+  const curves = Array.from(document.querySelectorAll<HTMLElement>("[data-curve]"));
+  const state: Record<string, number[]> = {};
+
+  const drawCurve = (el: HTMLElement) => {
+    const name = el.dataset.curve!;
+    const [x1, y1, x2, y2] = state[name];
+    const X = (v: number) => v * 100;
+    const Y = (v: number) => 100 - v * 100;
+    el.querySelector(".c-path")?.setAttribute(
+      "d",
+      `M0,100 C${X(x1)},${Y(y1)} ${X(x2)},${Y(y2)} 100,0`,
+    );
+    const h1 = el.querySelector(".c-h1");
+    h1?.setAttribute("x1", "0");
+    h1?.setAttribute("y1", "100");
+    h1?.setAttribute("x2", String(X(x1)));
+    h1?.setAttribute("y2", String(Y(y1)));
+    const h2 = el.querySelector(".c-h2");
+    h2?.setAttribute("x1", "100");
+    h2?.setAttribute("y1", "0");
+    h2?.setAttribute("x2", String(X(x2)));
+    h2?.setAttribute("y2", String(Y(y2)));
+    const p1 = el.querySelector(".c-p1");
+    p1?.setAttribute("cx", String(X(x1)));
+    p1?.setAttribute("cy", String(Y(y1)));
+    const p2 = el.querySelector(".c-p2");
+    p2?.setAttribute("cx", String(X(x2)));
+    p2?.setAttribute("cy", String(Y(y2)));
+    const value = `cubic-bezier(${state[name].map((n) => Math.round(n * 100) / 100).join(", ")})`;
+    const out = el.querySelector<HTMLOutputElement>(`output[data-out="${name}"]`);
+    if (out) out.textContent = value;
+    el.querySelectorAll<HTMLInputElement>("input[data-bez]").forEach((inp, i) => {
+      if (document.activeElement !== inp) inp.value = String(Math.round(state[name][i] * 100) / 100);
     });
-  });
-  const easeOut = document.querySelector<HTMLOutputElement>('output[data-out="ease-out"]');
-  if (easeOut) easeOut.textContent = base["ease-out"];
+    setVar(name, value);
+  };
+
+  for (const el of curves) {
+    const name = el.dataset.curve!;
+    base[name] = readBase(name);
+    now[name] = base[name];
+    const nums = (base[name].match(/-?[\d.]+/g) || ["0.25", "0.1", "0.25", "1"]).map(Number);
+    state[name] = nums.length === 4 ? nums : [0.25, 0.1, 0.25, 1];
+    const svg = el.querySelector("svg")!;
+    let dragging: 1 | 2 | null = null;
+    const at = (e: PointerEvent) => {
+      const r = svg.getBoundingClientRect();
+      // X is clamped to the square because a bezier with x outside 0..1 is not
+      // a timing function. Y is left free, which is where overshoot lives.
+      const x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      const y = Math.min(1.6, Math.max(-0.6, 1 - (e.clientY - r.top) / r.height));
+      return [Math.round(x * 100) / 100, Math.round(y * 100) / 100];
+    };
+    svg.addEventListener("pointerdown", (e) => {
+      const [x, y] = at(e);
+      const [x1, y1, x2, y2] = state[name];
+      dragging = Math.hypot(x - x1, y - y1) <= Math.hypot(x - x2, y - y2) ? 1 : 2;
+      svg.setPointerCapture(e.pointerId);
+      const i = dragging === 1 ? 0 : 2;
+      state[name][i] = x;
+      state[name][i + 1] = y;
+      drawCurve(el);
+    });
+    svg.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const [x, y] = at(e);
+      const i = dragging === 1 ? 0 : 2;
+      state[name][i] = x;
+      state[name][i + 1] = y;
+      drawCurve(el);
+    });
+    svg.addEventListener("pointerup", () => (dragging = null));
+    el.querySelectorAll<HTMLInputElement>("input[data-bez]").forEach((inp, i) => {
+      inp.addEventListener("input", () => {
+        state[name][i] = parseFloat(inp.value) || 0;
+        drawCurve(el);
+      });
+    });
+    drawCurve(el);
+  }
 
   document.getElementById("dial-reset")?.addEventListener("click", () => {
     for (const k of Object.keys(now)) {
@@ -366,6 +451,9 @@ const HINTS = {
     gap: 0.4rem;
     text-align: center;
     width: 100%;
+  }
+  .stage:has(.reg) {
+    align-content: center;
   }
   .specimen strong {
     font-family: var(--font-display);
@@ -483,7 +571,7 @@ const HINTS = {
   /* C2 grows from where the thumbnail sits, which is why the origin is the
      corner it started in rather than the middle of the sheet. */
   [data-spec="C2"] .sheet {
-    transform-origin: 20% 50%;
+    transform-origin: center;
     transform: scale(0.2);
   }
   [data-spec="C2"].open .sheet {
@@ -515,23 +603,11 @@ const HINTS = {
     from { transform: scaleX(0); }
     to { transform: scaleX(1); }
   }
-  }
-  }
-  }
   @keyframes blink {
     from { opacity: 1; }
     to { opacity: 0.15; }
   }
 
-  /* Loop turns a one shot into something a dial can be turned against.
-
-     !important, and it earns it. Every option sets its movement with the
-     animation shorthand, which resets iteration-count and direction as a side
-     effect, and those selectors carry an attribute plus a class plus an
-     element, so they outrank anything this rule can say without it. The
-     alternative is repeating the override once per option, which is the same
-     override written eleven times and one more thing to forget when a
-     twelfth option lands. */
   /* The stage is the control, so it has to say so. */
   .stage.tappable {
     cursor: pointer;
@@ -550,56 +626,27 @@ const HINTS = {
     font-size: 1.05rem;
     font-weight: 600;
   }
-  .reg .w {
-    position: relative;
-    display: inline-block;
-  }
-  .reg .ghost {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    opacity: 0;
-    transform: translateX(0);
-    pointer-events: none;
-    transition:
-      transform var(--t-slide) var(--ease-out),
-      opacity var(--t-fade) var(--ease-out);
-  }
-  .reg .ghost.m {
-    color: var(--marker);
-  }
-  .reg .ghost.b {
-    color: var(--blueprint);
-  }
-  .reg .w {
-    transition: transform var(--t-slide) var(--ease-out);
+  /* The specimens are the real component, so the only thing a variant
+     changes is which plates print and whether the sheet moves with them. */
+  .reg {
+    display: block;
+    text-align: left;
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
   /* E1, one fringe. The blueprint plate never prints. */
   .reg.E1 .ghost.b {
     display: none;
   }
-  .reg.E1 .w:hover .ghost.m {
-    opacity: 1;
-    transform: translateX(var(--slip-x));
-  }
-  /* E2, both plates slip, opposite ways. What ships. */
-  .reg.E2 .w:hover .ghost.m {
-    opacity: 1;
-    transform: translateX(var(--slip-x));
-  }
-  .reg.E2 .w:hover .ghost.b {
-    opacity: 1;
-    transform: translateX(calc(var(--slip-x) * -1));
-  }
-  /* E3, the sheet shifts: the word moves too. */
+  /* E2 is the component as it ships and needs no rule at all. */
+  /* E3, the sheet shifts, so the true word moves against its own ghost. */
   .reg.E3 .ghost.b {
     display: none;
   }
-  .reg.E3 .w:hover .ghost.m {
-    opacity: 1;
-    transform: translateX(calc(var(--slip-x) * 1.4));
+  .reg.E3 .true {
+    transition: transform var(--t-slide) var(--ease-out);
   }
-  .reg.E3 .w:hover {
+  .reg.E3:hover .true {
     transform: translateX(calc(var(--slip-x) * -0.4));
   }
 
@@ -734,22 +781,58 @@ const HINTS = {
     width: 100%;
     accent-color: var(--marker);
   }
-  .dial.ease {
-    grid-column: 1 / -1;
-    grid-template-columns: 3.5rem 1fr auto;
+  .curve {
+    display: grid;
+    justify-items: start;
+    gap: 0.3rem;
   }
-  .bez {
+  .curve svg {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    touch-action: none;
+    cursor: crosshair;
+    overflow: visible;
+  }
+  .c-field {
+    fill: none;
+  }
+  .c-diag {
+    stroke: var(--rule);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+  .c-path {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.5;
+  }
+  .c-h1,
+  .c-h2 {
+    stroke: var(--muted);
+    stroke-width: 1;
+  }
+  .c-p1,
+  .c-p2 {
+    fill: var(--marker);
+    cursor: grab;
+  }
+  .c-nums {
     display: flex;
-    gap: 0.35rem;
+    gap: 0.25rem;
   }
-  .bez input {
-    width: 4rem;
+  .c-nums input {
+    width: 3.1rem;
     font-family: var(--mono);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     background: var(--paper);
     color: var(--ink);
     border: 1px solid var(--rule);
-    padding: 0.15rem 0.3rem;
+    padding: 0.1rem 0.25rem;
+  }
+  .curve output {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--marker);
   }
   .patch-note {
     font-size: 0.72rem;
