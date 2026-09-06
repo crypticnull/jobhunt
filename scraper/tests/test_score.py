@@ -890,3 +890,36 @@ class RegionAndInterns(unittest.TestCase):
     def test_the_foreign_originals_are_still_foreign(self):
         for loc in ("Vancouver, BC", "Dublin, Ireland", "Paris, France", "Berlin, DE", "Toronto, ON"):
             self.assertEqual(self.go("Senior Product Designer", loc)["pile"], "logged", loc)
+
+
+class PayrollDefaultShape(unittest.TestCase):
+    """A payroll-default shape is a location reading "Remote (Berlin)", a
+    company defaulting to wherever its payroll already reaches. It was matched
+    against the body too, where "we are a fully remote, distributed team" hit
+    every time, and that took ten remote marks off four all-remote companies
+    in the 2026-09-06 digest."""
+
+    BODY = "We are a fully remote, distributed team. You will build design systems and prototypes in figma."
+
+    def go(self, location, body=None):
+        r = row(title="Senior Design Engineer", description=body or self.BODY, location=location,
+                comp_min=156500, comp_max=202300, comp_found=1)
+        return score(r, rules(), NOW, {"tier": 3, "size": None})
+
+    def test_a_bare_remote_location_is_not_a_payroll_default(self):
+        r = self.go("Remote")
+        self.assertEqual([f for f in r["flags"] if "payroll" in f], [])
+        self.assertEqual(fired(r, "remote")["value"], 22, "the full remote mark, not the halved one")
+
+    def test_the_shape_still_flags_where_it_is_real(self):
+        r = self.go("Remote, Global")
+        self.assertIn("payroll-default shape in the location", r["flags"][0])
+        self.assertNotIn("[a-z]", r["flags"][0], "a reason never prints a character class")
+
+    def test_a_nationwide_location_excuses_the_shape(self):
+        for loc in ("Remote - USA", "Remote - United States"):
+            self.assertEqual([f for f in self.go(loc)["flags"] if "payroll" in f], [], loc)
+
+    def test_timezone_language_is_unaffected(self):
+        r = self.go("Remote - USA", "Fully remote in the US. Must keep eastern time hours.")
+        self.assertTrue(any("timezone language: eastern time" in f for f in r["flags"]))

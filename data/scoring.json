@@ -68,10 +68,11 @@
         "WA",
         "OR"
       ],
+      "flag_location_shapes": [
+        "^remote\\s*[(,\\-]\\s*[a-z]"
+      ],
+      "flag_location_shapes_note": "A payroll-default shape is a location that reads 'Remote (Berlin)' or 'Remote - Poland', a company defaulting to wherever its payroll already reaches. It is a shape in the location field, so it is matched there and anchored to the front. The three phrases this replaces were matched against the body as well, where 'we are fully remote, and' hit every time, and that quietly took ten remote marks off Buffer, Recraft, RevenueCat and Supabase on 2026-09-06. A nationwide location or a real state list still excuses it.",
       "flag_phrases": [
-        "remote \\(",
-        "remote - [a-z]",
-        "remote, [a-z]",
         "eastern time",
         "et hours",
         "est hours",
@@ -79,6 +80,7 @@
         "central time",
         "ct hours"
       ],
+      "flag_phrases_note": "Time zone constraints only, matched against the location and the body, and excused by ok_timezone_phrases.",
       "ok_timezone_phrases": [
         "us time zones",
         "any us time zone",
