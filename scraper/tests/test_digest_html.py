@@ -166,8 +166,29 @@ class Page(unittest.TestCase):
             self.assertNotIn(pattern, self.html.replace('href="https://x/', 'X'), pattern)
 
     def test_the_pay_model_question_survives_into_the_page(self):
-        self.assertIn("Ask whether pay is the same wherever you live", self.html)
-        self.assertIn("location-adjusted", self.html)
+        self.assertIn("unknown, worth asking on the first call", self.html)
+        self.assertIn("location adjusted, so the move north cuts it", self.html)
+
+    def test_the_card_answers_who_and_where_without_leaving_it(self):
+        """Opening a card is for deciding without opening the posting, and the
+        company name was only in the collapsed summary."""
+        for label in ("company", "where", "pay", "posted", "first seen", "source"):
+            self.assertIn(f"<dt>{label}</dt>", self.html, label)
+        self.assertIn("<dd>Luma AI, tier 1</dd>", self.html)
+        self.assertIn("<dd>San Francisco, CA</dd>", self.html, "the head office of the other one")
+
+    def test_their_own_words_are_on_the_card(self):
+        self.assertIn("<h3>What they wrote</h3>", self.html)
+        self.assertIn("Generative video, ComfyUI, Python tooling", self.html)
+
+    def test_a_posting_with_no_description_prints_no_section(self):
+        """The Mask rule. An absent record is absent, never a heading over
+        nothing."""
+        row = dict(self.s.open_postings()[0])
+        row["description"] = ""
+        html = digest_html._card(row, COMPANIES, "apply")
+        self.assertNotIn("What they wrote", html)
+        self.assertIn("<dt>company</dt>", html, "the rest of the card still prints")
 
     def test_titles_and_companies_are_escaped(self):
         self.s.upsert(posting(source="ashby", source_id="9", company_slug="luma", url="https://x/9",

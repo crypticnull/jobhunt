@@ -23,6 +23,7 @@ it works with the script blocked. The script only adds the filters.
 """
 
 import json
+import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -132,21 +133,43 @@ PAGE_CSS = """
   .meta .where { flex: 1; min-width: 0; }
   .meta .pile { flex: none; color: var(--paper); background: var(--ink); padding: .08rem .4rem; letter-spacing: .06em; text-transform: uppercase; }
 
-  .detail { padding: 1rem 0; display: grid; gap: 1.1rem 2rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); align-items: start; border-top: 1px solid var(--rule); margin: 0 .95rem; }
-  .detail h3 { font-family: var(--mono); font-size: var(--step-xx); text-transform: uppercase; letter-spacing: var(--label-tracking); color: var(--muted); margin: 0 0 .5rem; font-weight: 400; }
+  /* The score and the facts share the top row, their own words take the full
+     width beneath, and the two actions sit on a rule at the foot with no
+     heading over them: they are two things to do, not a section. */
+  .detail {
+    padding: 1rem 0 0; margin: 0 .95rem; border-top: 1px solid var(--rule);
+    display: grid; gap: 1.4rem 2.5rem;
+    grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+    align-items: start;
+  }
+  .detail h3 { font-family: var(--mono); font-size: var(--step-xx); text-transform: uppercase; letter-spacing: var(--label-tracking); color: var(--muted); margin: 0 0 .6rem; font-weight: 400; }
+  .said, .act { grid-column: 1 / -1; }
+  @media (max-width: 46rem) { .detail { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Label and value on one line each, so twelve facts read as a list rather
+     than as a paragraph, and the labels form a column you can run an eye down. */
+  .factlist { margin: 0; display: grid; gap: .3rem; }
+  .fact { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: .75rem; align-items: baseline; }
+  .fact dt { font-family: var(--mono); font-size: var(--step-xx); color: var(--muted); }
+  .fact dd { margin: 0; font-size: var(--step-x); }
+
+  .said-body { max-width: var(--measure); max-height: 24rem; overflow-y: auto; padding-right: .75rem; }
+  .said-body p { margin: 0 0 .7rem; font-size: var(--step-x); }
+  .said-body p:last-child { margin-bottom: 0; }
+  .lead { margin: .7rem 0 0; font-size: var(--step-x); }
+  .scored .fl { margin: .7rem 0 0; font-size: var(--step-x); color: var(--marker); }
   .rows { display: grid; gap: .3rem; }
   .row { display: grid; grid-template-columns: 6.5rem 1fr 2.4rem; gap: .6rem; align-items: center; font-family: var(--mono); font-size: var(--step-xx); }
   .row span:first-child { color: var(--muted); }
   .row i { display: block; height: 6px; }
   .row b { font-weight: 400; font-variant-numeric: tabular-nums; text-align: right; }
-  .notes { display: grid; gap: .45rem; font-size: var(--step-x); max-width: 44ch; }
-  .notes p { margin: 0; }
-  .notes .fl { color: var(--marker); }
-  .act { display: grid; gap: .6rem; align-content: start; }
+  .act {
+    display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: center;
+    border-top: 1px solid var(--rule); margin-top: .3rem; padding: .8rem 0;
+  }
   .act a { font-family: var(--display); font-size: var(--step-x); font-weight: 500; }
   .pick { display: flex; gap: .5rem; align-items: center; font-family: var(--mono); font-size: var(--step-x); color: var(--muted); cursor: pointer; }
   .pick input { accent-color: var(--marker); width: 1rem; height: 1rem; }
-  .idtag { font-family: var(--mono); font-size: var(--step-xx); color: var(--muted); }
   .empty { font-family: var(--mono); font-size: var(--step-x); color: var(--muted); padding: 3rem 0; text-align: center; grid-column: 1 / -1; }
 
   table { border-collapse: collapse; width: 100%; font-size: var(--step-x); }
@@ -267,20 +290,60 @@ def _card(row, companies, pile):
         for l in legs
     ) or '<span class="leg">no legs</span>'
 
-    notes = [(1, f) for f in (detail.get("flags") or [])]
-    pay = company.get("pay_model", "unknown")
-    if pay == "location-adjusted":
-        notes.append((1, "Pay is location-adjusted, so the move north cuts it. Ask on the first call."))
-    elif pay == "unknown":
-        notes.append((0, "Pay model unknown. Ask whether pay is the same wherever you live."))
-    if detail.get("curriculum"):
-        notes.append((0, "Curriculum: " + ", ".join(detail["curriculum"])))
-    if detail.get("proof_lead"):
-        notes.append((0, f"Lead with {detail['proof_lead']}"))
+    # Everything the row carries, because the point of opening a card is to
+    # decide without opening the posting. Absent fields print nothing rather
+    # than a blank row, the same rule the site's Mask keeps.
+    facts = []
+    if tier:
+        facts.append(("company", f"{name}, tier {tier}"))
+    else:
+        facts.append(("company", name))
+    if company.get("category"):
+        facts.append(("kind", company["category"].replace("-", " ")))
+    where = row["location"] or ""
+    if row["remote_class"] and row["remote_class"] not in (where or "").lower():
+        where = f"{where}, {row['remote_class']}" if where else row["remote_class"]
+    if where:
+        facts.append(("where", where))
     if company.get("hq"):
-        notes.append((0, f"HQ {company['hq']}"))
-    notes.append((0, f"First seen {row['first_seen'][:10]}"))
-    note_html = "".join(f'<p class="{"fl" if hot else ""}">{_esc(t)}</p>' for hot, t in notes)
+        facts.append(("head office", company["hq"]))
+    facts.append(("pay", money or "not posted"))
+    pay = company.get("pay_model", "unknown")
+    facts.append(("pay model", {"location-adjusted": "location adjusted, so the move north cuts it",
+                                "same-everywhere": "the same wherever you live",
+                                "unknown": "unknown, worth asking on the first call"}.get(pay, pay)))
+    if row["employment_type"]:
+        facts.append(("employment", row["employment_type"]))
+    if row["posted_at"]:
+        facts.append(("posted", row["posted_at"][:10]))
+    facts.append(("first seen", row["first_seen"][:10]))
+    if row["last_seen"]:
+        facts.append(("still listed", row["last_seen"][:10]))
+    if legs:
+        facts.append(("asks for", ", ".join(legs)))
+    if detail.get("curriculum"):
+        facts.append(("study list", ", ".join(detail["curriculum"])))
+    if detail.get("title_tier"):
+        facts.append(("title tier", detail["title_tier"]))
+    if row["contact_hint"]:
+        facts.append(("a name in it", row["contact_hint"]))
+    facts.append(("source", f"{row['source']} &middot; id {row['id']}"))
+    fact_html = "".join(
+        f'<div class="fact"><dt>{_esc(k)}</dt><dd>{v if k == "source" else _esc(v)}</dd></div>'
+        for k, v in facts
+    )
+
+    flags = "".join(f'<p class="fl">{_esc(f)}</p>' for f in (detail.get("flags") or []))
+    lead = (f'<p class="lead">Lead with <b>{_esc(detail["proof_lead"])}</b></p>'
+            if detail.get("proof_lead") else "")
+
+    # Their own words, plain text out of the adapter, so paragraphs are the only
+    # structure there is and there is no markup to trust.
+    body = (row["description"] or "").strip()
+    said = ""
+    if body:
+        paras = "".join(f"<p>{_esc(b.strip())}</p>" for b in re.split(r"\n\s*\n", body) if b.strip())
+        said = f'''<section class="said"><h3>What they wrote</h3><div class="said-body">{paras}</div></section>'''
 
     return f"""<details class="card" data-id="{row['id']}" data-pile="{_esc(pile)}" data-score="{round(row['score'] or 0)}"\
  data-top="{row['comp_max'] if row['comp_found'] and row['comp_max'] else -1}" data-seen="{_esc(row['first_seen'][:10])}"\
@@ -293,13 +356,13 @@ def _card(row, companies, pile):
 <div class="meta"><span class="where">{_esc(row['location'] or row['remote_class'] or '')}</span>{'<span class="pile">apply</span>' if pile == 'apply' else ''}</div>
 </summary>
 <div class="detail">
-<div><h3>How it scored</h3><div class="rows">{rows}</div></div>
-<div><h3>What to know</h3><div class="notes">{note_html}</div></div>
-<div><h3>Do</h3><div class="act">
+<section class="scored"><h3>How it scored</h3><div class="rows">{rows}</div>{flags}{lead}</section>
+<section class="facts"><h3>The role</h3><dl class="factlist">{fact_html}</dl></section>
+{said}
+<footer class="act">
 <label class="pick"><input type="checkbox" data-pick="{row['id']}"> Pick for a letter</label>
 <a href="{_esc(row['url'])}" target="_blank" rel="noreferrer noopener">Open the posting &rarr;</a>
-<span class="idtag">id {row['id']}</span>
-</div></div>
+</footer>
 </div>
 </details>"""
 
