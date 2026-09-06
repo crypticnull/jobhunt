@@ -7,7 +7,11 @@
 //      stranger's screen.
 //   3. No .astro or .mjs file under site/src writes a hex colour, a
 //      millisecond duration or a cubic-bezier by hand. A component names a
-//      token, never a number.
+//      token, never a number. A file that genuinely has to, because its job is
+//      authoring a value rather than consuming one, says so in a comment:
+//        check-tokens-allow: easing curve, because ...
+//      The reason is required and the marker is in the diff, so an exemption
+//      is a thing somebody argued for rather than a thing that crept in.
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { load, ratios, render, root, OUTPUT } from "./tokens.mjs";
@@ -36,10 +40,17 @@ const literal = [
   [/cubic-bezier\(/, "easing curve"],
 ];
 for (const file of walk(join(root, "site", "src")).filter((f) => /\.(astro|mjs)$/.test(f))) {
-  const text = readFileSync(file, "utf8")
+  const raw = readFileSync(file, "utf8");
+  // Read the exemptions before the comments are stripped, since that is where
+  // they live. "because" is required: an exemption without a reason is not one.
+  const allowed = new Set(
+    [...raw.matchAll(/check-tokens-allow:\s*([^,\n]+?)\s*,\s*because\b/g)].map((m) => m[1].trim()),
+  );
+  const text = raw
     .replace(/\/\*[\s\S]*?\*\//g, "")   // block comments
     .replace(/^\s*\/\/.*$/gm, "");        // line comments
   for (const [re, what] of literal) {
+    if (allowed.has(what)) continue;
     const m = text.match(re);
     if (m) fail(`${relative(root, file)}: ${what} written by hand: ${m[0].trim()}`);
   }

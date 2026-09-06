@@ -24,6 +24,9 @@
      --t-blink   1000ms                       0ms      the record dot while a clip plays
      --ease-out  cubic-bezier(0.2, 0, 0, 1)   linear   anything entering or moving
      --ease-in   cubic-bezier(0.4, 0, 1, 1)   linear   anything leaving
+     --slip-x    0.14em                       0.14em   how far a misregistered word slips
+     --rise-y    0.5rem                       0.5rem   how far the hero rises on first paint
+     --press     0.99                         1        the scale a tile takes while pressed
      scroll      smooth                       auto
 */
 :root {
@@ -49,6 +52,9 @@
   --t-blink: 1000ms;
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --slip-x: 0.14em;
+  --rise-y: 0.5rem;
+  --press: 0.99;
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
@@ -81,6 +87,7 @@
     --t-blink: 0ms;
     --ease-out: linear;
     --ease-in: linear;
+    --press: 1;
   }
 }
 :root[data-motion="reduce"] {
@@ -88,6 +95,7 @@
   --t-blink: 0ms;
   --ease-out: linear;
   --ease-in: linear;
+  --press: 1;
 }
 @media (prefers-reduced-motion: no-preference) {
   :root:not([data-motion="reduce"]) {

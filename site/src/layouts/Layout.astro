@@ -690,7 +690,6 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
     position: absolute;
     inset: 0;
     z-index: -1;
-    color: var(--marker);
     opacity: 0;
     transform: translateX(0);
     pointer-events: none;
@@ -699,15 +698,23 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
       transform var(--t-slide) var(--ease-out),
       opacity var(--t-fade) var(--ease-out);
   }
-  .slip .w:hover .ghost {
-    opacity: 1;
-    transform: translateX(0.16em);
+  .slip .ghost.m {
+    color: var(--marker);
   }
-  /* A keyboard visitor never hovers, so the whole row registers off at once
-     when the link that holds it takes focus. */
-  a:focus-visible .slip .ghost {
+  .slip .ghost.b {
+    color: var(--blueprint);
+  }
+  .slip .w:hover .ghost.m,
+  a:focus-visible .slip .ghost.m {
     opacity: 1;
-    transform: translateX(0.16em);
+    transform: translateX(var(--slip-x));
+  }
+  /* The other plate goes the other way. A press does not slip in one
+     direction only. */
+  .slip .w:hover .ghost.b,
+  a:focus-visible .slip .ghost.b {
+    opacity: 1;
+    transform: translateX(calc(var(--slip-x) * -1));
   }
 
   /* ---- A1, the hero arrives ----------------------------------------------
@@ -726,7 +733,7 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
   @keyframes hero-rise {
     from {
       opacity: 0;
-      transform: translateY(0.5rem);
+      transform: translateY(var(--rise-y));
     }
     to {
       opacity: 1;
@@ -738,7 +745,7 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
      The tile acknowledges the press and nothing else. It is the part people
      actually notice and it costs one transform on a composited layer. */
   a.card:active {
-    transform: scale(0.995);
+    transform: scale(var(--press));
   }
   .card.work img,
   .card.work .mask {
@@ -746,6 +753,6 @@ const pageTitle = title ? `${title} · ${site.name}` : `${site.name}, ${site.her
   }
   a.card.work:active img,
   a.card.work:active .mask {
-    transform: scale(0.99);
+    transform: scale(var(--press));
   }
 </style>

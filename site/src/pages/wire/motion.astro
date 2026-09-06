@@ -48,8 +48,8 @@ const decisions = [
     title: "Misregistration",
     ask: "A press out of register prints the plates a hair apart and leaves a coloured fringe beside the type. Per word, on hover, so the page answers where the eye is rather than everywhere at once. The offset takes --t-slide, a cut under reduce, and the tint takes --t-fade.",
     options: [
-      { id: "E1", picked: true, name: "One fringe", token: "--t-slide, --t-fade", note: "A marker ghost slides right off the true impression. What is on the builds list now." },
-      { id: "E2", name: "Full misregistration", token: "--t-slide, --t-fade", note: "Marker one way, blueprint the other, which is what a four colour press actually does when it slips. Louder, and it spends the second accent colour." },
+      { id: "E1", name: "One fringe", token: "--t-slide, --t-fade", note: "A marker ghost slides right off the true impression. Reads as a hover glow rather than as a press fault." },
+      { id: "E2", picked: true, name: "Full misregistration", token: "--t-slide, --t-fade", note: "Marker one way, blueprint the other, which is what a four colour press actually does when it slips. On the builds list now, and it spends the second accent colour, which otherwise does almost nothing here." },
       { id: "E3", name: "The pair separates", token: "--t-slide, --t-fade", note: "The ghost goes one way and the word itself moves a hair the other. Reads as the sheet shifting rather than as ink smearing, and it is the only one that moves the text you are reading." },
     ],
   },
@@ -127,7 +127,7 @@ const decisions = [
                   <span class="opt-id">{o.id}</span> {o.name}
                   {o.picked && <span class="shipped">shipped</span>}
                 </label>
-                {d.id === "register" ? <span class="hint">hover the words</span> : <button type="button" data-play={o.id} disabled>Play</button>}
+                <button type="button" data-play={o.id} disabled>Loop</button>
               </div>
               <p class="token">{o.token}</p>
               <p class="note">{o.note}</p>
@@ -137,6 +137,42 @@ const decisions = [
       </section>
     ))
   }
+
+  <aside class="dials" aria-label="Dials">
+    <div class="dial-head">
+      <strong>Dials</strong>
+      <span class="hint">live, this browser only</span>
+      <button type="button" id="dial-reset">Reset</button>
+    </div>
+    <div class="dial-grid">
+      {[
+        { v: "t-quick", label: "quick", min: 0, max: 600, step: 10, unit: "ms" },
+        { v: "t-fade", label: "fade", min: 0, max: 600, step: 10, unit: "ms" },
+        { v: "t-slide", label: "slide", min: 0, max: 900, step: 10, unit: "ms" },
+        { v: "t-blink", label: "blink", min: 200, max: 3000, step: 50, unit: "ms" },
+        { v: "slip-x", label: "slip", min: 0, max: 0.6, step: 0.01, unit: "em" },
+        { v: "rise-y", label: "rise", min: 0, max: 2, step: 0.05, unit: "rem" },
+        { v: "press", label: "press", min: 0.9, max: 1, step: 0.005, unit: "" },
+      ].map((d) => (
+        <label class="dial">
+          <span class="dial-name">{d.label}</span>
+          <input type="range" data-var={d.v} data-unit={d.unit} min={d.min} max={d.max} step={d.step} />
+          <output data-out={d.v} />
+        </label>
+      ))}
+      <label class="dial ease">
+        <span class="dial-name">ease out</span>
+        <span class="bez">
+          {["x1", "y1", "x2", "y2"].map((k) => (
+            <input type="number" data-bez={k} min="-1" max="2" step="0.05" />
+          ))}
+        </span>
+        <output data-out="ease-out" />
+      </label>
+    </div>
+    <p class="patch-note">The record patch, for <code>data/design/tokens.json</code>. Paste it back and it becomes the site.</p>
+    <pre class="patch" id="patch">Nothing changed yet.</pre>
+  </aside>
 
   <section class="dec" id="answer">
     <h2><span class="n">E</span> The answer</h2>
@@ -150,19 +186,91 @@ const decisions = [
   // load or on scroll, and the token the option names is the token the
   // specimen runs, so the reduced column is what a visitor who asked for less
   // motion actually receives.
-  const restart = (el: HTMLElement, cls: string) => {
-    el.classList.remove(cls);
-    void el.offsetWidth;
-    el.classList.add(cls);
-  };
+  // Loop rather than one shot, because the point is to turn a dial while the
+  // movement is running and watch it change. Press again to stop.
   for (const b of document.querySelectorAll<HTMLButtonElement>("button[data-play]")) {
     b.disabled = false;
     b.addEventListener("click", () => {
-      const id = b.dataset.play!;
-      const spec = document.querySelector<HTMLElement>(`[data-spec="${id}"]`);
-      if (spec) restart(spec, "run");
+      const spec = document.querySelector<HTMLElement>(`[data-spec="${b.dataset.play}"]`);
+      if (!spec) return;
+      const on = spec.classList.toggle("loop");
+      spec.classList.toggle("run", on);
+      b.textContent = on ? "Stop" : "Loop";
+      b.classList.toggle("on", on);
     });
   }
+
+  // The dials write straight onto the root, so every specimen and the rest of
+  // the site change under them at once. Nothing is saved to the record from
+  // here: the panel prints the patch and Matt decides whether it ships.
+  const rootEl = document.documentElement;
+  const base: Record<string, string> = {};
+  const now: Record<string, string> = {};
+  const readBase = (v: string) => getComputedStyle(rootEl).getPropertyValue(`--${v}`).trim();
+  const bez = Array.from(document.querySelectorAll<HTMLInputElement>("input[data-bez]"));
+  const patch = document.getElementById("patch");
+
+  const paintPatch = () => {
+    const changed = Object.keys(now).filter((k) => now[k] !== base[k]);
+    if (!patch) return;
+    if (!changed.length) {
+      patch.textContent = "Nothing changed yet.";
+      return;
+    }
+    patch.textContent = changed
+      .map((k) => `  { "name": "${k}", "default": "${now[k]}" }`)
+      .join(",\n");
+  };
+
+  const setVar = (v: string, value: string) => {
+    now[v] = value;
+    rootEl.style.setProperty(`--${v}`, value);
+    const out = document.querySelector<HTMLOutputElement>(`output[data-out="${v}"]`);
+    if (out) out.textContent = value;
+    paintPatch();
+  };
+
+  for (const r of document.querySelectorAll<HTMLInputElement>("input[data-var]")) {
+    const v = r.dataset.var!;
+    const unit = r.dataset.unit ?? "";
+    base[v] = readBase(v);
+    now[v] = base[v];
+    r.value = String(parseFloat(base[v]));
+    const out = document.querySelector<HTMLOutputElement>(`output[data-out="${v}"]`);
+    if (out) out.textContent = base[v];
+    r.addEventListener("input", () => setVar(v, `${r.value}${unit}`));
+  }
+
+  // check-tokens-allow: easing curve, because this panel authors a curve from
+  // four numbers a person is turning rather than consuming one, and a lab that
+  // cannot write the thing it is for is not a lab. Nothing here reaches the
+  // record: the panel prints a patch and Matt decides.
+  base["ease-out"] = readBase("ease-out");
+  now["ease-out"] = base["ease-out"];
+  const nums = base["ease-out"].match(/-?[\d.]+/g) || ["0.2", "0", "0", "1"];
+  bez.forEach((input, i) => {
+    input.value = nums[i] ?? "0";
+    input.addEventListener("input", () => {
+      const v = `cubic-bezier(${bez.map((b) => b.value || "0").join(", ")})`;
+      setVar("ease-out", v);
+    });
+  });
+  const easeOut = document.querySelector<HTMLOutputElement>('output[data-out="ease-out"]');
+  if (easeOut) easeOut.textContent = base["ease-out"];
+
+  document.getElementById("dial-reset")?.addEventListener("click", () => {
+    for (const k of Object.keys(now)) {
+      rootEl.style.removeProperty(`--${k}`);
+      now[k] = base[k];
+      const out = document.querySelector<HTMLOutputElement>(`output[data-out="${k}"]`);
+      if (out) out.textContent = base[k];
+    }
+    for (const r of document.querySelectorAll<HTMLInputElement>("input[data-var]")) {
+      r.value = String(parseFloat(base[r.dataset.var!]));
+    }
+    bez.forEach((b, i) => (b.value = nums[i] ?? "0"));
+    paintPatch();
+  });
   const out = document.getElementById("picked");
   const KEY = "motion-picks";
   const picks: Record<string, string> = (() => {
@@ -364,9 +472,15 @@ const decisions = [
     to { opacity: 0.15; }
   }
 
-  /* Hover the words in a specimen and the variant runs. No play button:
-     the movement is the hover, so a button would be answering a question
-     nobody asked. */
+  /* Loop turns a one shot into something a dial can be turned against. */
+  .specimen.loop * {
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+
+  /* Hover a word to run the variant by hand, or press Loop and it runs on its
+     own. The hover is a transition and the loop is an animation, because a
+     transition has nothing to repeat. */
   .reg {
     font-family: var(--font-display);
     font-size: 1.05rem;
@@ -402,16 +516,16 @@ const decisions = [
   }
   .reg.E1 .w:hover .ghost.m {
     opacity: 1;
-    transform: translateX(0.16em);
+    transform: translateX(var(--slip-x));
   }
-  /* E2, both plates slip, opposite ways. */
+  /* E2, both plates slip, opposite ways. What ships. */
   .reg.E2 .w:hover .ghost.m {
     opacity: 1;
-    transform: translateX(0.12em);
+    transform: translateX(var(--slip-x));
   }
   .reg.E2 .w:hover .ghost.b {
     opacity: 1;
-    transform: translateX(-0.12em);
+    transform: translateX(calc(var(--slip-x) * -1));
   }
   /* E3, the sheet shifts: the word moves too. */
   .reg.E3 .ghost.b {
@@ -419,10 +533,40 @@ const decisions = [
   }
   .reg.E3 .w:hover .ghost.m {
     opacity: 1;
-    transform: translateX(0.2em);
+    transform: translateX(calc(var(--slip-x) * 1.4));
   }
   .reg.E3 .w:hover {
-    transform: translateX(-0.06em);
+    transform: translateX(calc(var(--slip-x) * -0.4));
+  }
+
+  /* Looped, the same movement without a pointer on it. */
+  .loop .reg .ghost {
+    opacity: 1;
+  }
+  .loop .reg.E1 .ghost.m,
+  .loop .reg.E2 .ghost.m {
+    animation: slip-m var(--t-slide) var(--ease-out) infinite alternate;
+  }
+  .loop .reg.E2 .ghost.b {
+    animation: slip-b var(--t-slide) var(--ease-out) infinite alternate;
+  }
+  .loop .reg.E3 .ghost.m {
+    animation: slip-far var(--t-slide) var(--ease-out) infinite alternate;
+  }
+  .loop .reg.E3 .w {
+    animation: slip-back var(--t-slide) var(--ease-out) infinite alternate;
+  }
+  @keyframes slip-m {
+    to { transform: translateX(var(--slip-x)); }
+  }
+  @keyframes slip-b {
+    to { transform: translateX(calc(var(--slip-x) * -1)); }
+  }
+  @keyframes slip-far {
+    to { transform: translateX(calc(var(--slip-x) * 1.4)); }
+  }
+  @keyframes slip-back {
+    to { transform: translateX(calc(var(--slip-x) * -0.4)); }
   }
 
   .shipped {
@@ -487,6 +631,109 @@ const decisions = [
     color: var(--muted);
     margin: 0;
     max-width: none;
+  }
+  /* The panel follows, because a dial you have to scroll back to is a dial
+     nobody turns. */
+  .dials {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin: 4rem 0 0;
+    padding: 1rem var(--gutter) 1.25rem;
+    background: var(--field);
+    border-top: 1px solid var(--rule);
+  }
+  .dial-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+  }
+  .dial-head strong {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  #dial-reset {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: transparent;
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    padding: 0.25rem 0.6rem;
+    cursor: pointer;
+  }
+  #dial-reset:hover {
+    border-color: var(--marker);
+    color: var(--marker);
+  }
+  .dial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    gap: 0.6rem var(--grid-gap);
+  }
+  .dial {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr 4.5rem;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .dial-name,
+  .dial output {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  .dial output {
+    color: var(--marker);
+    text-align: right;
+  }
+  .dial input[type="range"] {
+    width: 100%;
+    accent-color: var(--marker);
+  }
+  .dial.ease {
+    grid-column: 1 / -1;
+    grid-template-columns: 3.5rem 1fr auto;
+  }
+  .bez {
+    display: flex;
+    gap: 0.35rem;
+  }
+  .bez input {
+    width: 4rem;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    padding: 0.15rem 0.3rem;
+  }
+  .patch-note {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin: 0.9rem 0 0.35rem;
+    max-width: none;
+  }
+  .patch {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    padding: 0.6rem 0.75rem;
+    margin: 0;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  button.on {
+    border-color: var(--marker);
+    color: var(--marker);
   }
   .picked {
     font-family: var(--mono);
