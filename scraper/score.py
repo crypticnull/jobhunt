@@ -407,10 +407,19 @@ def evaluate(p, rules, company=None, now=None):
     # how the pile fills with work Matt would never take. A posting has to be
     # about something he does before comp and prestige can carry it.
     craft = piles.get("relevance_legs") or []
-    relevant = out["title_tier"] is not None or any(l in craft for l in legs) if craft else (out["title_tier"] is not None or bool(legs))
+    leg_hit = any(l in craft for l in legs) if craft else bool(legs)
+    # And the leg has to be corroborated by the title. At an AI company the
+    # About Us block says generative and product in every posting, so the legs
+    # fire on an Economist and a Revenue Accounting Manager the same as on a
+    # designer. A tiered title still passes on its own; this governs the
+    # rescue only, and the two halves get separate drop reasons so the digest
+    # shows which one is doing the work.
+    craft_titles = piles.get("relevance_title_terms") or []
+    title_craft = not craft_titles or bool(_hits(craft_titles, normalize_title(p.get("title"))))
+    relevant = out["title_tier"] is not None or (leg_hit and title_craft)
     if not relevant:
         out["pile"] = "logged"
-        out["drop_reason"] = "no title fit and no intersection"
+        out["drop_reason"] = "no title fit and no intersection" if not leg_hit else "intersection but the title names no craft"
         return out
     # The apply pile is what the letter generator reads. A posting whose title
     # does not fit is not one Matt can write a credible letter for, whatever the
