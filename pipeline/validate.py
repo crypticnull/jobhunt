@@ -28,6 +28,8 @@ TARGETS = [
     (ROOT / "data" / "scoring.json", SCHEMA / "scoring.schema.json"),
     (ROOT / "data" / "skills.json", SCHEMA / "skills.schema.json"),
     (ROOT / "data" / "design" / "tokens.json", SCHEMA / "tokens.schema.json"),
+    (ROOT / "data" / "identity.json", SCHEMA / "identity.schema.json"),
+    (ROOT / "data" / "resume.json", SCHEMA / "resume.schema.json"),
     (ROOT / "data" / "local" / "scoring.local.json", SCHEMA / "scoring.schema.json"),
 ]
 

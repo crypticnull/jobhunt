@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "note": "The parts of a resume the rest of the repo does not already know. The proof stories, their summaries and the skill list are pulled from data/proof and data/skills.json at render time rather than copied here, so the resume can never disagree with the site about what a thing is. Experience and education are empty because only Matt has them, and the renderer prints nothing for an empty section rather than inventing a line.",
+  "summary": "",
+  "lead_proof": ["ae-llama", "local-pipeline", "keynote-extractor", "event-franchises"],
+  "skill_areas": ["product", "motion", "3d", "generative", "software", "pipeline"],
+  "experience": [],
+  "education": []
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "identity.schema.json",
+  "title": "Who the surfaces are speaking as",
+  "description": "One record for the name, the positioning sentence and the ways to reach him. Read by site/src/site.config.mjs, by the letter renderer and by the resume, so the three cannot drift. Empty strings are rendered as absent rather than as blanks.",
+  "type": "object",
+  "required": ["version", "name", "hero"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "integer", "enum": [1] },
+    "note": { "type": "string" },
+    "name": { "type": "string" },
+    "hero": { "type": "string", "description": "The positioning thesis. One sentence that says what he is, not what he does." },
+    "sub": { "type": "string" },
+    "title": { "type": "string", "description": "How a resume or a letterhead names the role, which is not the same sentence as the hero." },
+    "location": { "type": "string" },
+    "email": { "type": "string" },
+    "github": { "type": "string" },
+    "site": { "type": "string" }
+  }
+}

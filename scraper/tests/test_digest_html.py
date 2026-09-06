@@ -57,7 +57,8 @@ class Page(unittest.TestCase):
         """A var() naming a token that is not in the record does nothing and
         says nothing, which is how a design change is lost in silence."""
         declared = set()
-        t = digest_html._tokens()
+        from pipeline import design
+        t = design.tokens()
         for group in (t["colour"]["light"], t["colour"]["dark"], t["colour"]["plate"], t["grid"], t["type"]):
             declared |= set(group)
         declared |= {m["name"] for m in t["motion"]["tokens"]}

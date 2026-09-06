@@ -22,14 +22,12 @@ breakdown, the flags, the curriculum hits and the command to mark it. It is a
 it works with the script blocked. The script only adds the filters.
 """
 
-import html
 import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from pipeline import design
 from . import digest as digest_mod
-
-TOKENS = Path(__file__).resolve().parent.parent / "data" / "design" / "tokens.json"
 
 # The order the score prints in, from the markdown, so the two read the same
 # and neither can quietly start leaving a rule out.
@@ -50,45 +48,6 @@ def _dateline(now):
     start = f"{monday.day} {months[monday.month - 1]}"
     end = f"{now.day} {months[now.month - 1]} {now.year}"
     return f"{start} to {end}"
-
-
-def _tokens(path=None):
-    return json.loads(Path(path or TOKENS).read_text(encoding="utf-8"))
-
-
-def _vars(pairs, indent="  "):
-    return "\n".join(f"{indent}--{k}: {v};" for k, v in pairs)
-
-
-def token_css(t):
-    """The same custom properties tools/tokens.mjs writes, from the same record.
-    Light on bare :root so an unstamped document has a full palette, the dark
-    blocks only redefine, and the reduced column is a decision per movement
-    rather than a switch that zeroes everything."""
-    motion = [(m["name"], m["default"]) for m in t["motion"]["tokens"]]
-    typ = list(t.get("type", {}).items())
-    reduced = [(m["name"], m["reduced"]) for m in t["motion"]["tokens"] if m["default"] != m["reduced"]]
-    dark = list(t["colour"]["dark"].items())
-    return "\n".join([
-        ":root {",
-        _vars(list(t["colour"]["light"].items()) + list(t["colour"]["plate"].items()) + typ + list(t["grid"].items()) + motion),
-        "  color-scheme: light dark;",
-        "}",
-        "@media (prefers-color-scheme: dark) {",
-        '  :root:not([data-theme="light"]) {',
-        _vars(dark, "    "),
-        "  }",
-        "}",
-        ':root[data-theme="dark"] {',
-        _vars(dark),
-        "  color-scheme: dark;",
-        "}",
-        "@media (prefers-reduced-motion: reduce) {",
-        '  :root:not([data-motion="full"]) {',
-        _vars(reduced, "    "),
-        "  }",
-        "}",
-    ])
 
 
 PAGE_CSS = """
@@ -269,8 +228,7 @@ FILTER_JS = """
 """
 
 
-def _esc(v):
-    return html.escape(str(v if v is not None else ""), quote=True)
+_esc = design.esc
 
 
 def _card(row, companies, pile):
@@ -411,7 +369,7 @@ def render(store, rules, companies=None, now=None, tokens=None):
 <meta name="robots" content="noindex, nofollow">
 <title>Shortlist, {_esc(_dateline(now).split(' to ')[1])}</title>
 <style>
-{token_css(tokens or _tokens())}
+{design.token_css(tokens)}
 {PAGE_CSS}</style>
 </head>
 <body data-week="{_esc(week)}">

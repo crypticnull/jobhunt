@@ -1,11 +1,15 @@
-// Site-wide copy and links. The hero sentence is the positioning thesis: it
-// says what he is, and the motion work is the proof underneath it.
+// Site-wide copy and links, read from data/identity.json so the site, the
+// letters and the resume cannot disagree about the name or the sentence. The
+// hero sentence is the positioning thesis: it says what he is, and the motion
+// work is the proof underneath it. Edit the record, not this file.
+import identity from "../../data/identity.json";
+
 export const site = {
-  name: "Matt Rodenbeck",
-  hero: "I realize visions, and build the pipelines that do the work.",
-  sub: "Production 3D and generative video running locally, plus the tooling and automation that gets it into a real workflow.",
-  github: "https://github.com/crypticnull",
-  // Set when the domain lands. Rendered only when non-empty.
-  email: "",
-  location: "Philadelphia today, Pacific Northwest next, remote either way.",
+  name: identity.name,
+  hero: identity.hero,
+  sub: identity.sub,
+  github: identity.github,
+  // Rendered only when non-empty.
+  email: identity.email,
+  location: identity.location,
 };
