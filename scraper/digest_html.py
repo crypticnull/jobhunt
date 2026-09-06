@@ -157,6 +157,7 @@ PAGE_CSS = """
   .said-body p { margin: 0 0 .7rem; font-size: var(--step-x); }
   .said-body p:last-child { margin-bottom: 0; }
   .lead { margin: .7rem 0 0; font-size: var(--step-x); }
+  .absent { color: var(--muted); font-style: italic; }
   .scored .fl { margin: .7rem 0 0; font-size: var(--step-x); color: var(--marker); }
   .rows { display: grid; gap: .3rem; }
   .row { display: grid; grid-template-columns: 6.5rem 1fr 2.4rem; gap: .6rem; align-items: center; font-family: var(--mono); font-size: var(--step-xx); }
@@ -319,8 +320,11 @@ def _card(row, companies, pile):
     facts.append(("first seen", row["first_seen"][:10]))
     if row["last_seen"]:
         facts.append(("still listed", row["last_seen"][:10]))
-    if legs:
-        facts.append(("asks for", ", ".join(legs)))
+    terms = detail.get("leg_terms") or {}
+    for leg in legs:
+        got = terms.get(leg) or []
+        facts.append((leg, ", ".join(got[:8]) + (f" and {len(got) - 8} more" if len(got) > 8 else "")
+                      if got else "in the body"))
     if detail.get("curriculum"):
         facts.append(("study list", ", ".join(detail["curriculum"])))
     if detail.get("title_tier"):
@@ -340,10 +344,11 @@ def _card(row, companies, pile):
     # Their own words, plain text out of the adapter, so paragraphs are the only
     # structure there is and there is no markup to trust.
     body = (row["description"] or "").strip()
-    said = ""
     if body:
-        paras = "".join(f"<p>{_esc(b.strip())}</p>" for b in re.split(r"\n\s*\n", body) if b.strip())
-        said = f'''<section class="said"><h3>What they wrote</h3><div class="said-body">{paras}</div></section>'''
+        inner = "".join(f"<p>{_esc(b.strip())}</p>" for b in re.split(r"\n\s*\n", body) if b.strip())
+    else:
+        inner = '<p class="absent">The store has no description for this row, so there is nothing of theirs to show. A polled posting always has one.</p>'
+    said = f'''<section class="said"><h3>What they wrote</h3><div class="said-body">{inner}</div></section>'''
 
     return f"""<details class="card" data-id="{row['id']}" data-pile="{_esc(pile)}" data-score="{round(row['score'] or 0)}"\
  data-top="{row['comp_max'] if row['comp_found'] and row['comp_max'] else -1}" data-seen="{_esc(row['first_seen'][:10])}"\

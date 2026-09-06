@@ -341,10 +341,31 @@ class Points(unittest.TestCase):
         self.assertTrue(a["flags"])
         self.assertEqual(a["pile"], "apply")
 
-    def test_proof_lead_follows_the_tier(self):
-        self.assertEqual(score(row(), rules(), NOW, {"tier": 4})["proof_lead"], "event-franchises")
-        self.assertEqual(score(row(), rules(), NOW, {"tier": 3})["proof_lead"], "keynote-extractor")
-        self.assertEqual(score(row(), rules(), NOW, {"size": 300})["proof_lead"], "ae-llama")
+    def test_proof_lead_follows_what_the_posting_asked_for(self):
+        """Choosing by company tier told him to lead with the Keynote
+        extractor on twenty two of the forty postings of the week to
+        6 September, and with ae-llama once, because most companies are tier 3.
+        Tier says how much he wants the company. It says nothing about the job."""
+        paid = dict(comp_min=150000, comp_max=180000, comp_found=1)
+        motion = score(row(description="You will own our motion system and ship it in Rive.", **paid), rules(), NOW, {"tier": 3})
+        self.assertEqual(motion["proof_lead"], "ae-llama")
+        gen = score(row(description="Diffusion models and ComfyUI.", **paid), rules(), NOW, {"tier": 4})
+        self.assertEqual(gen["proof_lead"], "local-pipeline")
+        pipe = score(row(description="Asset management, metadata and versioning.", **paid), rules(), NOW, {"tier": 3})
+        self.assertEqual(pipe["proof_lead"], "file-renamer")
+
+    def test_the_tier_is_the_fallback_when_nothing_was_asked_for(self):
+        r = score(row(title="Senior Motion Designer", description=""), rules(), NOW, {"tier": 4})
+        self.assertEqual(r["proof_lead"], "event-franchises", "the default row hits no leg but motion")
+
+    def test_the_words_that_hit_are_recorded_not_just_the_leg(self):
+        """A leg name is the scorer's vocabulary. "asks for pipeline" says
+        nothing about the day to day; "asset management, versioning" does."""
+        r = score(row(description="Asset management, metadata and versioning across the pipeline.", comp_min=150000, comp_max=180000, comp_found=1), rules(), NOW, TIER2)
+        self.assertIn("pipeline", r["legs_hit"])
+        got = r["leg_terms"]["pipeline"]
+        self.assertIn("asset management", got)
+        self.assertIn("versioning", got)
 
 
 class States(unittest.TestCase):

@@ -187,8 +187,15 @@ class Page(unittest.TestCase):
         row = dict(self.s.open_postings()[0])
         row["description"] = ""
         html = digest_html._card(row, COMPANIES, "apply")
-        self.assertNotIn("What they wrote", html)
+        # Silence where their words should be reads as a bug. The Mask draws a
+        # rule where a record is absent rather than leaving a hole.
+        self.assertIn("The store has no description for this row", html)
         self.assertIn("<dt>company</dt>", html, "the rest of the card still prints")
+
+    def test_the_words_that_hit_a_leg_print_instead_of_the_leg_name(self):
+        self.assertIn("<dt>product-motion</dt>", self.html)
+        self.assertIn("interface animation", self.html)
+        self.assertNotIn("<dt>asks for</dt>", self.html)
 
     def test_titles_and_companies_are_escaped(self):
         self.s.upsert(posting(source="ashby", source_id="9", company_slug="luma", url="https://x/9",
