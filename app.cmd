@@ -3,21 +3,29 @@ rem The job hunt as one window, from anywhere, with no cd.
 rem
 rem     X:\_CLAUDE\26_09_01_Job_Hunt\jobhunt\app.cmd
 rem
-rem Pin it to the taskbar and this is the only thing you ever run. It starts
-rem the console itself and the site the first time you click Site, and a second
-rem launch focuses the window that is already open rather than starting another.
+rem Pin it to the taskbar and this is the only thing you ever run. It hands off
+rem to electron.exe and exits, so no terminal is left sitting behind the window.
+rem electron.exe is a windowed binary, not a console one, so `start` gives it no
+rem console of its own either. Closing the app window ends everything it
+rem started, and launching this again focuses the window that is already open
+rem rather than starting a second copy.
 rem
 rem The first run installs Electron, which is a few hundred megabytes and takes
-rem a minute. Every run after that is instant.
+rem a minute. That one run shows its progress here and then this window closes.
 setlocal
-cd /d "%~dp0desktop"
-where npm >nul 2>&1 || (
-    echo npm is not on the PATH. Install Node 22 and reopen the shell.
-    exit /b 1
-)
-if not exist node_modules (
+set "APP=%~dp0desktop"
+set "EXE=%APP%\node_modules\electron\dist\electron.exe"
+if not exist "%EXE%" (
+    where npm >nul 2>&1 || (
+        echo npm is not on the PATH. Install Node 22 and reopen the shell.
+        pause
+        exit /b 1
+    )
     echo First run, installing Electron. This takes a minute and only happens once.
-    call npm install || exit /b 1
+    pushd "%APP%"
+    call npm install || (popd & pause & exit /b 1)
+    popd
 )
-call npm start
+start "" "%EXE%" "%APP%"
 endlocal
+exit /b 0

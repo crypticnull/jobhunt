@@ -19,6 +19,7 @@ const http = require("http");
 const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
+const WIN = process.platform === "win32";
 const CONSOLE_PORT = 4319;
 const SITE_PORT = 4321;
 
@@ -35,18 +36,46 @@ function python() {
     const named = fs.readFileSync(pin, "utf8").trim();
     if (named) return named;
   } catch {}
-  return process.platform === "win32" ? "python" : "python3";
+  return WIN ? "python" : "python3";
 }
 
-function start(name, cmd, args, cwd) {
-  const child = spawn(cmd, args, { cwd, shell: process.platform === "win32", windowsHide: true });
+// npm on Windows is npm.cmd, and node refuses to spawn a .cmd without a shell,
+// so that one gets cmd.exe in the middle. python does not, and must not: a
+// shell in the middle is a process that gets killed while the thing it started
+// carries on holding the store.
+function start(name, cmd, args, cwd, { shell = false } = {}) {
+  const child = spawn(cmd, args, {
+    cwd,
+    shell,
+    windowsHide: true,
+    // On unix this makes the child a process group leader so the whole tree can
+    // be signalled at once. On Windows the tree is taskkill's job instead.
+    detached: !WIN,
+  });
   child.on("error", (e) => console.error(`${name} did not start: ${e.message}`));
   // Its output is the only place a stack trace can surface once the window
   // owns the screen, so it goes to the terminal rather than nowhere.
-  child.stdout.on("data", (b) => process.stdout.write(`[${name}] ${b}`));
-  child.stderr.on("data", (b) => process.stderr.write(`[${name}] ${b}`));
+  child.stdout?.on("data", (b) => process.stdout.write(`[${name}] ${b}`));
+  child.stderr?.on("data", (b) => process.stderr.write(`[${name}] ${b}`));
   kids.push(child);
   return child;
+}
+
+// Killing the child is not killing what the child started. Through cmd.exe on
+// Windows, child.kill() ends the shell and leaves python holding the database,
+// which is the exact thing nobody notices until the four in the morning poll
+// fails. taskkill /T takes the tree; on unix the negative pid takes the group.
+function stop(child) {
+  if (!child || child.exitCode !== null || child.signalCode !== null) return;
+  try {
+    if (WIN) {
+      spawn("taskkill", ["/pid", String(child.pid), "/T", "/F"], { windowsHide: true });
+    } else {
+      process.kill(-child.pid, "SIGTERM");
+    }
+  } catch {
+    try { child.kill(); } catch {}
+  }
 }
 
 function up(port) {
@@ -84,12 +113,12 @@ async function startSite() {
   if (await up(SITE_PORT)) return true;
   const site = path.join(ROOT, "site");
   if (!fs.existsSync(path.join(site, "node_modules"))) {
-    start("site install", "npm", ["install"], site);
+    start("site install", WIN ? "npm.cmd" : "npm", ["install"], site, { shell: WIN });
     // npm install then astro dev, so the first ever click on Site works rather
     // than failing with a missing binary he then has to go and fix by hand.
     await new Promise((r) => kids[kids.length - 1].on("exit", r));
   }
-  start("site", "npm", ["run", "dev"], site);
+  start("site", WIN ? "npm.cmd" : "npm", ["run", "dev"], site, { shell: WIN });
   return waitFor(SITE_PORT, 90);
 }
 
@@ -165,9 +194,12 @@ if (!app.requestSingleInstanceLock()) {
 
   // Nothing this app started outlives it. A python server left holding the
   // store is the kind of thing that is only noticed at four in the morning.
-  app.on("before-quit", () => {
-    for (const c of kids) { try { c.kill(); } catch {} }
-  });
+  // Closing the window is the end of it. Nothing this app started keeps
+  // running, so there is never a process to go and find later.
+  const reap = () => { for (const c of kids) stop(c); kids.length = 0; };
+  app.on("before-quit", reap);
+  app.on("will-quit", reap);
+  process.on("exit", reap);
 }
 
 const { ipcMain } = require("electron");
