@@ -371,6 +371,19 @@ def legs_hit(p, rules):
     return [leg for leg, terms in legs.items() if _hits(terms, text)]
 
 
+def intersection_points(legs, rules):
+    """Legs are not worth the same. Flat five a leg meant a posting saying
+    figma scored the intersection exactly as hard as a posting saying you will
+    own our motion system, and in W36 that put 39 of 51 surfaced postings on
+    the product leg with not one of them naming motion or animation in the
+    title. A weight of nothing is not the same as not being a leg: the longform
+    vocabulary still shows in the digest, it just stops paying."""
+    s = rules["score"]["intersection"]
+    weights = s.get("weights") or {}
+    total = sum(weights.get(leg, s["per_leg"]) for leg in legs)
+    return min(total, s["max"])
+
+
 def title_tier(p, legs, rules):
     t = rules["score"]["title"]
     tnorm = normalize_title(p.get("title"))
@@ -462,7 +475,7 @@ def evaluate(p, rules, company=None, now=None):
     score = {
         "remote": s["remote"]["flagged"] if remote_result != "pass" else (s["remote"]["pacific"] if pacific else s["remote"]["pass"]),
         "comp": comp_points,
-        "intersection": min(len(legs), s["intersection"]["max_legs"]) * s["intersection"]["per_leg"],
+        "intersection": intersection_points(legs, rules),
         "title": title_points,
         "company": s["company_tier"].get(str(tier), s["company_tier"]["unknown"]),
         "curriculum": curriculum_points,

@@ -94,7 +94,8 @@
       "added": "2026-09-01",
       "last_reviewed": "2026-09-01",
       "pay_model": "unknown",
-      "hq": null
+      "hq": null,
+      "dropped": "2026-09-06"
     },
     {
       "slug": "arenanet",
@@ -151,7 +152,8 @@
       "hq": "Scottsdale, AZ",
       "remote_notes": "",
       "added": "2026-09-05",
-      "last_reviewed": "2026-09-05"
+      "last_reviewed": "2026-09-05",
+      "dropped": "2026-09-06"
     },
     {
       "slug": "black-forest-labs",
@@ -1804,7 +1806,8 @@
       "hq": "Chicago, IL",
       "remote_notes": "",
       "added": "2026-09-05",
-      "last_reviewed": "2026-09-05"
+      "last_reviewed": "2026-09-05",
+      "dropped": "2026-09-06"
     },
     {
       "slug": "remote",

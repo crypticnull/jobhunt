@@ -103,7 +103,7 @@ class Digest(unittest.TestCase):
         self.assertEqual(sum(len(v) for v in self.piles().values()), 0, "already surfaced and unchanged")
         # comp moves on the review posting: it changed, so it comes back, now in apply
         pid = self.ids["review"]
-        p = posting(source="greenhouse", source_id="2", company_slug="brand", url="https://x/2", remote="remote", location="Remote - US", title="Senior Motion Designer", description="python tooling", comp_min=150000, comp_max=160000)
+        p = posting(source="greenhouse", source_id="2", company_slug="brand", url="https://x/2", remote="remote", location="Remote - US", title="Senior Motion Designer", description="python tooling and our motion system", comp_min=150000, comp_max=160000)
         self.s.upsert(p, "2026-09-05T00:00:00+00:00")
         self.rescore(pid)
         self.assertIn(pid, self.piles()["apply"])
@@ -249,6 +249,17 @@ class Digest(unittest.TestCase):
                     if p.startswith("ashby/flawless-ai"))
         self.assertIn("answers", line)
         self.assertNotIn("zero postings", line)
+
+    def test_a_company_off_the_list_is_not_nominated_for_dropping(self):
+        """company_yield reads the postings table, which keeps every row a
+        company ever produced. The W36 digest asked Matt to drop monks and
+        elastic and both had been off the list since the 5th, so the command it
+        printed would have done nothing."""
+        for i in range(20):
+            self.s.upsert(posting(source="greenhouse", source_id=f"g{i}", company_slug="gone",
+                                  url=f"https://x/g{i}", title="Backend Engineer"), "2026-09-05T00:00:00+00:00")
+        rows = digest.dead_weight(self.s, self.r, {"kept": {"slug": "kept"}})
+        self.assertEqual([ln for ln in rows if "gone" in ln], [])
 
     def test_all_sources_answered(self):
         md, _ = digest.build(self.s, self.r, now=NOW)

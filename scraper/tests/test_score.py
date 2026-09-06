@@ -99,7 +99,7 @@ class Gates(unittest.TestCase):
         fine = score(row(comp_min=90 * 2080, comp_max=100 * 2080, comp_found=1, employment_type="contract"), rules(), NOW, TIER2)
         self.assertEqual(fine["pile"], "review")
         salaried = score(row(comp_min=40 * 2080, comp_max=50 * 2080, comp_found=1), rules(), NOW, TIER2)
-        self.assertNotEqual(salaried["pile"], "logged", "the hourly floor is for contract work only")
+        self.assertNotIn("hourly floor", salaried["drop_reason"] or "", "the hourly floor is for contract work only")
 
     def test_remote_in_body_only_is_a_flag_and_absent_is_a_drop(self):
         body = score(row(remote_class="unclear", location="", description="This role is remote."), rules(), NOW, TIER2)
@@ -153,7 +153,7 @@ class Disqualifiers(unittest.TestCase):
         stale = score(row(posted_at="2026-07-01T00:00:00+00:00", last_seen="2026-08-01T00:00:00+00:00"), rules(), NOW, TIER2)
         self.assertEqual(stale["drop_reason"], "stale")
         still_up = score(row(posted_at="2026-07-01T00:00:00+00:00"), rules(), NOW, TIER2)
-        self.assertIsNone(still_up["drop_reason"], "old but still listed is not stale")
+        self.assertNotEqual(still_up["drop_reason"], "stale", "old but still listed is not stale")
 
     def test_a_game_engine_is_always_a_flag(self):
         r = score(row(description="Unreal Engine and custom shader work."), rules(), NOW, TIER2)
@@ -284,7 +284,7 @@ class Points(unittest.TestCase):
         and no named human is exactly the posting a human should glance at."""
         r = score(row(), rules(), NOW, TIER2)
         self.assertEqual(r["pile"], "review")
-        self.assertEqual(r["score"], 51)
+        self.assertEqual(r["score"], 46, "the motion leg is the longform vocabulary and stops paying")
         self.assertEqual(r["title_tier"], "C")
 
     def test_title_tier_b_needs_a_technical_leg(self):
@@ -457,12 +457,26 @@ class GuidingPrinciples(unittest.TestCase):
             rules(), NOW, TIER2,
         )
         self.assertEqual(r["title_tier"], "A")
-        self.assertIn("product", r["legs_hit"])
+        self.assertIn("product-motion", r["legs_hit"])
         self.assertEqual(r["pile"], "apply")
 
-    def test_ui_animation_scores_the_product_leg(self):
+    def test_ui_animation_scores_the_product_motion_leg(self):
         r = score(row(title="Senior Product Designer", description="UI animation and interface animation for the app, plus Python tooling."), rules(), NOW, TIER2)
-        self.assertIn("product", r["legs_hit"])
+        self.assertIn("product-motion", r["legs_hit"])
+        self.assertNotIn("product", r["legs_hit"], "no figma, no design system, so no product design leg")
+
+    def test_figma_alone_no_longer_buys_what_a_motion_system_buys(self):
+        """The whole reason for the split. One list was doing two jobs, so a
+        posting saying figma scored the intersection exactly as hard as one
+        saying you will own our motion system, and in W36 that put 39 of 51
+        surfaced postings on the product leg with not one of them naming motion
+        or animation in the title."""
+        design = score(row(title="Senior Product Designer", description="Figma, design systems and design handoff."), rules(), NOW, TIER2)
+        motion = score(row(title="Senior Product Designer", description="You will own our motion system and ship it in Rive."), rules(), NOW, TIER2)
+        self.assertEqual(design["legs_hit"], ["product"])
+        self.assertEqual(motion["legs_hit"], ["product-motion"])
+        self.assertEqual(fired(design, "intersection")["value"], 2)
+        self.assertEqual(fired(motion, "intersection")["value"], 10)
 
 
 class Rebalance(unittest.TestCase):
@@ -697,7 +711,7 @@ class RemoteGateReadsTheBody(unittest.TestCase):
 
     def test_a_payroll_default_flag_does_not_hold_a_tiered_title(self):
         r = score(row(title="Senior Design Engineer", location="Remote - New York",
-                      description="Figma, prototyping, design systems, TypeScript, product motion.",
+                      description="Figma, design systems, TypeScript, and you will own our motion tokens and the UI animation.",
                       comp_min=200000, comp_max=260000, comp_found=1), rules(), NOW, TIER1)
         self.assertTrue(any("payroll-default" in f for f in r["flags"]))
         self.assertEqual(fired(r, "remote")["value"], 12)
@@ -794,7 +808,7 @@ class TitlesAfterTheReview(unittest.TestCase):
     def test_lottie_and_rive_unlock_tier_b(self):
         r = self.product("Product Designer", "Lottie and Rive animation for the app.")
         self.assertEqual(r["title_tier"], "B")
-        self.assertIn("product", r["legs_hit"])
+        self.assertIn("product-motion", r["legs_hit"])
 
 
 class ReadableReasons(unittest.TestCase):
