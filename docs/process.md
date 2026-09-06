@@ -41,6 +41,13 @@ that fails writes one line to `data/local/nightly-status.log`, and the
 Sunday digest prints those lines in its source health footer, so a job
 that stops says so where it can be read.
 
+The footer reports what is broken now rather than what broke this week. A
+source whose latest poll succeeded drops out of it, however many times it
+failed before that. Workable rate-limited four companies on the 5th and
+answered all four on the 6th, and the footer still led with the four 429s,
+which is how a footer stops being read and the next real outage goes past
+unnoticed.
+
 Every poll writes `data/last-run.json` and the nightly job pushes it, so a
 job that quietly stopped is visible in the repo rather than only in its
 silence. The digest says so at the top when the last poll is two days old
