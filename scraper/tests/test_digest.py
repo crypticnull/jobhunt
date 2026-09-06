@@ -80,7 +80,9 @@ class Digest(unittest.TestCase):
 
     def test_write_marks_and_unchanged_stay_quiet(self):
         with tempfile.TemporaryDirectory() as d:
-            path, n = digest.write(self.s, self.r, Path(d), COMPANIES, NOW)
+            path, n, page = digest.write(self.s, self.r, Path(d), COMPANIES, NOW)
+            self.assertTrue(page.exists(), "the page is written beside the markdown")
+            self.assertEqual(page.suffix, ".html")
             self.assertTrue(path.name.endswith("W36.md"))
             self.assertEqual(n, 2)
             text = path.read_text(encoding="utf-8")
