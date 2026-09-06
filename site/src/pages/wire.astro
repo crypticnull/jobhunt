@@ -1,0 +1,188 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import { site } from "../site.config.mjs";
+import { CHAPTER_ORDER } from "../schemas.mjs";
+
+// The wireframe as a record rather than a drawing.
+//
+// Every slot on the site is either filled by a record or masked, and this page
+// counts both from the same collections the pages read, so it cannot drift
+// from what a visitor actually gets. It is the content to-do list and the
+// interaction spec in one place, and it empties itself as records land.
+const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
+const chapters = await getCollection("chapters");
+const proof = await getCollection("proof");
+const writing = await getCollection("writing");
+
+const pending = (p) => p.data.hero.src.format === "svg";
+const chaptersOf = (id) => chapters.filter((c) => c.data.project === id).length;
+
+const home = [
+  { slot: "Hero sentence", have: Boolean(site.hero), need: "Written" },
+  { slot: "Hero motion", have: false, need: "Undecided. A loop, a still, or nothing" },
+  { slot: "Build rows", have: proof.filter((p) => p.data.linked_projects.length === 0).length > 0, need: "Records" },
+  {
+    slot: "Work tiles",
+    have: projects.filter((p) => p.data.featured && !pending(p)).length > 0,
+    need: `${projects.filter((p) => p.data.featured && pending(p)).length} hero stills`,
+  },
+  { slot: "Writing rows", have: writing.length > 0, need: "Posts" },
+  { slot: "About", have: true, need: "Written" },
+  { slot: "Contact address", have: Boolean(site.email), need: "Waiting on the domain" },
+];
+
+const study = projects.map((p) => {
+  const has = chaptersOf(p.id);
+  return {
+    title: p.data.title,
+    id: p.id,
+    film: !pending(p) || (p.data.video && p.data.video.provider !== "none"),
+    facts: p.data.tools.length > 0,
+    chapters: has,
+    stills: p.data.stills.length,
+    process: p.data.process.length,
+  };
+});
+
+const filled = home.filter((h) => h.have).length;
+const totalChapters = projects.length * CHAPTER_ORDER.length;
+const haveChapters = chapters.length;
+
+// Built means it is in the CSS or a component script today. Proposed means the
+// decision is still open, and those are the rows worth arguing about while the
+// boxes are still boxes.
+const interactions = [
+  { name: "Link hover", trigger: "Pointer over any link", response: "Colour to marker, underline to current colour", token: "--t-quick, --ease-out", state: "built" },
+  { name: "Index row hover", trigger: "Pointer over a build or writing row", response: "Row fills with field", token: "--t-quick, --ease-out", state: "built" },
+  { name: "Chapter mark", trigger: "A chapter scrolls into the top 40 percent", response: "The rail mark slides under its label", token: "--t-slide, --ease-out, cut under reduce", state: "built" },
+  { name: "Focus ring", trigger: "Keyboard focus", response: "Two pixel ring, plate variant on dark panels", token: "none, never animated", state: "built" },
+  { name: "Anchor jump", trigger: "Nav or rail link", response: "Smooth scroll, auto under reduce", token: "scroll-behavior", state: "built" },
+  { name: "Preferences", trigger: "Theme or motion radio", response: "Repaint, no transition, stamped before paint on the next load", token: "none, deliberately", state: "built" },
+  { name: "Film", trigger: "Play on the poster", response: "Native controls in a ratio-locked box, preload none, no shift", token: "none", state: "built" },
+  { name: "Hero entry", trigger: "First paint", response: "Open. The sentence has four seconds to land and motion could help or cost", token: "--t-fade would fit", state: "proposed" },
+  { name: "Tile to study", trigger: "Work tile click", response: "Open. A plain navigation, or the still holds while the page changes", token: "--t-fade would fit", state: "proposed" },
+  { name: "Still to full size", trigger: "Click a still or a board", response: "Open. A lightbox, a native dialog, or nothing at all", token: "--t-fade would fit", state: "proposed" },
+  { name: "Recording dot", trigger: "A clip is playing", response: "Open. The token exists for it and nothing uses it yet", token: "--t-blink", state: "proposed" },
+];
+const built = interactions.filter((i) => i.state === "built").length;
+---
+
+<Layout title="Wireframe" description="Every slot on the site, filled or masked, and every interaction, built or still open." noindex>
+  <h1>Wireframe</h1>
+  <p class="lede">
+    The site renders a masked box wherever a record is missing, so the layout, the motion and the interactions can be
+    judged at true size before the content exists. Each box disappears on its own the day its record lands, which is why
+    there is no separate wireframe to keep in step. It is the same site.
+  </p>
+
+  <p class="prose">
+    Wire mode is off for a visitor and lives in the URL rather than in preferences, because it is a tool for building
+    the site rather than a choice for reading it. Turn it on with <a href="/?wire">?wire</a> and it follows you from page
+    to page until the tab closes. <a href="/?nowire">?nowire</a> ends it.
+  </p>
+
+  <h2>Slots on the home page</h2>
+  <p class="lede">{filled} of {home.length} filled.</p>
+  <table class="wire-table">
+    <thead><tr><th>Slot</th><th>State</th><th>Waiting on</th></tr></thead>
+    <tbody>
+      {home.map((h) => (
+        <tr>
+          <td>{h.slot}</td>
+          <td class={h.have ? "" : "want"}>{h.have ? "filled" : "masked"}</td>
+          <td>{h.have ? "" : h.need}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <h2>Slots in the studies</h2>
+  <p class="lede">{haveChapters} of {totalChapters} chapters written, across {projects.length} records.</p>
+  <table class="wire-table">
+    <thead><tr><th>Study</th><th>Film</th><th>Tools</th><th>Chapters</th><th>Stills</th><th>Process</th></tr></thead>
+    <tbody>
+      {study.map((s) => (
+        <tr>
+          <td><a href={`/work/${s.id}?wire`}>{s.title}</a></td>
+          <td class={s.film ? "" : "want"}>{s.film ? "yes" : "masked"}</td>
+          <td class={s.facts ? "" : "want"}>{s.facts ? "yes" : "masked"}</td>
+          <td class={s.chapters ? "" : "want"}>{s.chapters} of {CHAPTER_ORDER.length}</td>
+          <td class={s.stills ? "" : "want"}>{s.stills}</td>
+          <td class={s.process ? "" : "want"}>{s.process}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <h2>Interactions</h2>
+  <p class="lede">
+    {built} of {interactions.length} built. The rest are open decisions, and they are worth settling while the content
+    is still boxes, because an interaction designed around real photographs tends to be an interaction that only works
+    with those photographs. <a href="/wire/motion">The motion lab</a> runs every option for real so the choice is made
+    by feel, and it writes back one line naming the picks.
+  </p>
+  <table class="wire-table">
+    <thead><tr><th>Interaction</th><th>Trigger</th><th>Response</th><th>Motion</th></tr></thead>
+    <tbody>
+      {interactions.map((i) => (
+        <tr class={i.state === "proposed" ? "open" : ""}>
+          <td>{i.name}</td>
+          <td>{i.trigger}</td>
+          <td>{i.response}</td>
+          <td class="mono">{i.token}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <h2>Two durations with nothing behind them</h2>
+  <p class="prose">
+    The record declares four durations and the system page gives each one a play button, but only <code>--t-quick</code>
+    and <code>--t-slide</code> appear anywhere in the site. <code>--t-fade</code> and <code>--t-blink</code> are
+    documented movements that nothing performs. Either the three proposed interactions above get built and claim them,
+    or they come out of the record. A design system that documents motion the product does not have is a brochure, and
+    this one is meant to be the opposite of that.
+  </p>
+
+  <p class="prose"><a href="/system">The token record and the motion table</a> carry the durations themselves.</p>
+</Layout>
+
+<style>
+  .wire-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0 3rem;
+    font-size: 0.85rem;
+  }
+  .wire-table th,
+  .wire-table td {
+    text-align: left;
+    padding: 0.6rem 1rem 0.6rem 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  .wire-table th {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .wire-table .want {
+    color: var(--marker);
+  }
+  .wire-table .mono {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  /* An open decision is the row to argue with, so it is the row that reads
+     differently. A left rule rather than a fill, because a filled row would
+     read as selected. */
+  .wire-table tr.open td:first-child {
+    box-shadow: inset 2px 0 0 var(--marker);
+    padding-left: 0.75rem;
+  }
+</style>

@@ -53,6 +53,24 @@ job that quietly stopped is visible in the repo rather than only in its
 silence. The digest says so at the top when the last poll is two days old
 or more.
 
+## Working on the site
+
+`dev.cmd` at the repo root starts it from anywhere, installs on the first run
+and whenever a pulled lockfile is newer than `node_modules`, and serves with
+`--host` so a phone on the same network can open it. "Works on a phone" is a
+stated non-negotiable and a laptop is a bad place to check it.
+
+```
+X:\_CLAUDE\26_09_01_Job_Hunt\jobhunt\dev.cmd
+```
+
+Four addresses worth knowing. `/?wire` is the wireframe, a masked box wherever
+a record is missing, and it follows you into the studies until the tab closes.
+`/wire` is the slot inventory and the content to-do list, generated from the
+same collections the pages read. `/wire/motion` runs the open interaction
+decisions so they can be settled by feel. `/system` is the token record
+rendered as a page.
+
 ## Any hand run
 
 `run.cmd` is the launcher at the repo root, so a command works from a

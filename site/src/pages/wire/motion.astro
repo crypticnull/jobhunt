@@ -1,0 +1,403 @@
+---
+import Layout from "../../layouts/Layout.astro";
+
+// The four interactions the wireframe left open, each one running for real so
+// the choice is made by feel rather than by description. Every option names
+// the token it would claim, because deciding the interaction is also deciding
+// which duration it spends, and two of the four durations in the record are
+// currently documented and performed nowhere.
+//
+// Pick one per decision and the page writes the line to hand back.
+const decisions = [
+  {
+    id: "hero",
+    n: "A",
+    title: "Hero entry",
+    ask: "First paint. The sentence has four seconds to say what you are before a visitor files you as a motion designer. Motion can carry that or spend it.",
+    options: [
+      { id: "A0", name: "Cut", token: "none", note: "The sentence is there on the first frame. Fastest to read, and the most confident thing a page can do." },
+      { id: "A1", name: "Fade up", token: "--t-fade", note: "Eight pixels and an opacity ramp. Costs 160ms of reading time and buys a sense that the page arrived rather than appeared." },
+      { id: "A2", name: "Rule, then text", token: "--t-slide then --t-fade", note: "A marker rule draws across, the sentence follows. Reads as drafting, which is the system's whole idea, but it is the slowest and it sequences." },
+    ],
+  },
+  {
+    id: "tile",
+    n: "B",
+    title: "Work tile to study",
+    ask: "The click from the index into a study. The still is the same image on both pages, which is the one fact an interaction here can use.",
+    options: [
+      { id: "B0", name: "Plain", token: "none", note: "A navigation. Nothing to maintain, nothing to go wrong on a slow connection." },
+      { id: "B1", name: "Press", token: "--t-quick", note: "The tile acknowledges the press and nothing else. Cheap, and it is the part people actually notice." },
+      { id: "B2", name: "The still holds", token: "--t-fade", note: "The image persists across the navigation and the rest of the page changes around it. The strongest signal of craft here, and the only option with a real failure mode." },
+    ],
+  },
+  {
+    id: "still",
+    n: "C",
+    title: "Still to full size",
+    ask: "Boards and styleframes are the proof, and a 20rem grid tile is not where anyone judges a frame. This one matters more than it looks.",
+    options: [
+      { id: "C0", name: "Nothing", token: "none", note: "The grid is the whole experience. Honest, and it wastes the process material the studies are built around." },
+      { id: "C1", name: "Dialog", token: "--t-fade", note: "Native dialog, backdrop, escape closes it, focus returns. The accessible answer with the least code." },
+      { id: "C2", name: "Grows from the tile", token: "--t-fade", note: "The frame scales up from where it sat. Better sense of place, more to get wrong on a phone." },
+    ],
+  },
+  {
+    id: "dot",
+    n: "D",
+    title: "The recording dot",
+    ask: "The token record declares --t-blink for a dot that marks a clip playing. Nothing on the site performs it.",
+    options: [
+      { id: "D0", name: "Drop it", token: "removes --t-blink", note: "The record stops documenting a movement the product does not have." },
+      { id: "D1", name: "Build it", token: "--t-blink", note: "A marker dot beside a playing clip. One more moving thing on a page whose job is to be read." },
+    ],
+  },
+];
+---
+
+<Layout title="Motion lab" description="The four open interaction decisions, running, so the choice is made by feel." noindex>
+  <h1>Motion lab</h1>
+  <p class="lede">
+    Four interactions the wireframe left open. Each option runs here for real, on the same tokens the site uses, so
+    turning motion down in the footer turns these down too and you can check the reduced column is a page that still
+    works rather than a page that lost something.
+  </p>
+  <p class="prose">
+    Pick one per decision and the line at the bottom is the answer to hand back. <a href="/wire">The slot inventory</a>
+    is next door, and <a href="/system">the token record</a> holds the durations themselves.
+  </p>
+
+  {
+    decisions.map((d) => (
+      <section class="dec" id={d.id}>
+        <h2><span class="n">{d.n}</span> {d.title}</h2>
+        <p class="ask">{d.ask}</p>
+        <ul class="opts">
+          {d.options.map((o) => (
+            <li>
+              <div class="stage" data-stage={o.id}>
+                <div class="specimen" data-spec={o.id}>
+                  {d.id === "hero" && (
+                    <>
+                      <span class="rule" />
+                      <strong>I realize visions, and build the pipelines that do the work.</strong>
+                      <em>Production 3D and generative video running locally.</em>
+                    </>
+                  )}
+                  {d.id === "tile" && (
+                    <>
+                      <span class="tile" />
+                      <span class="tile-meta">Quest 2025</span>
+                    </>
+                  )}
+                  {d.id === "still" && (
+                    <>
+                      <span class="thumb" />
+                      <span class="sheet" />
+                    </>
+                  )}
+                  {d.id === "dot" && (
+                    <>
+                      <span class="dot" />
+                      <span class="tile-meta">Playing</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div class="opt-head">
+                <label>
+                  <input type="radio" name={d.id} value={o.id} />
+                  <span class="opt-id">{o.id}</span> {o.name}
+                </label>
+                <button type="button" data-play={o.id} disabled>Play</button>
+              </div>
+              <p class="token">{o.token}</p>
+              <p class="note">{o.note}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+
+  <section class="dec" id="answer">
+    <h2><span class="n">E</span> The answer</h2>
+    <p class="ask">Four picks, one line. Nothing here is saved anywhere but this browser.</p>
+    <p class="picked" id="picked" aria-live="polite">Nothing picked yet.</p>
+  </section>
+</Layout>
+
+<script>
+  // Same rule as the system page: one movement per press, nothing plays on
+  // load or on scroll, and the token the option names is the token the
+  // specimen runs, so the reduced column is what a visitor who asked for less
+  // motion actually receives.
+  const restart = (el: HTMLElement, cls: string) => {
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+  };
+  for (const b of document.querySelectorAll<HTMLButtonElement>("button[data-play]")) {
+    b.disabled = false;
+    b.addEventListener("click", () => {
+      const id = b.dataset.play!;
+      const spec = document.querySelector<HTMLElement>(`[data-spec="${id}"]`);
+      if (spec) restart(spec, "run");
+    });
+  }
+  const out = document.getElementById("picked");
+  const KEY = "motion-picks";
+  const picks: Record<string, string> = (() => {
+    try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; }
+  })();
+  const order = ["hero", "tile", "still", "dot"];
+  const paint = () => {
+    const line = order.map((k) => picks[k]).filter(Boolean);
+    if (out) out.textContent = line.length ? line.join(" ") : "Nothing picked yet.";
+  };
+  for (const r of document.querySelectorAll<HTMLInputElement>('input[type="radio"]')) {
+    if (picks[r.name] === r.value) r.checked = true;
+    r.addEventListener("change", () => {
+      picks[r.name] = r.value;
+      try { localStorage.setItem(KEY, JSON.stringify(picks)); } catch {}
+      paint();
+    });
+  }
+  paint();
+</script>
+
+<style>
+  .dec {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.5rem;
+    margin: 3.5rem 0 0;
+  }
+  .dec .n {
+    font-family: var(--mono);
+    color: var(--muted);
+    font-size: 0.8em;
+    margin-right: 0.5rem;
+  }
+  .ask {
+    max-width: var(--measure);
+    color: var(--muted);
+  }
+  .opts {
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: 2rem var(--grid-gap);
+  }
+  /* A fixed box per specimen, so a movement never reflows the page around it
+     and the three options can be compared without anything jumping. */
+  .stage {
+    height: 8.5rem;
+    border: 1px solid var(--rule);
+    background: var(--field);
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    overflow: hidden;
+  }
+  .specimen {
+    display: grid;
+    justify-items: center;
+    gap: 0.4rem;
+    text-align: center;
+    width: 100%;
+  }
+  .specimen strong {
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    line-height: 1.25;
+    font-weight: 600;
+  }
+  .specimen em {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-style: normal;
+  }
+  .specimen .rule {
+    height: 2px;
+    width: 100%;
+    background: var(--marker);
+    transform-origin: left;
+  }
+  .specimen .tile {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--rule);
+  }
+  .specimen .tile-meta {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .specimen .thumb {
+    width: 4rem;
+    aspect-ratio: 16 / 9;
+    background: var(--rule);
+  }
+  .specimen .sheet {
+    position: absolute;
+    inset: 1rem;
+    background: var(--plate);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .stage {
+    position: relative;
+  }
+  .specimen .dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: var(--marker);
+  }
+
+  /* ---- The options, each running the token it names --------------------- */
+
+  /* A0, B0, C0, D0 do nothing on purpose, and there is no rule for them. */
+
+  [data-spec="A1"].run strong,
+  [data-spec="A1"].run em {
+    animation: rise var(--t-fade) var(--ease-out) both;
+  }
+  [data-spec="A1"].run em {
+    animation-delay: var(--t-quick);
+  }
+  [data-spec="A1"] .rule {
+    visibility: hidden;
+  }
+
+  [data-spec="A2"] .rule {
+    transform: scaleX(0);
+  }
+  [data-spec="A2"].run .rule {
+    animation: draw var(--t-slide) var(--ease-out) both;
+  }
+  [data-spec="A2"].run strong,
+  [data-spec="A2"].run em {
+    animation: rise var(--t-fade) var(--ease-out) both;
+    animation-delay: var(--t-slide);
+  }
+
+  [data-spec="A0"] .rule {
+    visibility: hidden;
+  }
+
+  [data-spec="B1"].run .tile {
+    animation: press var(--t-quick) var(--ease-out) both;
+  }
+
+  [data-spec="B2"].run .tile {
+    animation: hold var(--t-fade) var(--ease-out) both;
+  }
+  [data-spec="B2"].run .tile-meta {
+    animation: fadeout var(--t-fade) var(--ease-in) both;
+  }
+
+  [data-spec="C1"].run .sheet {
+    animation: sheetin var(--t-fade) var(--ease-out) both;
+  }
+  [data-spec="C2"] .sheet {
+    transform-origin: center;
+  }
+  [data-spec="C2"].run .sheet {
+    animation: grow var(--t-fade) var(--ease-out) both;
+  }
+
+  [data-spec="D1"].run .dot {
+    animation: blink var(--t-blink) steps(2, jump-none) 3;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(0.5rem); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes draw {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+  @keyframes press {
+    50% { transform: scale(0.985); }
+  }
+  @keyframes hold {
+    from { transform: scale(1); }
+    to { transform: scale(1.35); }
+  }
+  @keyframes fadeout {
+    to { opacity: 0; }
+  }
+  @keyframes sheetin {
+    from { opacity: 0; }
+    to { opacity: 0.92; }
+  }
+  @keyframes grow {
+    from { opacity: 0; transform: scale(0.35); }
+    to { opacity: 0.92; transform: scale(1); }
+  }
+  @keyframes blink {
+    from { opacity: 1; }
+    to { opacity: 0.15; }
+  }
+
+  .opt-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0.75rem 0 0.25rem;
+  }
+  .opt-head label {
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  .opt-id {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--marker);
+    letter-spacing: 0.06em;
+  }
+  .opt-head button {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--rule);
+    padding: 0.25rem 0.6rem;
+    cursor: pointer;
+  }
+  .opt-head button:hover {
+    border-color: var(--marker);
+    color: var(--marker);
+  }
+  .opt-head button[disabled] {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .token {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin: 0 0 0.4rem;
+  }
+  .note {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin: 0;
+    max-width: none;
+  }
+  .picked {
+    font-family: var(--mono);
+    font-size: 1rem;
+    letter-spacing: 0.12em;
+    color: var(--marker);
+  }
+</style>
