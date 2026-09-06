@@ -291,10 +291,22 @@ class Store:
             "JOIN (SELECT posting_id, MAX(id) AS id FROM status_log GROUP BY posting_id) last ON last.id = s.id "
             "GROUP BY s.state"
         ).fetchall()
+        # Description coverage, per source and only over open postings, because
+        # a posting with no body is one he cannot judge and one the scorer read
+        # nothing from. Split by source so an empty column names the adapter to
+        # go and fix rather than leaving it as a whole-store average.
+        described = self.db.execute(
+            "SELECT source, COUNT(*) AS n, "
+            "SUM(CASE WHEN description IS NOT NULL AND TRIM(description) != '' THEN 1 ELSE 0 END) AS with_body, "
+            "MAX(LENGTH(description)) AS longest "
+            "FROM postings WHERE closed_at IS NULL GROUP BY source ORDER BY n DESC"
+        ).fetchall()
         out = {
             "postings": q("SELECT COUNT(*) FROM postings"),
             "open": q("SELECT COUNT(*) FROM postings WHERE closed_at IS NULL"),
             "comp_found": q("SELECT COUNT(*) FROM postings WHERE comp_found = 1"),
+            "described": {r["source"]: {"open": r["n"], "with_body": r["with_body"] or 0,
+                                        "longest": r["longest"] or 0} for r in described},
             "by_state": {r["state"]: r["n"] for r in by_state},
             "polls": q("SELECT COUNT(*) FROM poll_log"),
             "poll_errors": q("SELECT COUNT(*) FROM poll_log WHERE ok = 0"),

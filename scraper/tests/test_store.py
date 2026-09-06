@@ -114,3 +114,23 @@ class Status(unittest.TestCase):
         self.assertEqual((st["postings"], st["open"], st["comp_found"]), (2, 2, 1))
         self.assertEqual(st["by_state"], {"applied": 1, "new": 1})
         self.assertEqual((st["polls"], st["poll_errors"]), (2, 1))
+
+    def test_stats_counts_bodies_per_source(self):
+        """A posting with no body is one he cannot judge, so the gap is counted
+        rather than averaged away, and per source so it names the adapter."""
+        # Distinct titles, because same company plus same title from another
+        # source is one role seen twice and upsert re-keys rather than adds.
+        self.s.upsert(p(source_id="2", title="Technical Artist", description="a real body"))
+        self.s.upsert(p(source="lever", source_id="3", title="Pipeline TD", url="https://x/3", description=""))
+        self.s.upsert(p(source="lever", source_id="4", title="Motion Lead", url="https://x/4", description=None))
+        d = self.s.stats()["described"]
+        self.assertEqual(d["greenhouse"], {"open": 2, "with_body": 1, "longest": len("a real body")})
+        self.assertEqual(d["lever"], {"open": 2, "with_body": 0, "longest": 0})
+
+    def test_stats_ignores_closed_postings_when_counting_bodies(self):
+        """Coverage is about what he is being shown, and a closed posting is not."""
+        pid, _ = self.s.upsert(p(source_id="9", title="Tools Engineer", url="https://x/9", description=""))
+        self.assertEqual(self.s.stats()["described"]["greenhouse"]["open"], 2)
+        self.s.db.execute("UPDATE postings SET closed_at = ? WHERE id = ?", ("2026-09-06", pid))
+        self.s.db.commit()
+        self.assertEqual(self.s.stats()["described"]["greenhouse"]["open"], 1)

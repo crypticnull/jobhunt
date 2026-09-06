@@ -307,6 +307,9 @@ def cmd_stats(args):
             lines.append(f"- seen {p['seen']}, surfaced {p['surfaced']}, applied {t.get('applied', 0)}, "
                          f"screens {t.get('screen', 0)}, loops {t.get('loop', 0)}, offers {t.get('offer', 0)}, rejected {t.get('rejected', 0)}, "
                          f"polls {p['polls']} with {p['poll_errors']} errors")
+        body = sum(d["with_body"] for d in s["described"].values())
+        lines.append(f"- bodies: {body} of {s['open']} open postings have one, "
+                     + ", ".join(f"{k} {v['with_body']}/{v['open']}" for k, v in s["described"].items()))
         lines.append(f"- store: {s['postings']} postings, {s['open']} open, {s['comp_found']} with comp, "
                      + ", ".join(f"{k} {v}" for k, v in sorted(s["by_state"].items())))
         print("\n".join(lines))
@@ -314,6 +317,13 @@ def cmd_stats(args):
     print(f"postings {s['postings']}, open {s['open']}, with comp {s['comp_found']}")
     print("by state: " + ", ".join(f"{k} {v}" for k, v in sorted(s["by_state"].items())))
     print(f"polls {s['polls']}, errors {s['poll_errors']}")
+    # A posting with no body is one he cannot judge, so the coverage prints
+    # every time rather than behind a flag, and it prints per source because
+    # that is the column that names which adapter to go and look at.
+    for src, d in s["described"].items():
+        gap = d["open"] - d["with_body"]
+        note = "" if not gap else f"  <- {gap} with no body"
+        print(f"  {src:16} {d['with_body']:4}/{d['open']:<4} described, longest {d['longest']:6}{note}")
     if "period" in s:
         p = s["period"]
         print(f"since {p['since']}: seen {p['seen']}, surfaced {p['surfaced']}, " + ", ".join(f"{k} {v}" for k, v in sorted(p["transitions"].items())))
